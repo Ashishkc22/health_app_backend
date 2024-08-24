@@ -1,0 +1,239 @@
+
+
+
+POST http://localhost:6060/auth/login
+Content-Type: application/json
+
+{
+    "email":"7rogyam@gmail.com",
+    "password":"123123@7489",
+    "device_id":"testID",
+    "role": "ADMIN"
+}
+
+###
+
+GET http://localhost:6060/auth/users?token=7Nfim8TpZ9ojpxAbovweD7&role=TL&onlyInfo=true
+
+###
+
+GET http://localhost:6060/auth/users?token=7Nfim8TpZ9ojpxAbovweD7
+
+###
+
+GET http://localhost:6060/auth/user?token=7Nfim8TpZ9ojpxAbovweD7
+
+
+###
+
+GET http://localhost:6060/auth/teamLeaderId?token=7Nfim8TpZ9ojpxAbovweD7&tlId=TL99016
+
+###
+
+
+GET http://localhost:6060/auth/single/63cb7868bb9f03804d2a64b5?token=7Nfim8TpZ9ojpxAbovweD7
+
+###
+PATCH http://localhost:6060/auth/user/63cb7868bb9f03804d2a64b5?token=7Nfim8TpZ9ojpxAbovweD7
+Content-Type: application/json
+
+{
+    "name": "NABEEL"
+}
+###
+
+POST http://localhost:6060/auth/register
+Content-Type: application/json
+
+{
+    "phone":"7976729755",
+    "password":"Lokesh@1234",
+    "device_id": "testID",
+    "email":"lokesh.verma25n@gmail.com",
+    "address":"225A Krishna Enclave, Kharar 140301",
+    "state":"Punjab",
+    "name":"Lokesh Verma",
+    "district":"Rupnagar",
+    "id_proof":{
+        "type":"aadhar",
+        "front":"",
+        "back":""
+    },
+    "emergency_contact":"7976729755",
+    "team_leader_id":"1543",
+    "lat": 35.656453556436,
+    "lon": 71.53452342345
+}
+
+###
+
+GET http://localhost:6060/cards?token=7Nfim8TpZ9ojpxAbovweD7&responseType=LIST&mode=ADMIN
+
+###
+
+GET http://localhost:6060/cards/63c0fa2c0d8d833e7347cfc7
+
+###
+
+DELETE http://localhost:6060/cards?token=CCBVTiCjXY2Aggj2a5RavK
+Content-Type: application/json
+
+{
+    "id":"63c685f180c39870f5ab4b40"
+}
+
+###
+
+POST http://localhost:6060/cards?token=4kKfJVzW4H3xZUu1LfvBkL
+Content-Type: application/json
+
+{
+    "image": "https://media.istockphoto.com/id/1212960962/photo/young-handsome-man-with-beard-wearing-casual-sweater-and-glasses-over-blue-background.jpg?s=612x612&w=0&k=20&c=OROMM-bo6YlzmnsAfQZDyFfYAskJUHcDKE0XDNfKUwM=",
+    "name": "Lokesh",
+    "gender": "Male",
+    "id_proof": {
+        "type": "aadhar",
+        "value":"123412341234"
+    },
+    "birth_year":"a20a00",
+    "state": "Punjab",
+    "district": "Mohali",
+    "tehsil": "SAS Nagar",
+    "area": "Kharar",
+    "address": "225A, Krishna Enclave",
+    "phone": "9887998663",
+    "father_husband_name":"Prakash Chandra",
+    "blood_group":"B+",
+    "emergency_contact": "7976729755"
+}
+
+
+###
+
+PATCH http://localhost:6060/cards/640b5cffea344d6bcf51fb8a?token=7Nfim8TpZ9ojpxAbovweD7
+Content-Type: application/json
+
+{
+    "status": "UNDELIVERED"
+}
+
+###
+
+GET http://localhost:6060/hospitals?token=D8EDqMrfLdnJo9nhcQjuo2&page=1&limit=5&mode=ADMIN
+
+###
+
+GET http://localhost:6060/hospitals/63c055fd7e7323f297ee9a14?token=Td9HHecJrvD377FchgJmr1
+
+###
+
+DELETE http://localhost:6060/hospitals?token=VHWUVDwpkQf6L1GFWAvt41
+Content-Type: application/json
+
+{
+    "id":"63d8e33edfb1be9e044c6c5c"
+}
+
+###
+
+POST http://localhost:6060/hospitals?token=VHWUVDwpkQf6L1GFWAvt41
+Content-Type: application/json
+
+{
+    "state": "Punjab",
+            "district": "Mohali",
+            "category": "Hospital",
+            "entity_name": "Birla",
+            "reg_no": "1212121212",
+            "established_in": "10-2000",
+            "doctors": [
+                {
+                    "name":"Dr. Manpreet",
+                    "specialization": "Neuro",
+                    "experience": "10 years",
+                    "type": "stay"
+                }
+            ],
+            "basic_facilities": ["test1"],
+            "advance_facilities": ["test2"],
+            "timings": ["12-12-2010"],
+            "address": "225A Krishna enclave",
+            "pincode": "140301",
+            "city": "SAS Nagar",
+            "tel_no": "112212",
+            "mobile_no": "9887999888",
+            "email": "lokesh@gmail.com",
+            "website": "melchtrna.con",
+            "hospital_rates": ["test1"],
+            "discount_ipd": 10.0,
+            "discount_opd": 0.0,
+            "discount_medicine": 10.0,
+            "discount_diagnostic": 0.0,
+            "acknowledge": "test",
+            "auth_sign": "",
+            "date_of_agreement": "12-12-2012",
+            "images": []
+}
+
+
+###
+
+PATCH http://localhost:6060/hospitals/63cae44fdd3973881a14953f?token=UdmoQSmGeibFgcwJNm8heJ
+Content-Type: application/json
+
+{
+    "status":"ENABLE"
+}
+
+###
+
+GET http://localhost:6060/settings/?responseType=d
+
+###
+
+POST http://localhost:6060/settings/
+Content-Type: application/json
+
+{
+            "hospital_category": ["Hospital","Medical","Diagnostic Center","Dental Clinic"],
+            "doctor_specialization": ["Dentist","Neurologist","Cardiologist"],
+            "basic_facilities": ["Wheel chair", "Ambulance"],
+            "advance_facilities": ["Insurance Claim", "MRI"],
+            "hospital_rates": [1000,2000,3000],
+            "discounts":{
+                "ipd": 10,
+                "opd": 5,
+                "medicine": 10,
+                "diagnostic": 0
+            }
+}
+
+###
+
+GET http://localhost:6060/address/gram?type=ADMIN&showHidden=false&tehsilId=63d189dd7ac0cf452d7f3901
+
+###
+//63c681806072b29c2133326e - state
+//63c681806072b29c21333270 - District
+//63d189dd7ac0cf452d7f3901 - Tehsil
+//63e760f0883fd49db87f2eb9 - Gram Panchayat
+
+POST http://localhost:6060/address/gram
+Content-Type: application/json
+
+{
+    "name":"TEst AGar Gam",
+    "gramPanchayatId":"63e760f0883fd49db87f2eb9"
+}
+
+###
+//4kKfJVzW4H3xZUu1LfvBkL
+GET http://localhost:6060/dashboard?token=8DghxTAwisaevMAXrPwLgz&type=ADMIN&duration=TODAY
+
+###
+
+PATCH http://localhost:6060/address/pushData/test
+Content-Type: application/json
+
+###
+GET http://localhost:6060/address/upload/data
