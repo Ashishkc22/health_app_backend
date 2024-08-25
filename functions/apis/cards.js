@@ -38,6 +38,53 @@ router.get("/", async (req, res) => {
       message: "Invalid Token",
     });
   }
+  const userList =
+    (await cardSch.aggregate([
+      {
+        $group: {
+          _id: null,
+          userIds: { $addToSet: "$created_by" },
+        },
+      },
+      {
+        $unwind: {
+          path: "$userIds",
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          let: { userIds: { $toObjectId: "$userIds" } },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$_id", "$$userIds"] }, // Match the converted ObjectId
+              },
+            },
+            {
+              $project: {
+                _id: "$_id",
+                name: "$name",
+                uid: "$uid",
+              },
+            },
+          ],
+          as: "userDetails",
+        },
+      },
+      {
+        $project: {
+          userDetails: { $arrayElemAt: ["$userDetails", 0] },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          users: { $push: "$userDetails" },
+        },
+      },
+    ])) || [];
+
   const tokenUser = await userSch.findById(token.uid);
   if (tokenUser == null || tokenUser.status != "Verified") {
     return res.status(200).json({
@@ -201,6 +248,13 @@ router.get("/", async (req, res) => {
     const totalPrintCardsShowing = await cardSch.countDocuments(x);
     const totalPrintCards = await cardSch.countDocuments({
       status: { $in: ["REPRINT", "SUBMITTED"] },
+      $or: [
+        {
+          created_at: {
+            $lt: moment().startOf("day").hour(10).valueOf(),
+          },
+        },
+      ],
     });
     return res.status(200).json({
       status: "success",
@@ -210,6 +264,7 @@ router.get("/", async (req, res) => {
       total_print_card: totalPrintCards,
       total_print_card_showing: totalPrintCardsShowing,
       data: data,
+      userList: userList[0].users,
     });
   }
   if (Object.keys(qry).length == 0 && req.query.responseType == "COUNT") {
@@ -275,7 +330,11 @@ router.get("/", async (req, res) => {
       return x;
     });
     if (req.query.responseType == "LIST") {
-      const totalCards = await cardSch.countDocuments();
+      const totalCards = await cardSch.countDocuments({
+        $or: [
+          { created_at: { $lt: moment().startOf("day").hour(10).valueOf() } },
+        ],
+      });
       const totalQryCards = await cardSch.countDocuments(qry);
       var x = {};
       for (let v of Object.keys(qry)) {
@@ -287,6 +346,13 @@ router.get("/", async (req, res) => {
       console.log(x);
       const totalPrintCardsShowing = await cardSch.countDocuments(x);
       const totalPrintCards = await cardSch.countDocuments({
+        $or: [
+          {
+            created_at: {
+              $lt: moment().startOf("day").hour(10).valueOf(),
+            },
+          },
+        ],
         status: "SUBMITTED",
       });
       return res.status(200).json({
@@ -300,6 +366,7 @@ router.get("/", async (req, res) => {
         // 'delivered': newList.filter((a) => a.status.toString().toUpperCase() == "DELIVERED").length,
         // 'other': newList.filter((a) => (!(["DELIVERED", "SUBMITTED", "UNDELIVERED"].includes(a.status.toString().toUpperCase())))).length,
         data: newList,
+        userList: userList[0].users,
       });
     }
     var finalList = Array();
