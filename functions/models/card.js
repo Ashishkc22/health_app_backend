@@ -84,6 +84,7 @@ const cardSchema = new mongoose.Schema({
   },
   status_history: {
     type: Array,
+    default: [],
   },
   isPrintedPreviously: {
     type: Boolean,

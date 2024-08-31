@@ -6,7 +6,7 @@ const userSch = require("../models/user");
 const areaSch = require("../models/area");
 const tehsilSch = require("../models/new_tehsil");
 const bin = require("../models/bin");
-const { isEmpty } = require("lodash");
+const { isEmpty, groupBy } = require("lodash");
 const moment = require("moment/moment");
 
 require("padleft");
@@ -198,7 +198,7 @@ router.get("/", async (req, res) => {
       }
     }
     x.status = { $in: ["REPRINT", "SUBMITTED"] };
-    console.log(x);
+    console.log("total x", x);
     const totalPrintCardsShowing = await cardSch.countDocuments(x);
     const totalPrintCards = await cardSch.countDocuments({
       status: { $in: ["REPRINT", "SUBMITTED"] },
@@ -296,7 +296,8 @@ router.get("/", async (req, res) => {
         }
       }
       x.status = "SUBMITTED";
-      console.log(x);
+      console.log("total x", x);
+
       const totalPrintCardsShowing = await cardSch.countDocuments(x);
       const totalPrintCards = await cardSch.countDocuments({
         $or: [
@@ -306,7 +307,7 @@ router.get("/", async (req, res) => {
             },
           },
         ],
-        status: "SUBMITTED",
+        status: { $in: ["REPRINT", "SUBMITTED"] },
       });
       return res.status(200).json({
         status: "success",
@@ -352,6 +353,322 @@ router.get("/", async (req, res) => {
       data: finalList,
     });
   }
+});
+
+router.get("/to-be-printed", async (req, res) => {
+  if (req.query.token == null) {
+    return res.status(200).json({
+      status: "failed",
+      message: "Invalid Token",
+    });
+  }
+  const token = await tokenSch.findOne({ token: req.query.token });
+  if (token == null) {
+    return res.status(200).json({
+      status: "failed",
+      message: "Invalid Token",
+    });
+  }
+
+  const tokenUser = await userSch.findById(token.uid);
+  if (tokenUser == null || tokenUser.status != "Verified") {
+    return res.status(200).json({
+      status: "failed",
+      message:
+        tokenUser == null
+          ? "Access Denied"
+          : `${tokenUser.status} User: Access Denied`,
+    });
+  }
+  var qry = {};
+  var createdQry = {};
+  if (req.query.from != null && req.query.to != null) {
+    qry.created_at = {
+      $gte: parseInt(req.query.from),
+      $lte: parseInt(req.query.to),
+    };
+  } else {
+    if (req.query.from != null) {
+      createdQry.$gte = parseInt(req.query.from);
+      qry.created_at = createdQry;
+    }
+    if (req.query.to != null) {
+      createdQry.$lte = parseInt(req.query.to);
+      qry.created_at = createdQry;
+    }
+  }
+  if (req.query.duration != null) {
+    console.log(req.query.duration);
+    if (req.query.duration == "TODAY") {
+      const nowDate = new Date(Date.now());
+      qry.created_at = {
+        $gte: new Date(
+          nowDate.getFullYear(),
+          nowDate.getMonth(),
+          nowDate.getDate(),
+          0,
+          0
+        ).getTime(),
+      };
+    } else if (req.query.duration == "THIS WEEK") {
+      const nowDate = new Date(Date.now());
+      const weekDay = nowDate.getDay();
+      qry.created_at = {
+        $gte:
+          new Date(
+            nowDate.getFullYear(),
+            nowDate.getMonth(),
+            nowDate.getDate(),
+            0,
+            0
+          ).getTime() -
+          weekDay * 24 * 60 * 60 * 1000,
+      };
+    } else if (req.query.duration == "THIS MONTH") {
+      const now = new Date(Date.now());
+      qry.created_at = {
+        $gte: parseInt(
+          new Date(now.getFullYear(), now.getMonth(), 1).valueOf()
+        ),
+      };
+    } else if (req.query.duration == "ALL") {
+    } else if (
+      parseInt(req.query.duration) != null &&
+      parseInt(req.query.duration) != NaN
+    ) {
+      let ltDur =
+        parseInt(req.query.till_duration) != null &&
+        parseInt(req.query.till_duration) != NaN
+          ? parseInt(req.query.till_duration)
+          : parseInt(req.query.duration) + 24 * 60 * 60 * 1000;
+
+      ltDur = moment(ltDur).subtract(1, "hour").valueOf();
+      qry.created_at = {
+        $gte: parseInt(req.query.duration),
+        $lte: ltDur,
+      };
+      console.log(qry);
+    }
+  } else {
+    qry["$or"] = [
+      { created_at: { $lt: moment().startOf("day").hour(10).valueOf() } }, // Condition 1: Created before 10:00 AM
+      // { created_at: { $lte: moment().startOf("day").hour(22).valueOf() } }, // Condition 2: Created before 10:00 PM
+    ];
+  }
+  if (req.query.q != null) {
+    // if((q.toString().length==6) && (parseInt(q.toString())>0)){
+    //     qry.
+    // }
+    qry.$or = [
+      { unique_number: req.query.q },
+      {
+        name: {
+          $regex: req.query.q,
+          $options: "i",
+        },
+      },
+      { phone: req.query.q },
+    ];
+  }
+  if (req.query.status != null) {
+    if (req.query.mode == "ADMIN") {
+      if (req.query.status === "SUBMITTED") {
+        qry.status = {
+          $in: ["REPRINT", "SUBMITTED"],
+        };
+      } else {
+        qry.status = req.query.status;
+      }
+    } else {
+      if (req.query.status.toString().toLowerCase().startsWith("other")) {
+        qry.status = {
+          $in: ["UNDELIVERED", "DISCARDED"],
+        };
+      } else if (
+        req.query.status.toString().toLowerCase().startsWith("submitted")
+      ) {
+        qry.status = {
+          $in: ["PRINTED", "SUBMITTED"],
+        };
+      } else {
+        qry.status = req.query.status;
+      }
+    }
+  }
+  if (req.query.tehsil != null) {
+    qry.tehsil = req.query.tehsil;
+  }
+  if (req.query.state != null) {
+    qry.state = req.query.state;
+  }
+  if (req.query.district != null) {
+    qry.district = req.query.district;
+  }
+  if (req.query.gram_p != null) {
+    qry.area = req.query.gram_p;
+  }
+  if ((req.query.created_by || "") != "") {
+    qry.created_by = req.query.created_by;
+  }
+  let cardData = await cardSch.aggregate([
+    {
+      $match: {
+        status: { $in: ["REPRINT", "SUBMITTED"] },
+        ...qry,
+      },
+    },
+    {
+      $sort: {
+        tehsil: 1,
+        created_at: -1,
+        created_by: 1,
+      },
+    },
+    {
+      $addFields: {
+        unifiedLocation: {
+          $concat: ["$state", "/", "$district", "/", "$tehsil"],
+        },
+      },
+    },
+    {
+      $group: {
+        _id: {
+          location: "$unifiedLocation",
+          createdBy: "$created_by_uid",
+        },
+        cards: { $push: "$$ROOT" },
+        cardCount: { $sum: 1 },
+      },
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "_id.createdBy",
+        foreignField: "uid",
+        pipeline: [
+          {
+            $project: {
+              _id: 0,
+              uid: 1,
+              name: 1,
+              email: 1,
+              phone: 1,
+              team_leader_id: 1, // Include TL ID for the next lookup
+            },
+          },
+        ],
+        as: "userDetails",
+      },
+    },
+    {
+      $unwind: {
+        path: "$userDetails",
+      },
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "userDetails.team_leader_id",
+        foreignField: "tl_id",
+        pipeline: [
+          {
+            $project: {
+              _id: 0,
+              uid: 1,
+              name: 1,
+              email: 1,
+              phone: 1,
+            },
+          },
+        ],
+        as: "teamLeaderDetails",
+      },
+    },
+    {
+      $sort: {
+        cardCount: -1,
+      },
+    },
+    {
+      $skip: parseInt(req.query.page || 0) * parseInt(req.query.limit || "40"), // Skip documents for previous pages
+    },
+    {
+      $limit: parseInt(req.query.limit || "40"), // Limit the number of documents to the page size
+    },
+  ]);
+  console.log("cardIds", cardData);
+  const cardIds = [];
+  cardData = groupBy(cardData, (cardDetails) => {
+    cardDetails.cards.forEach((c) => cardIds.push(c._id));
+    return cardDetails._id.location;
+  });
+
+  // cardIds =
+  //   cardIds?.map(function (doc) {
+  //     return doc._id.toString();
+  //   }) || [];
+
+  const tehsilCount = await cardSch.aggregate([
+    !isEmpty(qry) ? { $match: qry } : null,
+    {
+      $group: {
+        _id: "$tehsil",
+        totalCards: { $sum: 1 },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        tehsil: "$_id",
+        totalCards: 1,
+      },
+    },
+    {
+      $replaceRoot: {
+        newRoot: {
+          $arrayToObject: [[{ k: "$tehsil", v: "$totalCards" }]],
+        },
+      },
+    },
+  ]);
+  let newTehsilCount = {};
+  tehsilCount.forEach((object) => {
+    Object.keys(object).forEach((key) => (newTehsilCount[key] = object[key]));
+  });
+
+  const totalCards = await cardSch.countDocuments();
+  const totalQryCards = await cardSch.countDocuments(qry);
+  var x = {};
+  for (let v of Object.keys(qry)) {
+    if (v != "status") {
+      x[v] = qry[v];
+    }
+  }
+  x.status = { $in: ["REPRINT", "SUBMITTED"] };
+  console.log(x);
+  const totalPrintCardsShowing = await cardSch.countDocuments(x);
+  const totalPrintCards = await cardSch.countDocuments({
+    status: { $in: ["REPRINT", "SUBMITTED"] },
+    $or: [
+      {
+        created_at: {
+          $lt: moment().startOf("day").hour(10).valueOf(),
+        },
+      },
+    ],
+  });
+  return res.status(200).json({
+    status: "success",
+    page_number: req.query.page || "0",
+    total: totalCards,
+    cardIds,
+    total_showing: totalQryCards,
+    total_print_card: totalPrintCards,
+    total_print_card_showing: totalPrintCardsShowing,
+    data: cardData,
+    tehsilCount: newTehsilCount,
+  });
 });
 
 router.get("/card-users", async (req, res) => {

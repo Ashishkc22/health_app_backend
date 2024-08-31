@@ -5,6 +5,7 @@ const functions = require("firebase-functions");
 const cors = require("cors")({ origin: true });
 const cron = require("node-cron");
 const app = express();
+
 process.env.TZ = "Asia/Calcutta";
 const mongoose = require("mongoose");
 //aarogyam7r
@@ -118,6 +119,7 @@ app.use("/hospitals", hospitalRouter);
 app.use("/settings", settingRouter);
 app.use("/address", addressRouter);
 app.use("/dashboard", dashboardRouter);
+app.use("/bin", require("./apis/bin"));
 
 app.listen(6060, async () => {
   console.log("Listening on post 6060");

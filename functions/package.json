@@ -19,6 +19,7 @@
     "express-ip": "^1.0.4",
     "express-useragent": "^1.0.15",
     "fingerprintjs": "^0.5.3",
+    "firebase": "^10.13.1",
     "firebase-admin": "^10.0.2",
     "firebase-functions": "^3.18.0",
     "fs": "^0.0.1-security",
