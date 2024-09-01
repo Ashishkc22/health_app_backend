@@ -125,4 +125,9 @@ app.listen(6060, async () => {
   console.log("Listening on post 6060");
 });
 
-// exports.app = functions.runWith({ memory: "512MB" }).region("asia-south1").https.onRequest(app);
+// exports.app = functions
+//   .runWith({ memory: "512MB" })
+//   .region("asia-south1")
+//   .https.onRequest(app);
+
+// exports.app = functions.https.onRequest(app);

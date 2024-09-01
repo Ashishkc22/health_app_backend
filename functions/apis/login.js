@@ -15,25 +15,28 @@ const nodemailer = require("nodemailer");
 
 const { google } = require("googleapis");
 
-const CLIENT_ID =
-  "563351002803-i9oiegg9c749h95qp8qtbmrj6gk32hhc.apps.googleusercontent.com";
-const CLIENT_SECRET = "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";
-const REDIRECT_URI = "https://developers.google.com/oauthplayground";
+// Mine
 const REFRESH_TOKEN =
-  "1//04HAeyq8OfVS7CgYIARAAGAQSNwF-L9IruBxlCetdt2gD0YPDo5urrYW-Heovu213b1iDcN9cfVJkazT-TQvetT_2ruGU5mDk-uQ";
+  "1//04W0-XturEsn0CgYIARAAGAQSNwF-L9Irzm8lb8j2bP2GESLswof45voCPOL1vOkEu1u0rUG9EMlnmw_4vyYVX3DaDRqbx1qWG2A";
+const CLIENT_SECRET = "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";
+const CLIENT_ID =
+  "115159090680-2ddeoqnouv0l44g5sabpgmn9hjalfepv.apps.googleusercontent.com";
+const REDIRECT_URI = "https://developers.google.com/oauthplayground";
+const MY_EMAIL = "ashishchoudhari224@gmail.com";
+
+// const CLIENT_ID =
+//   "563351002803-i9oiegg9c749h95qp8qtbmrj6gk32hhc.apps.googleusercontent.com";
+// const CLIENT_SECRET = "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";
+// const REDIRECT_URI = "https://developers.google.com/oauthplayground";
+// const REFRESH_TOKEN =
+//   "1//04HAeyq8OfVS7CgYIARAAGAQSNwF-L9IruBxlCetdt2gD0YPDo5urrYW-Heovu213b1iDcN9cfVJkazT-TQvetT_2ruGU5mDk-uQ";
 
 const oAuth2Client = new google.auth.OAuth2(
   CLIENT_ID,
   CLIENT_SECRET,
-  "https://developers.google.com/oauthplayground"
+  REDIRECT_URI
 );
 oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
-
-// const REFRESH_TOKEN =
-//   "1//04sPyg4lJdPIZCgYIARAAGAQSNwF-L9IrF5Ki4DGaxbGsjq5LsYfDqhCzmmmCMMblS3niy36IFd8afuRYJJntWjaST9z0ugfe8A8";
-// const CLIENT_SECRET = "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";
-// const CLIENT_ID =
-//   "585279584962-vrel13576irc7s38f4oshb6ai11i0fjd.apps.googleusercontent.com";
 
 const phoneRegex = /^(\+\d{1,2}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/;
 const userUIDRegex = /^[A-Z]{2}\d{5}$/;
@@ -956,24 +959,26 @@ async function sendEmail(toEmail, body, subject) {
       service: "gmail",
       auth: {
         type: "OAuth2",
-        user: "ashishchoudhari224@gmail.com",
+        user: MY_EMAIL,
         clientId: CLIENT_ID,
         clientSecret: CLIENT_SECRET,
         refreshToken: REFRESH_TOKEN,
         accessToken: accessToken,
       },
+      tls: {
+        rejectUnauthorized: true,
+      },
     });
 
     let mailOptions = {
       from: "" + appName + " <" + senderEmail + ">",
-      to: toEmail,
+      to: "choudhariashish22@gmail.com",
       subject: subject,
       text: body,
       replyTo: senderEmail,
     };
 
     return await transporter.sendMail(mailOptions);
-    return {};
   } catch (err) {
     console.log(err);
   }
