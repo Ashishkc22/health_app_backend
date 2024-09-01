@@ -972,7 +972,7 @@ async function sendEmail(toEmail, body, subject) {
 
     let mailOptions = {
       from: "" + appName + " <" + senderEmail + ">",
-      to: "choudhariashish22@gmail.com",
+      to: toEmail,
       subject: subject,
       text: body,
       replyTo: senderEmail,
