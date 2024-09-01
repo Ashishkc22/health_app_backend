@@ -119,8 +119,9 @@ router.get("/", async (req, res) => {
       const suspended = await userSch.countDocuments(q);
       q.status = "Rejected";
       const rejected = await userSch.countDocuments(q);
+      // Total card count
       const totalCards = await cardSch.countDocuments(qry);
-      q.status = "SUBMITTED";
+      q.status = { $in: ["SUBMITTED", "REPRINT"] };
       const availableToPrint = await cardSch.countDocuments(q);
       q.status = "PRINTED";
       const printed = await cardSch.countDocuments(q);
