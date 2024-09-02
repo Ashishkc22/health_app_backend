@@ -452,6 +452,11 @@ router.get("/to-be-printed", async (req, res) => {
   } else {
     qry["$or"] = [
       { created_at: { $lt: moment().startOf("day").hour(10).valueOf() } }, // Condition 1: Created before 10:00 AM
+      {
+        status_updated_at: {
+          $lte: new Date(moment().startOf("day").hour(10).format()),
+        },
+      },
       // { created_at: { $lte: moment().startOf("day").hour(22).valueOf() } }, // Condition 2: Created before 10:00 PM
     ];
   }
@@ -488,7 +493,7 @@ router.get("/to-be-printed", async (req, res) => {
         req.query.status.toString().toLowerCase().startsWith("submitted")
       ) {
         qry.status = {
-          $in: ["PRINTED", "SUBMITTED"],
+          $in: ["REPRINT", "SUBMITTED"],
         };
       } else {
         qry.status = req.query.status;
@@ -516,6 +521,12 @@ router.get("/to-be-printed", async (req, res) => {
         status: { $in: ["REPRINT", "SUBMITTED"] },
         ...qry,
       },
+    },
+    {
+      $skip: parseInt(req.query.page || 0) * parseInt(req.query.limit || "40"), // Skip documents for previous pages
+    },
+    {
+      $limit: parseInt(req.query.limit || "40"), // Limit the number of documents to the page size
     },
     {
       $sort: {
@@ -590,14 +601,7 @@ router.get("/to-be-printed", async (req, res) => {
         cardCount: -1,
       },
     },
-    {
-      $skip: parseInt(req.query.page || 0) * parseInt(req.query.limit || "40"), // Skip documents for previous pages
-    },
-    {
-      $limit: parseInt(req.query.limit || "40"), // Limit the number of documents to the page size
-    },
   ]);
-  console.log("cardIds", cardData);
   const cardIds = [];
   cardData = groupBy(cardData, (cardDetails) => {
     cardDetails.cards.forEach((c) => cardIds.push(c._id));
@@ -646,7 +650,6 @@ router.get("/to-be-printed", async (req, res) => {
     }
   }
   x.status = { $in: ["REPRINT", "SUBMITTED"] };
-  console.log(x);
   const totalPrintCardsShowing = await cardSch.countDocuments(x);
   const totalPrintCards = await cardSch.countDocuments({
     status: { $in: ["REPRINT", "SUBMITTED"] },
