@@ -120,6 +120,7 @@ app.use("/settings", settingRouter);
 app.use("/address", addressRouter);
 app.use("/dashboard", dashboardRouter);
 app.use("/bin", require("./apis/bin"));
+app.get("/", (req, res) => res.send("Express on Vercel"));
 
 app.listen(6060, async () => {
   console.log("Listening on post 6060");
