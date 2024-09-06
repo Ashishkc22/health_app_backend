@@ -4,9 +4,10 @@
   "scripts": {
     "serve": "firebase emulators:start --only functions",
     "shell": "firebase functions:shell",
-    "start": "npm run shell",
+    "start": "pm2 start index.js",
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log",
+
     "devStart": "nodemon ./index.js"
   },
   "engines": {
