@@ -1,6 +1,6 @@
 // require('dotenv').config();
 const express = require("express");
-const functions = require("firebase-functions");
+// const functions = require("firebase-functions");
 // const fs = require("fs");
 const cors = require("cors")({ origin: true });
 const cron = require("node-cron");
