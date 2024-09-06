@@ -178,7 +178,7 @@ router.get("/", async (req, res) => {
   }
   if (req.query.mode == "ADMIN" && req.query.status == "SUBMITTED") {
     if ((req.query.created_by || "") != "") {
-      qry.created_by = req.query.created_by;
+      qry.created_by_uid = req.query.created_by;
     }
     const data = await cardSch
       .find(qry)
@@ -248,7 +248,7 @@ router.get("/", async (req, res) => {
     });
   } else {
     if (tokenUser.role == "ADMIN" && req.query.created_by != null) {
-      qry.created_by = req.query.created_by;
+      qry.created_by_uid = req.query.created_by;
     }
     if (req.query.mode != "ADMIN") {
       qry.created_by = tokenUser._id;
@@ -513,7 +513,7 @@ router.get("/to-be-printed", async (req, res) => {
     qry.area = req.query.gram_p;
   }
   if ((req.query.created_by || "") != "") {
-    qry.created_by = req.query.created_by;
+    qry.created_by_uid = req.query.created_by;
   }
   let cardData = await cardSch.aggregate([
     {
