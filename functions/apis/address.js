@@ -5,6 +5,7 @@ const districtSchema = require("../models/district");
 const tehsilSchema = require("../models/tehsil");
 const areaSchema = require("../models/area");
 const gramSchema = require("../models/gram");
+const cardSchema = require("../models/card");
 const newTehsilSchema = require("../models/new_tehsil");
 
 router.get("/upload/data", async (req, res) => {
@@ -179,9 +180,18 @@ router.get("/:responseType", async (req, res) => {
           qry.active = true;
         }
         const tehsils = await newTehsilSchema.find(qry);
+
+        let newTehsil = [];
+        for (let i = 0; i < tehsils.length; i++) {
+          const count = await cardSchema.countDocuments({
+            tehsil: tehsils[i].name,
+          });
+          newTehsil.push({ ...tehsils[i]?.toObject(), count });
+        }
+
         return res.status(200).json({
           status: "success",
-          data: tehsils,
+          data: newTehsil,
         });
       }
     }
@@ -281,7 +291,9 @@ router.get("/:responseType", async (req, res) => {
         const gramPs = await areaSchema.find(qry);
         var objs = Array();
         for (let x of gramPs) {
-          const grams = await gramSchema.find({ ref_id: x._id, active: true });
+          const grams = await gramSchema
+            .find({ ref_id: x._id, active: true })
+            .sort({ name: 1 });
           for (let y of grams) {
             y.grampanchayat_name = x.name;
             objs.push(y);

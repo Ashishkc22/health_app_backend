@@ -183,9 +183,9 @@ router.get("/", async (req, res) => {
     const data = await cardSch
       .find(qry)
       .sort({
-        tehsil: 1,
-        created_at: -1,
-        created_by: 1,
+        // tehsil: 1,
+        // created_by: 1,
+        created_at: req.query.sortBy ? 1 : -1,
       })
       .skip(parseInt(req.query.page || 0) * parseInt(req.query.limit || "40"))
       .limit(parseInt(req.query.limit || "40"));
@@ -253,13 +253,15 @@ router.get("/", async (req, res) => {
     if (req.query.mode != "ADMIN") {
       qry.created_by = tokenUser._id;
     }
+    console.log("sortBY", req.query.sortBy);
+
     const resp = await cardSch
       .find(qry)
       .sort({
-        ...(req.query.sortBy && { status_updated_at: -1 }),
-        created_at: -1,
-        tehsil: 1,
-        created_by: 1,
+        // ...(req.query.sortBy && { status_updated_at: -1 }),
+        // tehsil: 1,
+        // created_by: 1,
+        created_at: req.query.sortBy ? 1 : -1,
       })
       .skip(parseInt(req.query.page || 0) * parseInt(req.query.limit || "40"))
       .limit(parseInt(req.query.limit || "40"));
@@ -295,11 +297,11 @@ router.get("/", async (req, res) => {
           x[v] = qry[v];
         }
       }
-      x.status = "SUBMITTED";
-      console.log("total x", x);
+      x.status = { $in: ["REPRINT", "SUBMITTED"] };
 
       const totalPrintCardsShowing = await cardSch.countDocuments(x);
       const totalPrintCards = await cardSch.countDocuments({
+        status: { $in: ["REPRINT", "SUBMITTED"] },
         $or: [
           {
             created_at: {
@@ -307,7 +309,6 @@ router.get("/", async (req, res) => {
             },
           },
         ],
-        status: { $in: ["REPRINT", "SUBMITTED"] },
       });
       return res.status(200).json({
         status: "success",
@@ -523,17 +524,15 @@ router.get("/to-be-printed", async (req, res) => {
       },
     },
     {
+      $sort: {
+        created_at: req?.query?.sortBy ? 1 : -1,
+      },
+    },
+    {
       $skip: parseInt(req.query.page || 0) * parseInt(req.query.limit || "40"), // Skip documents for previous pages
     },
     {
       $limit: parseInt(req.query.limit || "40"), // Limit the number of documents to the page size
-    },
-    {
-      $sort: {
-        tehsil: 1,
-        created_at: -1,
-        created_by: 1,
-      },
     },
     {
       $addFields: {
@@ -614,7 +613,8 @@ router.get("/to-be-printed", async (req, res) => {
   //   }) || [];
 
   const tehsilCount = await cardSch.aggregate([
-    !isEmpty(qry) ? { $match: qry } : null,
+    // !isEmpty(qry) ? { $match: qry } : null,
+    { $match: { status: { $in: ["REPRINT", "SUBMITTED"] } } },
     {
       $group: {
         _id: "$tehsil",
@@ -693,19 +693,19 @@ router.get("/card-users", async (req, res) => {
       (await cardSch.aggregate([
         {
           $group: {
-            _id: null,
-            userIds: { $addToSet: "$created_by" },
+            _id: "$created_by",
+            count: { $sum: 1 },
           },
         },
-        {
-          $unwind: {
-            path: "$userIds",
-          },
-        },
+        // {
+        //   $unwind: {
+        //     path: "$userIds",
+        //   },
+        // },
         {
           $lookup: {
             from: "users",
-            let: { userIds: { $toObjectId: "$userIds" } },
+            let: { userIds: { $toObjectId: "$_id" } },
             pipeline: [
               {
                 $match: {
@@ -726,18 +726,20 @@ router.get("/card-users", async (req, res) => {
         {
           $project: {
             userDetails: { $arrayElemAt: ["$userDetails", 0] },
+            count: 1,
           },
         },
         {
-          $group: {
-            _id: null,
-            users: { $push: "$userDetails" },
+          $replaceRoot: {
+            newRoot: {
+              $mergeObjects: ["$userDetails", { count: "$count" }],
+            },
           },
         },
       ])) || [];
     return res.status(200).json({
       status: "success",
-      userList: userList[0].users,
+      userList: userList,
     });
   } catch (error) {
     res.status(400).json({
@@ -1029,7 +1031,27 @@ router.patch("/:id", async (req, res) => {
     if (req.body.discard_reason != null) {
       fields.discard_reason = req.body.discard_reason;
     }
+
     const oldCard = await cardSch.findById(req.params.id);
+    if (oldCard.status != req.body.status && (req.body.status || "") != "") {
+      fields["$push"] = {
+        status_history: {
+          previous_status: oldCard.status,
+          updated_status: req.body.status,
+          created_at: new Date().valueOf(),
+          ...(req.body?.discard_reason && {
+            reason: req.body.discard_reason,
+          }),
+          updated_by: {
+            name: userr.name,
+            phone: userr.phone,
+            _id: userr._id,
+            uid: userr.uid,
+          },
+        },
+      };
+    }
+
     if (oldCard.status == "PRINTED" || userr.role == "ADMIN") {
       if (req.body.status != null) {
         if (
@@ -1114,19 +1136,22 @@ router.patch("/:id", async (req, res) => {
           upMap["$inc"].dis_count = -1;
         }
 
-        fields["$push"] = {
-          status_history: {
-            previous_status: oldCard.status,
-            updated_status: req.body.status,
-            created_at: new Date().valueOf(),
-            updated_by: {
-              name: userr.name,
-              phone: userr.phone,
-              _id: userr._id,
-              uid: userr.uid,
-            },
-          },
-        };
+        // fields["$push"] = {
+        //   status_history: {
+        //     previous_status: oldCard.status,
+        //     updated_status: req.body.status,
+        //     created_at: new Date().valueOf(),
+        //     ...(req.body?.discard_reason && {
+        //       reason: req.body.discard_reason,
+        //     }),
+        //     updated_by: {
+        //       name: userr.name,
+        //       phone: userr.phone,
+        //       _id: userr._id,
+        //       uid: userr.uid,
+        //     },
+        //   },
+        // };
 
         console.log(upMap);
         const usr = await userSch.findByIdAndUpdate(oldCard.created_by, upMap);
@@ -1284,20 +1309,20 @@ router.post("/moveStatus", async (req, res) => {
     console.log("list", list);
 
     var ups = {};
-    // for (let x of list) {
-    //   const crd = await cardSch.findByIdAndUpdate(x, {
-    //     status: "PRINTED",
-    //   });
-    //   ups[x.created_by] = (ups[x.created_by] || 0) + 1;
-    // }
-    // for (let x of Object.keys(ups)) {
-    //   await userSch.findByIdAndUpdate(x, {
-    //     $inc: {
-    //       p_count: ups[x],
-    //       p2_count: 0 - ups[x],
-    //     },
-    //   });
-    // }
+    for (let x of list) {
+      const crd = await cardSch.findByIdAndUpdate(x, {
+        status: "PRINTED",
+      });
+      ups[crd.created_by] = (ups[crd.created_by] || 0) + 1;
+    }
+    for (let x of Object.keys(ups)) {
+      await userSch.findByIdAndUpdate(x, {
+        $inc: {
+          p_count: ups[x],
+          p2_count: 0 - ups[x],
+        },
+      });
+    }
     return res.status(200).json({
       status: "success",
       message: "Card updated successfully",

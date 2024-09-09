@@ -535,8 +535,6 @@ router.get("/users", async (req, res) => {
 
 router.patch("/user/:id", async (req, res) => {
   try {
-    console.log("req.body", req.body);
-
     if (req.query.token == null) {
       return res.status(200).json({
         status: "failed",
@@ -675,6 +673,50 @@ router.patch("/user/:id", async (req, res) => {
       data: user,
     });
   } catch (err) {
+    return res.status(200).json({
+      status: "failed",
+      message: err.message,
+    });
+  }
+});
+
+router.patch("/user/suspend/:id", async (req, res) => {
+  try {
+    if (req.query.token == null) {
+      return res.status(200).json({
+        status: "failed",
+        message: "Invalid Token",
+      });
+    }
+    const token = await tokenSch.findOne({ token: req.query.token });
+    if (token == null) {
+      return res.status(200).json({
+        status: "failed",
+        message: "Invalid Token",
+      });
+    }
+
+    if (!["Suspended", "Verified"].includes(req.body.status)) {
+      return res.status(200).json({
+        status: "failed",
+        message: "Invalid status",
+      });
+    }
+    const fields = {};
+    const status = req.body.status;
+    fields.status = status;
+    if (status === "Suspended") {
+      fields.suspension_reason = req.body.suspension_reason;
+    }
+    const us = await userSch.findByIdAndUpdate(req.params.id, fields, {
+      new: true,
+    });
+    return res.status(200).json({
+      status: "success",
+      message: "User updated successfully",
+      data: us,
+    });
+  } catch (error) {
     return res.status(200).json({
       status: "failed",
       message: err.message,
