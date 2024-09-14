@@ -118,12 +118,13 @@ router.get("/", async (req, res) => {
       };
       console.log(qry);
     }
-  } else {
-    qry["$or"] = [
-      { created_at: { $lt: moment().startOf("day").hour(10).valueOf() } }, // Condition 1: Created before 10:00 AM
-      // { created_at: { $lte: moment().startOf("day").hour(22).valueOf() } }, // Condition 2: Created before 10:00 PM
-    ];
   }
+  // else {
+  //   qry["$or"] = [
+  //     { created_at: { $lt: moment().startOf("day").hour(10).valueOf() } }, // Condition 1: Created before 10:00 AM
+  //     // { created_at: { $lte: moment().startOf("day").hour(22).valueOf() } }, // Condition 2: Created before 10:00 PM
+  //   ];
+  // }
   if (req.query.q != null) {
     // if((q.toString().length==6) && (parseInt(q.toString())>0)){
     //     qry.
@@ -253,8 +254,35 @@ router.get("/", async (req, res) => {
     if (req.query.mode != "ADMIN") {
       qry.created_by = tokenUser._id;
     }
-    console.log("sortBY", req.query.sortBy);
-
+    const statusCount =
+      (
+        await cardSch.aggregate([
+          // { $match: qry },
+          {
+            $group: {
+              _id: "$status",
+              count: { $sum: 1 },
+            },
+          },
+          {
+            $group: {
+              _id: null, // No grouping by a specific field, just collecting all data
+              result: {
+                $push: {
+                  k: "$_id", // Use the value from the _id field as the key
+                  v: "$count", // Use the count field as the value
+                },
+              },
+            },
+          },
+          {
+            $replaceRoot: {
+              newRoot: { $arrayToObject: "$result" }, // Converts the array into an object
+            },
+          },
+        ])
+      )?.[0] || [];
+    const documentCount = await cardSch.countDocuments(qry);
     const resp = await cardSch
       .find(qry)
       .sort({
@@ -263,7 +291,11 @@ router.get("/", async (req, res) => {
         // created_by: 1,
         created_at: req.query.sortBy ? 1 : -1,
       })
-      .skip(parseInt(req.query.page || 0) * parseInt(req.query.limit || "40"))
+      .skip(
+        documentCount > parseInt(req.query.limit || "40")
+          ? parseInt(req.query.page || 0) * parseInt(req.query.limit || "40")
+          : 0
+      )
       .limit(parseInt(req.query.limit || "40"));
     var tss = Array();
     for (let x of resp) {
@@ -286,9 +318,9 @@ router.get("/", async (req, res) => {
     });
     if (req.query.responseType == "LIST") {
       const totalCards = await cardSch.countDocuments({
-        $or: [
-          { created_at: { $lt: moment().startOf("day").hour(10).valueOf() } },
-        ],
+        // $or: [
+        //   { created_at: { $lt: moment().startOf("day").hour(10).valueOf() } },
+        // ],
       });
       const totalQryCards = await cardSch.countDocuments(qry);
       var x = {};
@@ -302,21 +334,25 @@ router.get("/", async (req, res) => {
       const totalPrintCardsShowing = await cardSch.countDocuments(x);
       const totalPrintCards = await cardSch.countDocuments({
         status: { $in: ["REPRINT", "SUBMITTED"] },
-        $or: [
-          {
-            created_at: {
-              $lt: moment().startOf("day").hour(10).valueOf(),
-            },
-          },
-        ],
+        // $or: [
+        //   {
+        //     created_at: {
+        //       $lt: moment().startOf("day").hour(10).valueOf(),
+        //     },
+        //   },
+        // ],
       });
       return res.status(200).json({
         status: "success",
-        page_number: req.query.page || "0",
+        page_number:
+          totalQryCards > parseInt(req.query.limit || "40")
+            ? req.query.page || "0"
+            : "0",
         total: totalCards,
         total_showing: totalQryCards,
         total_print_card: totalPrintCards,
         total_print_card_showing: totalPrintCardsShowing,
+        statusCount,
         // 'submitted': totalPrintCardsShowing,
         // 'delivered': newList.filter((a) => a.status.toString().toUpperCase() == "DELIVERED").length,
         // 'other': newList.filter((a) => (!(["DELIVERED", "SUBMITTED", "UNDELIVERED"].includes(a.status.toString().toUpperCase())))).length,
@@ -451,15 +487,17 @@ router.get("/to-be-printed", async (req, res) => {
       console.log(qry);
     }
   } else {
-    qry["$or"] = [
-      { created_at: { $lt: moment().startOf("day").hour(10).valueOf() } }, // Condition 1: Created before 10:00 AM
-      {
-        status_updated_at: {
-          $lte: new Date(moment().startOf("day").hour(10).format()),
+    if (req?.query?.isPrintMode != "false") {
+      qry["$or"] = [
+        { created_at: { $lt: moment().startOf("day").hour(10).valueOf() } }, // Condition 1: Created before 10:00 AM
+        {
+          status_updated_at: {
+            $lte: new Date(moment().startOf("day").hour(10).format()),
+          },
         },
-      },
-      // { created_at: { $lte: moment().startOf("day").hour(22).valueOf() } }, // Condition 2: Created before 10:00 PM
-    ];
+        // { created_at: { $lte: moment().startOf("day").hour(22).valueOf() } }, // Condition 2: Created before 10:00 PM
+      ];
+    }
   }
   if (req.query.q != null) {
     // if((q.toString().length==6) && (parseInt(q.toString())>0)){
@@ -516,6 +554,304 @@ router.get("/to-be-printed", async (req, res) => {
   if ((req.query.created_by || "") != "") {
     qry.created_by_uid = req.query.created_by;
   }
+
+  const documentCount = await cardSch.countDocuments({
+    status: { $in: ["REPRINT", "SUBMITTED"] },
+    ...qry,
+  });
+
+  // New aggregation
+  // db.getCollection("cards").aggregate([
+  //   {
+  //     $match: {
+  //       status: { $in: ["REPRINT", "SUBMITTED"] },
+  //     },
+  //   },
+
+  //   {
+  //     $sort: {
+  //       created_at: -1,
+  //     },
+  //   },
+
+  //   {
+  //     $lookup: {
+  //       from: "users",
+  //       localField: "created_by_uid",
+  //       foreignField: "uid",
+  //       pipeline: [
+  //         {
+  //           $project: {
+  //             _id: 1,
+  //             uid: 1,
+  //             name: 1,
+  //             email: 1,
+  //             phone: 1,
+  //             team_leader_id: 1, // Include TL ID for the next lookup
+  //           },
+  //         },
+  //       ],
+  //       as: "userDetails",
+  //     },
+  //   },
+
+  //   {
+  //     $addFields: {
+  //       userDetails: { $arrayElemAt: ["$userDetails", 0] }, // Convert array to object
+  //     },
+  //   },
+
+  //   {
+  //     $group: {
+  //       _id: {
+  //         location: "$userDetails.team_leader_id",
+  //       },
+  //       cards: { $push: "$$ROOT" },
+  //       cardCount: { $sum: 1 },
+  //     },
+  //   },
+
+  //   {
+  //     $addFields: {
+  //       cards: {
+  //         $slice: [
+  //           "$cards", // The array to slice
+  //           0 * 100, // Skip amount
+  //           100, // Limit
+  //         ],
+  //       },
+  //     },
+  //   },
+
+  //   {
+  //     $unwind: "$cards", // Unwind the cards to access created_by_uid
+  //   },
+
+  //   {
+  //     $group: {
+  //       _id: {
+  //         team_leader_id: "$_id.location", // Keep grouping by team leader ID
+  //         created_by_uid: "$cards.created_by_uid", // Group by created_by_uid within each team leader
+  //       },
+  //       userDetails: { $first: "$cards.userDetails" },
+  //       cards: { $push: "$cards" }, // Push the card data for each user
+  //       cardCount: { $sum: 1 }, // Count the number of cards for each user
+  //     },
+  //   },
+
+  //   {
+  //     $sort: {
+  //       cardCount: -1,
+  //     },
+  //   },
+
+  //   {
+  //     $group: {
+  //       _id: "$_id.team_leader_id", // Final grouping by team_leader_id
+  //       users: {
+  //         $push: {
+  //           created_by_uid: "$_id.created_by_uid",
+  //           userDetails: "$userDetails",
+  //           cards: "$cards",
+  //           cardCount: "$cardCount",
+  //         },
+  //       },
+  //       totalCardCount: { $sum: "$cardCount" }, // Total card count for each team leader
+  //     },
+  //   },
+  //   {
+  //     $sort: {
+  //       totalCardCount: -1,
+  //     },
+  //   },
+  //   {
+  //     $lookup: {
+  //       from: "users",
+  //       localField: "_id",
+  //       foreignField: "tl_id",
+  //       pipeline: [
+  //         {
+  //           $match: {
+  //             role: "TL",
+  //           },
+  //         },
+  //         {
+  //           $project: {
+  //             _id: 0,
+  //             uid: 1,
+  //             name: 1,
+  //             email: 1,
+  //             phone: 1,
+  //             tl_id: 1,
+  //           },
+  //         },
+  //       ],
+  //       as: "teamLeaderDetails",
+  //     },
+  //   },
+
+  //   {
+  //     $addFields: {
+  //       teamLeaderDetails: { $arrayElemAt: ["$teamLeaderDetails", 0] }, // Convert array to object
+  //     },
+  //   },
+  // ]);
+
+  //-----------------------------------------------------------------------------------------------------------
+
+  // let cardData = await cardSch.aggregate([
+  //   {
+  //     $match: {
+  //       status: { $in: ["REPRINT", "SUBMITTED"] },
+  //       ...qry,
+  //     },
+  //   },
+
+  //   {
+  //     $sort: {
+  //       created_at: -1,
+  //     },
+  //   },
+
+  //   {
+  //     $lookup: {
+  //       from: "users",
+  //       localField: "created_by_uid",
+  //       foreignField: "uid",
+  //       pipeline: [
+  //         {
+  //           $project: {
+  //             _id: 1,
+  //             uid: 1,
+  //             name: 1,
+  //             email: 1,
+  //             phone: 1,
+  //             team_leader_id: 1, // Include TL ID for the next lookup
+  //           },
+  //         },
+  //       ],
+  //       as: "userDetails",
+  //     },
+  //   },
+
+  //   {
+  //     $addFields: {
+  //       userDetails: { $arrayElemAt: ["$userDetails", 0] }, // Convert array to object
+  //     },
+  //   },
+
+  //   {
+  //     $group: {
+  //       _id: {
+  //         location: "$userDetails.team_leader_id",
+  //       },
+  //       cards: { $push: "$$ROOT" },
+  //       cardCount: { $sum: 1 },
+  //     },
+  //   },
+
+  //   {
+  //     $addFields: {
+  //       cards: {
+  //         $slice: [
+  //           "$cards", // The array to slice
+  //           0 * 100, // Skip amount
+  //           100, // Limit
+  //         ],
+  //       },
+  //     },
+  //   },
+
+  //   {
+  //     $unwind: "$cards", // Unwind the cards to access created_by_uid
+  //   },
+
+  //   {
+  //     $group: {
+  //       _id: {
+  //         team_leader_id: "$_id.location", // Keep grouping by team leader ID
+  //         created_by_uid: "$cards.created_by_uid", // Group by created_by_uid within each team leader
+  //       },
+  //       userDetails: { $first: "$cards.userDetails" },
+  //       cards: { $push: "$cards" }, // Push the card data for each user
+  //       cardCount: { $sum: 1 }, // Count the number of cards for each user
+  //       cardIds: { $push: "$cards._id" },
+  //     },
+  //   },
+
+  //   {
+  //     $sort: {
+  //       cardCount: -1,
+  //     },
+  //   },
+
+  //   {
+  //     $group: {
+  //       _id: "$_id.team_leader_id", // Final grouping by team_leader_id
+  //       users: {
+  //         $push: {
+  //           created_by_uid: "$_id.created_by_uid",
+  //           userDetails: "$userDetails",
+  //           cards: "$cards",
+  //           cardCount: "$cardCount",
+  //           //             cardIds: "$cardIds"
+  //         },
+  //       },
+  //       cardIds: { $push: "$cardIds" },
+  //       totalCardCount: { $sum: "$cardCount" }, // Total card count for each team leader
+  //     },
+  //   },
+  //   {
+  //     $sort: {
+  //       totalCardCount: -1,
+  //     },
+  //   },
+  //   {
+  //     $project: {
+  //       users: 1,
+  //       totalCardCount: 1,
+  //       cardIds: {
+  //         $reduce: {
+  //           input: "$cardIds", // Flatten the collected arrays
+  //           initialValue: [],
+  //           in: { $concatArrays: ["$$value", "$$this"] },
+  //         },
+  //       },
+  //     },
+  //   },
+  //   {
+  //     $lookup: {
+  //       from: "users",
+  //       localField: "_id",
+  //       foreignField: "tl_id",
+  //       pipeline: [
+  //         {
+  //           $match: {
+  //             role: "TL",
+  //           },
+  //         },
+  //         {
+  //           $project: {
+  //             _id: 0,
+  //             uid: 1,
+  //             name: 1,
+  //             email: 1,
+  //             phone: 1,
+  //             tl_id: 1,
+  //           },
+  //         },
+  //       ],
+  //       as: "teamLeaderDetails",
+  //     },
+  //   },
+
+  //   {
+  //     $addFields: {
+  //       teamLeaderDetails: { $arrayElemAt: ["$teamLeaderDetails", 0] }, // Convert array to object
+  //     },
+  //   },
+  // ]);
+
   let cardData = await cardSch.aggregate([
     {
       $match: {
@@ -523,17 +859,26 @@ router.get("/to-be-printed", async (req, res) => {
         ...qry,
       },
     },
-    {
-      $sort: {
-        created_at: req?.query?.sortBy ? 1 : -1,
-      },
-    },
-    {
-      $skip: parseInt(req.query.page || 0) * parseInt(req.query.limit || "40"), // Skip documents for previous pages
-    },
-    {
-      $limit: parseInt(req.query.limit || "40"), // Limit the number of documents to the page size
-    },
+    ...(req?.query?.sortBy
+      ? [
+          {
+            $sort: {
+              status_updated_at: -1,
+            },
+          },
+        ]
+      : []),
+    // ...(documentCount > parseInt(req.query.limit || "40")
+    //   ? [
+    //       {
+    //         $skip:
+    //           parseInt(req.query.page || 0) * parseInt(req.query.limit || "40"), // Skip documents for previous pages
+    //       },
+    //     ]
+    //   : []),
+    // {
+    //   $limit: parseInt(req.query.limit || "40"), // Limit the number of documents to the page size
+    // },
     {
       $addFields: {
         unifiedLocation: {
@@ -548,7 +893,26 @@ router.get("/to-be-printed", async (req, res) => {
           createdBy: "$created_by_uid",
         },
         cards: { $push: "$$ROOT" },
-        cardCount: { $sum: 1 },
+        // cardCount: { $sum: 1 },
+      },
+    },
+    {
+      $addFields: {
+        cards: {
+          $slice: [
+            "$cards", // The array to slice
+            documentCount > parseInt(req.query.limit || "40")
+              ? parseInt(req.query.page || 0) *
+                parseInt(req.query.limit || "40")
+              : 0, // Skip amount
+            parseInt(req.query.limit || "40"), // Limit
+          ],
+        },
+      },
+    },
+    {
+      $addFields: {
+        cardCount: { $size: "$cards" },
       },
     },
     {
@@ -600,12 +964,25 @@ router.get("/to-be-printed", async (req, res) => {
         cardCount: -1,
       },
     },
+    {
+      $match: { cards: { $ne: [] } },
+    },
   ]);
-  const cardIds = [];
+
+  let cardIds = [];
   cardData = groupBy(cardData, (cardDetails) => {
-    cardDetails.cards.forEach((c) => cardIds.push(c._id));
     return cardDetails._id.location;
   });
+  let totalDocs = 0;
+  Object.keys(cardData).forEach((key) => {
+    cardData[key].forEach((data) =>
+      data.cards.forEach((c) => {
+        totalDocs += 1;
+        cardIds.push(c._id);
+      })
+    );
+  });
+  // cardData.forEach((c) => (cardIds = cardIds.concat(c.cardIds)));
 
   // cardIds =
   //   cardIds?.map(function (doc) {
@@ -653,22 +1030,28 @@ router.get("/to-be-printed", async (req, res) => {
   const totalPrintCardsShowing = await cardSch.countDocuments(x);
   const totalPrintCards = await cardSch.countDocuments({
     status: { $in: ["REPRINT", "SUBMITTED"] },
-    $or: [
-      {
-        created_at: {
-          $lt: moment().startOf("day").hour(10).valueOf(),
+    ...(req?.query?.isPrintMode != "false" && {
+      $or: [
+        {
+          created_at: {
+            $lt: moment().startOf("day").hour(10).valueOf(),
+          },
         },
-      },
-    ],
+      ],
+    }),
   });
   return res.status(200).json({
     status: "success",
-    page_number: req.query.page || "0",
+    page_number:
+      documentCount > parseInt(req.query.limit || "40")
+        ? req.query.page || "0"
+        : "0",
     total: totalCards,
     cardIds,
     total_showing: totalQryCards,
     total_print_card: totalPrintCards,
     total_print_card_showing: totalPrintCardsShowing,
+    total_documents_per_page: totalDocs,
     data: cardData,
     tehsilCount: newTehsilCount,
   });
@@ -729,11 +1112,18 @@ router.get("/card-users", async (req, res) => {
             count: 1,
           },
         },
+
         {
           $replaceRoot: {
             newRoot: {
               $mergeObjects: ["$userDetails", { count: "$count" }],
             },
+          },
+        },
+        {
+          $sort: {
+            name: 1,
+            // count: -1,
           },
         },
       ])) || [];
