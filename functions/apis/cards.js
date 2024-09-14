@@ -289,7 +289,7 @@ router.get("/", async (req, res) => {
         // ...(req.query.sortBy && { status_updated_at: -1 }),
         // tehsil: 1,
         // created_by: 1,
-        created_at: req.query.sortBy ? 1 : -1,
+        status_updated_at: req.query.sortBy ? -1 : 1,
       })
       .skip(
         documentCount > parseInt(req.query.limit || "40")
