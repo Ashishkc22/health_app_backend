@@ -1074,6 +1074,15 @@ router.get("/card-users", async (req, res) => {
     }
     const userList =
       (await cardSch.aggregate([
+        ...(req.query.status
+          ? [
+              {
+                $match: {
+                  status: { $in: ["REPRINT", "SUBMITTED"] },
+                },
+              },
+            ]
+          : []),
         {
           $group: {
             _id: "$created_by",
@@ -1702,6 +1711,19 @@ router.post("/moveStatus", async (req, res) => {
     for (let x of list) {
       const crd = await cardSch.findByIdAndUpdate(x, {
         status: "PRINTED",
+        status_updated_at: new Date(),
+        $push: {
+          status_history: {
+            updated_status: "PRINTED",
+            created_at: new Date().valueOf(),
+            updated_by: {
+              name: userr.name,
+              phone: userr.phone,
+              _id: userr._id,
+              uid: userr.uid,
+            },
+          },
+        },
       });
       ups[crd.created_by] = (ups[crd.created_by] || 0) + 1;
     }
@@ -1784,7 +1806,7 @@ router.patch("/updateStatus", async (req, res) => {
         status_history: {
           previous_status: oldCard.status,
           updated_status: req.body.status,
-          updated_at: new Date().valueOf,
+          created_at: new Date().valueOf(),
           updated_by: {
             name: userr.name,
             phone: userr.phone,

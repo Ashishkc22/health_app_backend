@@ -276,7 +276,7 @@ router.get("/:responseType", async (req, res) => {
           qry.active = true;
         }
         console.log(qry);
-        const areas = await gramSchema.find(qry);
+        const areas = await gramSchema.find(qry).sort({ name: 1 });
         return res.status(200).json({
           status: "success",
           data: areas,
@@ -288,7 +288,7 @@ router.get("/:responseType", async (req, res) => {
         if (req.query.type != "ADMIN" || req.query.showHidden != "true") {
           qry.active = true;
         }
-        const gramPs = await areaSchema.find(qry);
+        const gramPs = await areaSchema.find(qry).sort({ name: 1 });
         var objs = Array();
         for (let x of gramPs) {
           const grams = await gramSchema
