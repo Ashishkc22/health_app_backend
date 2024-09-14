@@ -286,10 +286,9 @@ router.get("/", async (req, res) => {
     const resp = await cardSch
       .find(qry)
       .sort({
-        // ...(req.query.sortBy && { status_updated_at: -1 }),
         // tehsil: 1,
-        // created_by: 1,
-        status_updated_at: req.query.sortBy ? -1 : 1,
+        ...(req.query.sortBy && { status_updated_at: -1 }),
+        created_at: -1,
       })
       .skip(
         documentCount > parseInt(req.query.limit || "40")
@@ -859,15 +858,21 @@ router.get("/to-be-printed", async (req, res) => {
         ...qry,
       },
     },
-    ...(req?.query?.sortBy
-      ? [
-          {
-            $sort: {
-              status_updated_at: -1,
-            },
-          },
-        ]
-      : []),
+    {
+      $sort: {
+        ...(req?.query?.sortBy && { status_updated_at: -1 }),
+        created_at: -1,
+      },
+    },
+    // ...(req?.query?.sortBy
+    //   ? [
+    //       {
+    //         $sort: {
+    //           status_updated_at: -1,
+    //         },
+    //       },
+    //     ]
+    //   : []),
     // ...(documentCount > parseInt(req.query.limit || "40")
     //   ? [
     //       {
