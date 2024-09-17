@@ -179,7 +179,7 @@ router.get("/:responseType", async (req, res) => {
         if (req.query.type != "ADMIN" || req.query.showHidden != "true") {
           qry.active = true;
         }
-        const tehsils = await newTehsilSchema.find(qry);
+        const tehsils = await newTehsilSchema.find(qry).sort({ name: 1 });
 
         let newTehsil = [];
         for (let i = 0; i < tehsils.length; i++) {

@@ -485,18 +485,9 @@ router.get("/to-be-printed", async (req, res) => {
       };
       console.log(qry);
     }
-  } else {
-    if (req?.query?.isPrintMode != "false") {
-      qry["$or"] = [
-        { created_at: { $lt: moment().startOf("day").hour(10).valueOf() } }, // Condition 1: Created before 10:00 AM
-        {
-          status_updated_at: {
-            $lte: new Date(moment().startOf("day").hour(10).format()),
-          },
-        },
-        // { created_at: { $lte: moment().startOf("day").hour(22).valueOf() } }, // Condition 2: Created before 10:00 PM
-      ];
-    }
+  }
+  if (req?.query?.isPrintMode) {
+    qry["$or"] = [{ created_at: { $lt: parseInt(req?.query?.isPrintMode) } }];
   }
   if (req.query.q != null) {
     // if((q.toString().length==6) && (parseInt(q.toString())>0)){
@@ -921,6 +912,11 @@ router.get("/to-be-printed", async (req, res) => {
       },
     },
     {
+      $sort: {
+        cardCount: -1,
+      },
+    },
+    {
       $lookup: {
         from: "users",
         localField: "_id.createdBy",
@@ -972,15 +968,33 @@ router.get("/to-be-printed", async (req, res) => {
     {
       $match: { cards: { $ne: [] } },
     },
+    {
+      $group: {
+        _id: "$_id.location",
+        cards: { $push: "$$ROOT" },
+        totalCards: { $sum: "$cardCount" },
+      },
+    },
+    {
+      $sort: {
+        totalCards: -1,
+      },
+    },
   ]);
 
   let cardIds = [];
-  cardData = groupBy(cardData, (cardDetails) => {
-    return cardDetails._id.location;
-  });
+  // let allCardCount = {};
+  // cardData = groupBy(cardData, (cardDetails) => {
+  //   if (allCardCount[cardDetails._id.location]) {
+  //     allCardCount[cardDetails._id.location] += cardDetails.cardCount;
+  //   } else {
+  //     allCardCount[cardDetails._id.location] = cardDetails.cardCount;
+  //   }
+  //   return cardDetails._id.location;
+  // });
   let totalDocs = 0;
-  Object.keys(cardData).forEach((key) => {
-    cardData[key].forEach((data) =>
+  cardData.forEach((key) => {
+    key.cards.forEach((data) =>
       data.cards.forEach((c) => {
         totalDocs += 1;
         cardIds.push(c._id);
@@ -1035,11 +1049,11 @@ router.get("/to-be-printed", async (req, res) => {
   const totalPrintCardsShowing = await cardSch.countDocuments(x);
   const totalPrintCards = await cardSch.countDocuments({
     status: { $in: ["REPRINT", "SUBMITTED"] },
-    ...(req?.query?.isPrintMode != "false" && {
+    ...(req?.query?.isPrintMode && {
       $or: [
         {
           created_at: {
-            $lt: moment().startOf("day").hour(10).valueOf(),
+            $lt: parseInt(req?.query?.isPrintMode),
           },
         },
       ],
