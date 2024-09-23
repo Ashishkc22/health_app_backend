@@ -54,7 +54,10 @@ router.post("/login", async (req, res) => {
   console.log("IP Address:", ipAddress);
   const usr = await userSch.findOne(
     req.body.role == "ADMIN"
-      ? { email: req.body.email, role: "ADMIN" }
+      ? {
+          email: req.body.email,
+          $or: [{ role: "ADMIN" }, { role: "SUBADMIN" }],
+        }
       : { phone: req.body.phone }
   );
   if (usr == null) {
@@ -79,8 +82,12 @@ router.post("/login", async (req, res) => {
     // const encoder = new UuidEncoder('base64');
     // const tc = encoder.encode(tkn);
     //.....
-    console.log(usr);
-    if (req.body.role == "ADMIN" && usr.role != "ADMIN") {
+    console.log("usr", usr);
+    if (
+      req.body.role == "ADMIN" &&
+      usr.role != "ADMIN" &&
+      usr.role != "SUBADMIN"
+    ) {
       return res.status(200).json({
         status: "failed",
         message: "Unauthorized Access",
@@ -112,6 +119,7 @@ router.post("/login", async (req, res) => {
         tokenS,
         user_token: tkn,
         uid: usr._id,
+        role: usr.role,
         status: parseStatus(usr.status),
         validity: parseInt(Date.now() + 24 * 60 * 60 * 1000),
       },
@@ -632,6 +640,9 @@ router.patch("/user/:id", async (req, res) => {
     if (req.body.reject_reason != null) {
       fields.reject_reason = req.body.reject_reason;
     }
+    if (oldData.tl_id && req.body.role == "TL") {
+      fields.team_leader_id = "";
+    }
     if (req.body.role == "TL" && (oldData.tl_id || "") == "") {
       let uuid;
       while (true) {
@@ -645,6 +656,7 @@ router.patch("/user/:id", async (req, res) => {
           break;
         }
       }
+      fields.team_leader_id = "";
       fields.tl_id = uuid;
     }
     if (oldData.name != req.body.name) {

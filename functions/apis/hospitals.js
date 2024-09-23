@@ -256,6 +256,8 @@ router.post("/", async (req, res) => {
       close_time: req.body.close_time,
       map_link: req.body.map_link,
       status: req.body.status || "ENABLE",
+      contactPersonName: req.body.contactPersonName,
+      contactPersonPhone: req.body.contactPersonPhone,
       uid: uid,
     });
     const resp = await hsp.save();

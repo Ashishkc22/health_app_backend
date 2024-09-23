@@ -7,6 +7,7 @@ const areaSchema = require("../models/area");
 const gramSchema = require("../models/gram");
 const cardSchema = require("../models/card");
 const newTehsilSchema = require("../models/new_tehsil");
+const { sortBy } = require("lodash");
 
 router.get("/upload/data", async (req, res) => {
   await areaSchema.updateMany(
@@ -191,7 +192,7 @@ router.get("/:responseType", async (req, res) => {
 
         return res.status(200).json({
           status: "success",
-          data: newTehsil,
+          data: sortBy(newTehsil, "count").reverse(),
         });
       }
     }
