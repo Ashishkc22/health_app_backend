@@ -40,7 +40,9 @@ router.get("/", async (req, res) => {
       .skip(parseInt(req.query.page || 0) * parseInt(req.query.limit || "50"))
       .limit(parseInt(req.query.limit || "50"));
 
-    const documentCount = await binSch.countDocuments();
+    const documentCount = await binSch.countDocuments({
+      metaDataName: req.query.type,
+    });
     return res.status(200).json({
       status: "success",
       docCount: documentCount,
@@ -152,7 +154,7 @@ async function deleteCard(req, res) {
     });
   }
 
-  // const resp = await cardSch.findByIdAndDelete(req.body.id || req.query.id);
+  const resp = await cardSch.findByIdAndDelete(req.body.id || req.query.id);
   return resp;
 }
 async function deleteHospital(req, res) {

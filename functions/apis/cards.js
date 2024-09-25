@@ -1326,6 +1326,18 @@ router.post("/", async (req, res) => {
       )
         .toString()
         .padStart(2, "0")}/${issueDate.getFullYear()}`,
+      status_history: [
+        {
+          previous_status: "SUBMITTED",
+          updated_status: "SUBMITTED",
+          created_at: new Date().valueOf(),
+          updated_by: {
+            name: userr.name,
+            phone: userr.phone,
+            uid: userr.uid,
+          },
+        },
+      ],
       unique_number: uuid,
       s_no: req.body.s_no || "",
     });
