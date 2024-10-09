@@ -101,17 +101,17 @@ const updateUserStatus = require("./crons/updateUserStatus");
 const cleanbin = require("./crons/cleanBin");
 
 // Schedule the cron job to run every day at 11:00 PM
-// cron.schedule(
-//   "0 23 * * *",
-//   () => {
-//     updateUserStatus.updateUserStatus();
-//     cleanbin.deleteDocumentsThreeDaysAgo();
-//   },
-//   {
-//     scheduled: true,
-//     timezone: "Asia/Kolkata", // Set your timezone
-//   }
-// );
+cron.schedule(
+  "0 23 * * *",
+  () => {
+    updateUserStatus.updateUserStatus();
+    cleanbin.deleteDocumentsThreeDaysAgo();
+  },
+  {
+    scheduled: true,
+    timezone: "Asia/Kolkata", // Set your timezone
+  }
+);
 
 app.use("/auth", loginRouter);
 app.use("/cards", cardRouter);

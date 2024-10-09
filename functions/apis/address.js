@@ -1,13 +1,16 @@
 const express = require("express");
 const router = express.Router();
 const stateSchema = require("../models/states");
+const tokenSch = require("../models/token");
+const userSch = require("../models/user");
 const districtSchema = require("../models/district");
 const tehsilSchema = require("../models/tehsil");
 const areaSchema = require("../models/area");
 const gramSchema = require("../models/gram");
 const cardSchema = require("../models/card");
 const newTehsilSchema = require("../models/new_tehsil");
-const { sortBy } = require("lodash");
+const mongoose = require("mongoose");
+const { sortBy, isEmpty } = require("lodash");
 
 router.get("/upload/data", async (req, res) => {
   await areaSchema.updateMany(
@@ -138,6 +141,179 @@ router.get("/upload/data", async (req, res) => {
   });
 });
 
+const addgrams = async ({ data, session, gramPanchayatId }) => {
+  try {
+    const allGramData = data.map((g) => ({
+      name: g.name,
+      ref_id: gramPanchayatId,
+      active: true,
+    }));
+    await gramSchema.insertMany(allGramData, { session });
+  } catch (error) {
+    throw error;
+  }
+};
+
+const addGramPanChayat = async ({ data, session, janpadPanchyatId }) => {
+  try {
+    for (let i = 0; i < data.length; i++) {
+      const inputeGramPanchayat = data[i];
+      const existingJanpadPanchayat = await areaSchema.findOne({
+        name: inputeGramPanchayat.name,
+      });
+      let gramPanchayatId;
+      if (isEmpty(existingJanpadPanchayat)) {
+        const gramPanchayat = areaSchema({
+          name: inputeGramPanchayat.name,
+          ref_id: janpadPanchyatId,
+          rojgar_sahayak: inputeGramPanchayat.rojgar_sahayak,
+          sachiv: inputeGramPanchayat.sachiv,
+          sarpanch: inputeGramPanchayat.sarpanch,
+          pincode: "",
+          active: true,
+        });
+        const gramPanchayatData = await gramPanchayat.save({ session });
+        gramPanchayatId = gramPanchayatData._id.toString();
+      } else {
+        gramPanchayatId = existingJanpadPanchayat._id.toString();
+      }
+      await addgrams({
+        data: inputeGramPanchayat.gram,
+        session,
+        gramPanchayatId: gramPanchayatId,
+      });
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
+const addJanpadPanchayat = async ({ data, session, districtId }) => {
+  try {
+    for (let i = 0; i < data.length; i++) {
+      const jpInputeData = data[i];
+      const existingJanpadPanchayat = await tehsilSchema.findOne({
+        name: jpInputeData.name,
+      });
+      let jpId;
+      if (isEmpty(existingJanpadPanchayat)) {
+        const jp = tehsilSchema({
+          name: jpInputeData.name,
+          ref_id: districtId,
+          active: true,
+        });
+        const jpData = await jp.save({ session });
+        jpId = jpData._id.toString();
+      } else {
+        jpId = existingJanpadPanchayat._id.toString();
+      }
+      await addGramPanChayat({
+        data: jpInputeData.gramPanchayat,
+        session,
+        janpadPanchyatId: jpId,
+      });
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
+const addDistricts = async ({ data, session, stateId, skip }) => {
+  try {
+    for (let i = 0; i < data.length; i++) {
+      const dis = data[i];
+      const existingDistrict = await districtSchema.findOne({
+        name: dis.district,
+      });
+      let disId;
+      if (isEmpty(existingDistrict) && !skip.includes("district")) {
+        const district = districtSchema({
+          name: dis.district,
+          ref_id: stateId,
+          active: true,
+        });
+        const districtData = await district.save({ session });
+        disId = districtData._id.toString();
+      } else {
+        disId = existingDistrict?._id.toString();
+      }
+      if (disId) {
+        await addJanpadPanchayat({
+          data: dis.janpadPanchyat,
+          session,
+          districtId: disId,
+        });
+      } else {
+        throw new Error("No district found");
+      }
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
+router.post("/add-location", async (req, res) => {
+  const session = await mongoose.startSession();
+  try {
+    if (req.body.token == null) {
+      return res.status(200).json({
+        status: "failed",
+        message: "Missing Token",
+      });
+    }
+    const token = await tokenSch.findOne({ token: req.body.token });
+    if (token == null) {
+      return res.status(200).json({
+        status: "failed",
+        message: "Invalid Token",
+      });
+    }
+
+    const user = await userSch.findById(token.uid);
+    if (user == null || user.status != "Verified" || user.role != "ADMIN") {
+      return res.status(200).json({
+        status: "failed",
+        message:
+          user == null ? "Access Denied" : `${user.status} User: Access Denied`,
+      });
+    }
+    session.startTransaction();
+
+    await addDistricts({
+      data: req.body.data,
+      session,
+      stateId: "63c681806072b29c2133326e",
+      skip: req.body?.options?.skip,
+    });
+
+    await session.commitTransaction();
+    session.endSession();
+    return res.status(200).json({
+      status: "success",
+      message: "Done",
+    });
+  } catch (error) {
+    console.log("error", error?.message);
+    await session.abortTransaction();
+    session.endSession();
+    return res.status(400).json({
+      status: "failed",
+      message: error?.message || "failed to add location.",
+    });
+  }
+});
+
+router.get("/all-get-janpanchyat", async (req, res) => {
+  console.log("tehsils ----");
+  const tehsils = await tehsilSchema.find({ active: true });
+  console.log("tehsils", tehsils);
+
+  return res.status(200).json({
+    status: "success",
+    data: tehsils,
+  });
+});
+
 router.get("/:responseType", async (req, res) => {
   try {
     if (req.params.responseType == "state") {
@@ -145,7 +321,7 @@ router.get("/:responseType", async (req, res) => {
       if (req.query.type != "ADMIN" || req.query.showHidden != "true") {
         qry.active = true;
       }
-      const states = await stateSchema.find(qry);
+      const states = await stateSchema.find(qry).sort({ name: 1 });
       return res.status(200).json({
         status: "success",
         data: states,
@@ -167,7 +343,7 @@ router.get("/:responseType", async (req, res) => {
         if (req.query.type != "ADMIN" || req.query.showHidden != "true") {
           qry.active = true;
         }
-        const districts = await districtSchema.find(qry);
+        const districts = await districtSchema.find(qry).sort({ name: 1 });
         return res.status(200).json({
           status: "success",
           data: districts,
@@ -202,7 +378,7 @@ router.get("/:responseType", async (req, res) => {
         if (req.query.type != "ADMIN" || req.query.showHidden != "true") {
           qry.active = true;
         }
-        const tehsils = await tehsilSchema.find(qry);
+        const tehsils = await tehsilSchema.find(qry).sort({ name: 1 });
         return res.status(200).json({
           status: "success",
           data: tehsils,
@@ -215,7 +391,7 @@ router.get("/:responseType", async (req, res) => {
         if (req.query.type != "ADMIN" || req.query.showHidden != "true") {
           qry.active = true;
         }
-        const areas = await areaSchema.find(qry);
+        const areas = await areaSchema.find(qry).sort({ name: 1 });
         if (req.query.type == "ADMIN") {
           return res.status(200).json({
             status: "success",
@@ -224,7 +400,9 @@ router.get("/:responseType", async (req, res) => {
         } else {
           var objs = Array();
           for (let area of areas) {
-            const grams = await gramSchema.find({ ref_id: area._id });
+            const grams = await gramSchema
+              .find({ ref_id: area._id })
+              .sort({ name: 1 });
             var gms = Array();
             for (let gm of grams) {
               gm.grampanchayat_name = area.name;
@@ -245,7 +423,7 @@ router.get("/:responseType", async (req, res) => {
         if (req.query.type != "ADMIN" || req.query.showHidden != "true") {
           qry.active = true;
         }
-        const areas = await areaSchema.find(qry);
+        const areas = await areaSchema.find(qry).sort({ name: 1 });
         if (req.query.type == "ADMIN") {
           return res.status(200).json({
             status: "success",
@@ -254,7 +432,9 @@ router.get("/:responseType", async (req, res) => {
         } else {
           var objs = Array();
           for (let area of areas) {
-            const grams = await gramSchema.find({ ref_id: area._id });
+            const grams = await gramSchema
+              .find({ ref_id: area._id })
+              .sort({ name: 1 });
             var gms = Array();
             for (let gm of grams) {
               gm.grampanchayat_name = area.name;

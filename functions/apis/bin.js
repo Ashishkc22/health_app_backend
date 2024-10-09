@@ -6,6 +6,7 @@ const binSch = require("../models/bin");
 const cardSch = require("../models/card");
 const hospital = require("../models/hospital");
 const { isEmpty } = require("lodash");
+const mongoose = require("mongoose");
 
 router.use(async (req, res, next) => {
   if (req.query.token == null) {
@@ -109,77 +110,97 @@ router.post("/restore", async (req, res) => {
 
 // Delete functions
 async function deleteCard(req, res) {
-  const cardData = await cardSch.findById(req.body.id || req.query.id);
-  if (isEmpty(cardData)) {
-    return res.status(200).json({
-      status: "failed",
-      message: "Card not found",
+  const session = await mongoose.startSession();
+  try {
+    const cardData = await cardSch.findById(req.body.id || req.query.id);
+    if (isEmpty(cardData)) {
+      return res.status(200).json({
+        status: "failed",
+        message: "Card not found",
+      });
+    }
+    session.startTransaction();
+    const deletedData = new binSch({
+      _id: cardData._id,
+      image: cardData.image,
+      name: cardData.name,
+      birth_year: cardData.birth_year,
+      gender: cardData.gender,
+      id_proof: cardData.id_proof,
+      state: cardData.state,
+      district: cardData.district,
+      tehsil: cardData.tehsil,
+      area: cardData.area,
+      phone: cardData.phone,
+      father_husband_name: cardData.father_husband_name,
+      blood_group: cardData.blood_group,
+      emergency_contact: cardData.emergency_contact,
+      status: cardData.status,
+      created_by: cardData.created_by,
+      created_by_uid: cardData.created_by_uid,
+      created_at: cardData.created_at,
+      issue_date: cardData.issue_date,
+      unique_number: cardData.unique_number,
+      expiry_date: cardData.expiry_date,
+      expiry_years: cardData.expiry_years,
+      s_no: cardData.s_no,
+      __v: cardData.__v,
+      discard_reason: cardData.discard_reason,
+      metaDataName: "Card",
+      deleted_at: new Date(),
     });
-  }
+    const deeletedData = await deletedData.save({ session });
+    if (!deeletedData) {
+      return res.status(200).json({
+        status: "failed",
+        message: "Card not found",
+      });
+    }
 
-  const deletedData = new binSch({
-    _id: cardData._id,
-    image: cardData.image,
-    name: cardData.name,
-    birth_year: cardData.birth_year,
-    gender: cardData.gender,
-    id_proof: cardData.id_proof,
-    state: cardData.state,
-    district: cardData.district,
-    tehsil: cardData.tehsil,
-    area: cardData.area,
-    phone: cardData.phone,
-    father_husband_name: cardData.father_husband_name,
-    blood_group: cardData.blood_group,
-    emergency_contact: cardData.emergency_contact,
-    status: cardData.status,
-    created_by: cardData.created_by,
-    created_by_uid: cardData.created_by_uid,
-    created_at: cardData.created_at,
-    issue_date: cardData.issue_date,
-    unique_number: cardData.unique_number,
-    expiry_date: cardData.expiry_date,
-    expiry_years: cardData.expiry_years,
-    s_no: cardData.s_no,
-    __v: cardData.__v,
-    discard_reason: cardData.discard_reason,
-    metaDataName: "Card",
-    deleted_at: new Date(),
-  });
-  const deeletedData = await deletedData.save();
-  if (!deeletedData) {
-    return res.status(200).json({
-      status: "failed",
-      message: "Card not found",
-    });
+    const resp = await cardSch.findByIdAndDelete(
+      cardData?._id || req.body.id || req.query.id,
+      { session }
+    );
+    await session.commitTransaction();
+    return resp;
+  } catch (error) {
+    await session.abortTransaction();
+    throw error;
   }
-
-  const resp = await cardSch.findByIdAndDelete(req.body.id || req.query.id);
-  return resp;
 }
 async function deleteHospital(req, res) {
-  const hospitalData = await hospital.findById(req.body.id || req.query.id);
-  if (isEmpty(hospitalData)) {
-    return res.status(200).json({
-      status: "failed",
-      message: "Card not found",
-    });
-  }
+  const session = await mongoose.startSession();
+  try {
+    session.startTransaction();
+    const hospitalData = await hospital.findById(req.body.id || req.query.id);
+    if (isEmpty(hospitalData)) {
+      return res.status(200).json({
+        status: "failed",
+        message: "Card not found",
+      });
+    }
 
-  const deletedData = new binSch({
-    ...hospitalData.toObject(),
-    metaDataName: "Hospital",
-    deleted_at: new Date(),
-  });
-  const deeletedData = await deletedData.save();
-  if (!deeletedData) {
-    return res.status(200).json({
-      status: "failed",
-      message: "Hospital not found",
+    const deletedData = new binSch({
+      ...hospitalData.toObject(),
+      metaDataName: "Hospital",
+      deleted_at: new Date(),
     });
+    const deeletedData = await deletedData.save({ session });
+    if (!deeletedData) {
+      return res.status(200).json({
+        status: "failed",
+        message: "Hospital not found",
+      });
+    }
+    const resp = await hospital.findByIdAndDelete(req.body.id || req.query.id, {
+      session,
+    });
+    await session.commitTransaction();
+    return resp;
+  } catch (error) {
+    await session.abortTransaction();
+    throw error;
   }
-  const resp = await hospital.findByIdAndDelete(req.body.id || req.query.id);
-  return resp;
 }
 
 const deleteType = {

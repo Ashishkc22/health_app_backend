@@ -8,6 +8,25 @@ const tokenSch = require("../models/token");
 const moment = require("moment");
 const { isEmpty } = require("lodash");
 
+const getDocumentCount = async ({ query = {}, dbSchema }) => {
+  if (dbSchema) {
+    return {
+      today: await dbSchema.countDocuments({
+        created_at: { $gte: moment().startOf("day").valueOf() },
+        ...query,
+      }),
+      yesterday: await dbSchema.countDocuments({
+        created_at: { $lte: moment().startOf("day").valueOf() },
+        ...query,
+      }),
+    };
+  }
+  return {
+    today: 0,
+    yesterday: 0,
+  };
+};
+
 router.get("/", async (req, res) => {
   try {
     if (req.query.token == null) {
@@ -122,27 +141,165 @@ router.get("/", async (req, res) => {
       // Total card count
       const totalCards = await cardSch.countDocuments(qry);
       q.status = { $in: ["SUBMITTED", "REPRINT"] };
+      let todayTotalCards = 0;
+      let yesterdayTotalCards = 0;
+      if (user.role == "ADMIN" && req.query.type == "ADMIN") {
+        const result = await getDocumentCount({ dbSchema: cardSch });
+        todayTotalCards = result.today;
+        yesterdayTotalCards = result.yesterday;
+      }
       const availableToPrint = await cardSch.countDocuments(q);
+      let availableToPrintTodayCount = 0;
+      let availableToPrintYesterdayCount = 0;
+
+      if (user.role == "ADMIN" && req.query.type == "ADMIN") {
+        const result = await getDocumentCount({
+          dbSchema: cardSch,
+          query: {
+            status: { $in: ["SUBMITTED", "REPRINT"] },
+          },
+        });
+        availableToPrintTodayCount = result.today;
+        availableToPrintYesterdayCount = result.yesterday;
+      }
       q.status = "PRINTED";
       const printed = await cardSch.countDocuments(q);
+      let printedTodayCount = 0;
+      let printedYesterdayCount = 0;
+
+      if (user.role == "ADMIN" && req.query.type == "ADMIN") {
+        const result = await getDocumentCount({
+          dbSchema: cardSch,
+          query: {
+            status: "PRINTED",
+          },
+        });
+        printedTodayCount = result.today;
+        printedYesterdayCount = result.yesterday;
+      }
       q.status = "UNDELIVERED";
       const undeliveredCards = await cardSch.countDocuments(q);
+      let undeliveredCardsTodayCount = 0;
+      let undeliveredCardsYesterdayCount = 0;
+
+      if (user.role == "ADMIN" && req.query.type == "ADMIN") {
+        const result = await getDocumentCount({
+          dbSchema: cardSch,
+          query: {
+            status: "UNDELIVERED",
+          },
+        });
+        undeliveredCardsTodayCount = result.today;
+        undeliveredCardsYesterdayCount = result.yesterday;
+      }
       q.status = "DELIVERED";
       const deliveredCards = await cardSch.countDocuments(q);
+
+      let deliveredCardsTodayCount = 0;
+      let deliveredCardsYesterdayCount = 0;
+
+      if (user.role == "ADMIN" && req.query.type == "ADMIN") {
+        const result = await getDocumentCount({
+          dbSchema: cardSch,
+          query: {
+            status: "DELIVERED",
+          },
+        });
+        deliveredCardsTodayCount = result.today;
+        deliveredCardsYesterdayCount = result.yesterday;
+      }
+
       q.status = "DISCARDED";
       const discarded = await cardSch.countDocuments(q);
+
+      let discardedCardsTodayCount = 0;
+      let discardedCardsYesterdayCount = 0;
+
+      if (user.role == "ADMIN" && req.query.type == "ADMIN") {
+        const result = await getDocumentCount({
+          dbSchema: cardSch,
+          query: {
+            status: "DISCARDED",
+          },
+        });
+        discardedCardsTodayCount = result.today;
+        discardedCardsYesterdayCount = result.yesterday;
+      }
+
       const totalH = await hospital.countDocuments(qry);
+
+      let totalHospitalTodayCount = 0;
+      let totalHospitalYesterdayCount = 0;
+
+      if (user.role == "ADMIN" && req.query.type == "ADMIN") {
+        const result = await getDocumentCount({
+          dbSchema: hospital,
+        });
+        totalHospitalTodayCount = result.today;
+        totalHospitalYesterdayCount = result.yesterday;
+      }
+
       q = { category: "Hospital" };
       if (qry.created_at != null) {
         q.created_at = qry.created_at;
       }
       const totalHosp = await hospital.countDocuments(q);
+
+      let hospitalTodayCount = 0;
+      let hospitalYesterdayCount = 0;
+
+      if (user.role == "ADMIN" && req.query.type == "ADMIN") {
+        const result = await getDocumentCount({
+          dbSchema: hospital,
+          query: { category: "Hospital" },
+        });
+        hospitalTodayCount = result.today;
+        hospitalYesterdayCount = result.yesterday;
+      }
+
       q.category = "Diagnostic Centre";
       const totalDC = await hospital.countDocuments(q);
+
+      let totalDCTodayCount = 0;
+      let totalDCYesterdayCount = 0;
+
+      if (user.role == "ADMIN" && req.query.type == "ADMIN") {
+        const result = await getDocumentCount({
+          dbSchema: hospital,
+          query: { category: "Diagnostic Centre" },
+        });
+        totalDCTodayCount = result.today;
+        totalDCYesterdayCount = result.yesterday;
+      }
+
       q.category = "Medical";
       const totalMedical = await hospital.countDocuments(q);
+
+      let totalMedicalTodayCount = 0;
+      let totalMedicalYesterdayCount = 0;
+
+      if (user.role == "ADMIN" && req.query.type == "ADMIN") {
+        const result = await getDocumentCount({
+          dbSchema: hospital,
+          query: { category: "Medical" },
+        });
+        totalMedicalTodayCount = result.today;
+        totalMedicalYesterdayCount = result.yesterday;
+      }
+
       q.category = "Pathology Lab";
       const pathologyLab = await hospital.countDocuments(q);
+      let pathologyLabTodayCount = 0;
+      let pathologyLabYesterdayCount = 0;
+
+      if (user.role == "ADMIN" && req.query.type == "ADMIN") {
+        const result = await getDocumentCount({
+          dbSchema: hospital,
+          query: { category: "Pathology Lab" },
+        });
+        pathologyLabTodayCount = result.today;
+        pathologyLabYesterdayCount = result.yesterday;
+      }
       return res.status(200).json({
         status: "success",
         data: {
@@ -154,15 +311,39 @@ router.get("/", async (req, res) => {
           suspended_users: suspended,
           rejected_users: rejected,
           total_cards: totalCards,
+          todayTotalCards,
+          yesterdayTotalCards,
           available_to_print: availableToPrint,
+          availableToPrintTodayCount,
+          availableToPrintYesterdayCount,
           printed: printed,
+          printedTodayCount,
+          printedYesterdayCount,
           undelivered_cards: undeliveredCards,
+          undeliveredCardsTodayCount,
+          undeliveredCardsYesterdayCount,
           delivered_cards: deliveredCards,
+          deliveredCardsTodayCount,
+          deliveredCardsYesterdayCount,
           discard_cards: discarded,
+          discardedCardsTodayCount,
+          discardedCardsYesterdayCount,
+
           total_hospital: totalH,
+          totalHospitalTodayCount,
+          totalHospitalYesterdayCount,
           hospitals: totalHosp,
-          diagnostic_centers: (totalDC || 0) + pathologyLab,
+          hospitalTodayCount,
+          hospitalYesterdayCount,
+          diagnostic_centers: totalDC,
+          totalDCTodayCount,
+          totalDCYesterdayCount,
+          pathology_lab: pathologyLab,
+          pathologyLabTodayCount,
+          pathologyLabYesterdayCount,
           medicals: totalMedical,
+          totalMedicalTodayCount,
+          totalMedicalYesterdayCount,
         },
       });
     }
@@ -270,6 +451,75 @@ router.get("/", async (req, res) => {
     return res.status(200).json({
       status: "failed",
       message: "Failed to get dashboard",
+    });
+  }
+});
+
+router.get("/:type", async (req, res) => {
+  try {
+    if (req?.params?.type) {
+      let pipeline = [
+        {
+          $match: {
+            $and: [
+              { created_at: { $gte: moment().startOf("year").valueOf() } },
+              { created_at: { $lte: moment().endOf("year").valueOf() } },
+            ],
+          },
+        },
+        {
+          $group: {
+            _id: {
+              district: "$district",
+              subDivision: "$tehsil",
+            },
+            size: { $sum: 1 },
+          },
+        },
+        {
+          $project: {
+            district: "$_id.district",
+            tehshil: "$_id.subDivision",
+            size: "$size",
+            _id: 0,
+          },
+        },
+        {
+          $group: {
+            _id: "$district",
+            size: { $sum: "$count" },
+            data: {
+              $push: {
+                name: "$$ROOT.tehshil",
+                size: "$$ROOT.size",
+              },
+            },
+          },
+        },
+        {
+          $project: {
+            name: "$_id",
+            children: "$data",
+            size: "$size",
+            _id: 0,
+          },
+        },
+      ];
+      const data = await cardSch.aggregate(pipeline);
+      return res.status(200).json({
+        status: "success",
+        data,
+      });
+    } else {
+      return res.status(500).json({
+        error: "failed to get data.",
+        message: "Type is missing.",
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      error: "failed to get data.",
+      message: error.message || "Something went wrong.",
     });
   }
 });
