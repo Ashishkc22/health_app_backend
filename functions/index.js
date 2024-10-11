@@ -87,7 +87,7 @@ db.once("open", async function () {
 });
 
 // const expressIp = require("express-ip");
-app.use(express.json());
+app.use(express.json({ limit: "10mb" }));
 app.use(cors);
 // app.use(expressIp().getIp);
 
