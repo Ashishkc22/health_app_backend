@@ -141,25 +141,40 @@ router.get("/upload/data", async (req, res) => {
   });
 });
 
-const addgrams = async ({ data, session, gramPanchayatId }) => {
+const addgrams = async ({ data = [], gramPanchayatId }) => {
+  const insertedIds = [];
   try {
-    const allGramData = data.map((g) => ({
-      name: g.name,
-      ref_id: gramPanchayatId,
-      active: true,
-    }));
-    await gramSchema.insertMany(allGramData, { session });
+    for (i = 0; i < data?.length; i++) {
+      const g = data[i];
+      const existingData = await gramSchema.findOne({
+        name: g.name,
+        ref_id: gramPanchayatId,
+      });
+      if (isEmpty(existingData)) {
+        const gram = gramSchema({
+          name: g.name,
+          ref_id: gramPanchayatId,
+          active: true,
+        });
+        const savedGram = await gram.save();
+        insertedIds.push(savedGram._id);
+      }
+    }
   } catch (error) {
+    console.log(`deleting grams ${insertedIds}`);
+    await gramSchema.deleteMany({ _id: { $in: insertedIds } });
     throw error;
   }
 };
 
-const addGramPanChayat = async ({ data, session, janpadPanchyatId }) => {
+const addGramPanChayat = async ({ data, janpadPanchyatId }) => {
+  const insertedIds = [];
   try {
     for (let i = 0; i < data.length; i++) {
       const inputeGramPanchayat = data[i];
       const existingJanpadPanchayat = await areaSchema.findOne({
         name: inputeGramPanchayat.name,
+        ref_id: janpadPanchyatId,
       });
       let gramPanchayatId;
       if (isEmpty(existingJanpadPanchayat)) {
@@ -172,28 +187,32 @@ const addGramPanChayat = async ({ data, session, janpadPanchyatId }) => {
           pincode: "",
           active: true,
         });
-        const gramPanchayatData = await gramPanchayat.save({ session });
+        const gramPanchayatData = await gramPanchayat.save();
         gramPanchayatId = gramPanchayatData._id.toString();
+        insertedIds.push(gramPanchayatData._id);
       } else {
         gramPanchayatId = existingJanpadPanchayat._id.toString();
       }
       await addgrams({
         data: inputeGramPanchayat.gram,
-        session,
         gramPanchayatId: gramPanchayatId,
       });
     }
   } catch (error) {
+    console.log(`deleting GramPanChayat ${insertedIds}`);
+    await areaSchema.deleteMany({ _id: { $in: insertedIds } });
     throw error;
   }
 };
 
-const addJanpadPanchayat = async ({ data, session, districtId }) => {
+const addJanpadPanchayat = async ({ data, districtId }) => {
+  const insertedIds = [];
   try {
     for (let i = 0; i < data.length; i++) {
       const jpInputeData = data[i];
       const existingJanpadPanchayat = await tehsilSchema.findOne({
         name: jpInputeData.name,
+        ref_id: districtId,
       });
       let jpId;
       if (isEmpty(existingJanpadPanchayat)) {
@@ -202,28 +221,38 @@ const addJanpadPanchayat = async ({ data, session, districtId }) => {
           ref_id: districtId,
           active: true,
         });
-        const jpData = await jp.save({ session });
+        const jpData = await jp.save();
         jpId = jpData._id.toString();
+        insertedIds.push(jpData._id);
+        console.log(`addded JanpadPanchayat ${jpInputeData.name}`);
       } else {
         jpId = existingJanpadPanchayat._id.toString();
       }
+      if (!jpId) {
+        console.log("JanpadPanchayat Id not found. for disId", districtId);
+
+        throw new Error("JanpadPanchayat Id not found.");
+      }
       await addGramPanChayat({
         data: jpInputeData.gramPanchayat,
-        session,
         janpadPanchyatId: jpId,
       });
     }
   } catch (error) {
+    console.log(`deleting JanpadPanchayat ${insertedIds}`);
+    await tehsilSchema.deleteMany({ _id: { $in: insertedIds } });
     throw error;
   }
 };
 
-const addDistricts = async ({ data, session, stateId, skip }) => {
+const addDistricts = async ({ data, stateId, skip = [] }) => {
+  const insertedIds = [];
   try {
     for (let i = 0; i < data.length; i++) {
       const dis = data[i];
       const existingDistrict = await districtSchema.findOne({
         name: dis.district,
+        ref_id: stateId,
       });
       let disId;
       if (isEmpty(existingDistrict) && !skip.includes("district")) {
@@ -232,15 +261,15 @@ const addDistricts = async ({ data, session, stateId, skip }) => {
           ref_id: stateId,
           active: true,
         });
-        const districtData = await district.save({ session });
+        const districtData = await district.save();
         disId = districtData._id.toString();
+        insertedIds.push(districtData._id);
       } else {
         disId = existingDistrict?._id.toString();
       }
       if (disId) {
         await addJanpadPanchayat({
           data: dis.janpadPanchyat,
-          session,
           districtId: disId,
         });
       } else {
@@ -248,12 +277,13 @@ const addDistricts = async ({ data, session, stateId, skip }) => {
       }
     }
   } catch (error) {
+    console.log(`deleting districts ${insertedIds}`);
+    await districtSchema.deleteMany({ _id: { $in: insertedIds } });
     throw error;
   }
 };
 
 router.post("/add-location", async (req, res) => {
-  const session = await mongoose.startSession();
   try {
     if (req.body.token == null) {
       return res.status(200).json({
@@ -277,25 +307,16 @@ router.post("/add-location", async (req, res) => {
           user == null ? "Access Denied" : `${user.status} User: Access Denied`,
       });
     }
-    session.startTransaction();
-
     await addDistricts({
       data: req.body.data,
-      session,
       stateId: "63c681806072b29c2133326e",
       skip: req.body?.options?.skip,
     });
-
-    await session.commitTransaction();
-    session.endSession();
     return res.status(200).json({
       status: "success",
       message: "Done",
     });
   } catch (error) {
-    console.log("error", error?.message);
-    await session.abortTransaction();
-    session.endSession();
     return res.status(400).json({
       status: "failed",
       message: error?.message || "failed to add location.",

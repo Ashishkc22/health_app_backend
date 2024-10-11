@@ -4,6 +4,7 @@ const userSch = require("../models/user");
 const hospitalSch = require("../models/hospital");
 const cardSch = require("../models/card");
 const tokenSch = require("../models/token");
+const { sortBy } = require("lodash");
 
 const otpSch = require("../models/otp");
 // const UuidEncoder = require('uuid-encoder');
@@ -14,6 +15,7 @@ const TokenGenerator = require("uuid-token-generator");
 const nodemailer = require("nodemailer");
 
 const { google } = require("googleapis");
+const { redis } = require("googleapis/build/src/apis/redis");
 
 // Mine
 const REFRESH_TOKEN =
@@ -517,6 +519,7 @@ router.get("/users", async (req, res) => {
           }
           list.push(x);
         }
+        list = sortBy(list, "ratio").reverse();
         const visible = await userSch.countDocuments(qry);
         const total = await userSch.countDocuments();
         return res.status(200).json({
@@ -562,6 +565,23 @@ router.patch("/user/:id", async (req, res) => {
     if (req.body.image != null) {
       fields.image = req.body.image;
     }
+    if (req.body.passportImage != null) {
+      fields.passportImage = req.body.passportImage;
+    }
+    if (req.body.registrationFormImage != null) {
+      fields.registrationFormImage = req.body.registrationFormImage;
+    }
+
+    if (req.body.agreementImage != null) {
+      fields.agreementImage = req.body.agreementImage;
+    }
+    if (req.body.panCardImage != null) {
+      fields.panCardImage = req.body.panCardImage;
+    }
+    if (req.body.signatureImage != null) {
+      fields.signatureImage = req.body.signatureImage;
+    }
+
     if (req.body.name != null) {
       fields.name = req.body.name;
     }
@@ -818,6 +838,110 @@ router.post("/register", async (req, res) => {
       });
     }
     console.log("INCORRECT DATA");
+    return res.status(200).json({
+      status: "failed",
+      message: "Invalid Data",
+    });
+  } catch (err) {
+    console.log(`ERROR: ${err.message}`);
+    return res.status(200).json({
+      status: "failed",
+      message: "Invalid Data",
+    });
+  }
+});
+
+router.post("/add-tl", async (req, res) => {
+  try {
+    if (req.body.token == null) {
+      return res.status(200).json({
+        status: "failed",
+        message: "Invalid Token",
+      });
+    }
+    const token = await tokenSch.findOne({ token: req.body.token });
+    if (token == null) {
+      return res.status(200).json({
+        status: "failed",
+        message: "Invalid Token",
+      });
+    }
+
+    const usr = await userSch.find({ phone: req.body.phone });
+    if (usr.length > 0) {
+      return res.status(200).json({
+        status: "failed",
+        message: "User already exists with this phone number!",
+      });
+    }
+    if (usr.role === "admin") {
+      return res.status(200).json({
+        status: "failed",
+        message: "Unauthorized",
+      });
+    }
+
+    if (req.body.password != "") {
+      let uuid;
+      let tl_id;
+      while (true) {
+        var x = (Math.floor(Math.random() * (99999 - 10001 + 1)) + 10001)
+          .toString()
+          .padStart(5, "0");
+        const uid = `FE${x}`;
+        const qry = await userSch.exists({ uid: uid });
+        if (!qry) {
+          uuid = uid;
+          break;
+        }
+      }
+      while (true) {
+        var x = (Math.floor(Math.random() * (99999 - 10001 + 1)) + 10001)
+          .toString()
+          .padStart(5, "0");
+        const uid = `TL${x}`;
+        const qry = await userSch.exists({ uid: uid });
+        if (!qry) {
+          tl_id = uid;
+          break;
+        }
+      }
+
+      // const uxid = `FE${length.toString().padStart(5, '0')}`;
+      const user = new userSch({
+        uid: uuid,
+        name: req.body.name,
+        phone: req.body.phone,
+        alternate_phone: req.body.alternate_phone,
+        password: req.body.password,
+        email: req.body.email,
+        image: req.body.image,
+        address: req.body.address,
+        state: req.body.state,
+        district: req.body.district,
+        janPanchayat: req.body.janPanchayat,
+        id_proof: req.body.id_proof,
+        last_fetch: parseInt(Date.now()),
+        passportImage: req.body.passportImage,
+        registrationFormImage: req.body.registrationFormImage,
+        agreementImage: req.body.agreementImage,
+        panCardImage: req.body.panCardImage,
+        signatureImage: req.body.signatureImage,
+        // ...(emergency_contact && {emergency_contact: req.body.emergency_contact,}),
+        // team_leader_id: req.body.team_leader_id,
+        // device_id: req.body.device_id,
+        created_at: parseInt(Date.now()),
+        status: "Unverified",
+        role: "TL",
+        lat: parseFloat(req.body.lat) || 0.0,
+        lon: parseFloat(req.body.lon) || 0.0,
+      });
+      const resp = await user.save();
+      return res.status(200).json({
+        status: "success",
+        message: "User registered successfully!",
+      });
+    }
     return res.status(200).json({
       status: "failed",
       message: "Invalid Data",

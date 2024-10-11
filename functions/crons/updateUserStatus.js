@@ -15,6 +15,7 @@ const updateUserStatus = async () => {
     // Find users who have not submitted any cards in the past 5 days
     const usersToSuspend = await userSch.find({
       _id: { $nin: usersWithRecentCards },
+      role: { $nin: ["ADMIN", "SUBADMIN"] },
       status: "Verified",
     });
 

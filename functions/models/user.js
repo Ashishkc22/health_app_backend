@@ -11,7 +11,6 @@ const userSchema = new mongoose.Schema({
   },
   device_id: {
     type: String,
-    required: true,
   },
   name: {
     type: String,
@@ -138,6 +137,17 @@ const userSchema = new mongoose.Schema({
   lon: {
     type: Number,
   },
+  alternate_phone: {
+    type: Number,
+  },
+  janPanchayat: {
+    type: String,
+  },
+  signatureImage: { type: String },
+  passportImage: { type: String },
+  registrationFormImage: { type: String },
+  agreementImage: { type: String },
+  panCardImage: { type: String },
   suspension_reason: {
     type: String,
   },

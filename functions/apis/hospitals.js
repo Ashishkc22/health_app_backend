@@ -56,7 +56,7 @@ router.get("/", async (req, res) => {
     if (req.query.type != null) {
       qry["$or"] = [
         { category: req.query.type },
-        { category: "Diagnostic Centre" },
+        // { category: "Diagnostic Centre" },
       ];
     }
     if (req.query.mode == "ADMIN") {
