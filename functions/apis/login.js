@@ -17,21 +17,13 @@ const nodemailer = require("nodemailer");
 const { google } = require("googleapis");
 const { redis } = require("googleapis/build/src/apis/redis");
 
-// Mine
-const REFRESH_TOKEN =
-  "1//04W0-XturEsn0CgYIARAAGAQSNwF-L9Irzm8lb8j2bP2GESLswof45voCPOL1vOkEu1u0rUG9EMlnmw_4vyYVX3DaDRqbx1qWG2A";
-const CLIENT_SECRET = "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";
+const MY_EMAIL = "Aarogyam7r@gmail.com";
 const CLIENT_ID =
-  "115159090680-2ddeoqnouv0l44g5sabpgmn9hjalfepv.apps.googleusercontent.com";
+  "563351002803-i9oiegg9c749h95qp8qtbmrj6gk32hhc.apps.googleusercontent.com";
+const CLIENT_SECRET = "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";
 const REDIRECT_URI = "https://developers.google.com/oauthplayground";
-const MY_EMAIL = "ashishchoudhari224@gmail.com";
-
-// const CLIENT_ID =
-//   "563351002803-i9oiegg9c749h95qp8qtbmrj6gk32hhc.apps.googleusercontent.com";
-// const CLIENT_SECRET = "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";
-// const REDIRECT_URI = "https://developers.google.com/oauthplayground";
-// const REFRESH_TOKEN =
-//   "1//04HAeyq8OfVS7CgYIARAAGAQSNwF-L9IruBxlCetdt2gD0YPDo5urrYW-Heovu213b1iDcN9cfVJkazT-TQvetT_2ruGU5mDk-uQ";
+const REFRESH_TOKEN =
+  "1//04MIE0CBTkw1TCgYIARAAGAQSNwF-L9IrbgZKIe9UEFW2oDXPu1PDEMgtlSEJ6sAibLB6LFqpYVDgoW4Xq3QG2ExWA-wIS2C7iQA";
 
 const oAuth2Client = new google.auth.OAuth2(
   CLIENT_ID,
@@ -519,7 +511,9 @@ router.get("/users", async (req, res) => {
           }
           list.push(x);
         }
-        list = sortBy(list, "ratio").reverse();
+        if (req.query.sortBy === "ratio") {
+          list = sortBy(list, "ratio").reverse();
+        }
         const visible = await userSch.countDocuments(qry);
         const total = await userSch.countDocuments();
         return res.status(200).json({
@@ -867,6 +861,20 @@ router.post("/add-tl", async (req, res) => {
       });
     }
 
+    if (!req.body?.password || !req.body?.confirmPassword) {
+      return res.status(200).json({
+        status: "failed",
+        message: "Missing password or confirm password.",
+      });
+    }
+
+    if (req.body?.password !== req.body?.confirmPassword) {
+      return res.status(200).json({
+        status: "failed",
+        message: "Mismatch password.",
+      });
+    }
+
     const usr = await userSch.find({ phone: req.body.phone });
     if (usr.length > 0) {
       return res.status(200).json({
@@ -911,6 +919,7 @@ router.post("/add-tl", async (req, res) => {
       const user = new userSch({
         uid: uuid,
         name: req.body.name,
+        legalName: req.body.legalName,
         phone: req.body.phone,
         alternate_phone: req.body.alternate_phone,
         password: req.body.password,
@@ -1133,6 +1142,7 @@ function random(len) {
 async function sendEmail(toEmail, body, subject) {
   try {
     const accessToken = await oAuth2Client.getAccessToken();
+
     let transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {

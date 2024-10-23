@@ -16,7 +16,10 @@ const getDocumentCount = async ({ query = {}, dbSchema }) => {
         ...query,
       }),
       yesterday: await dbSchema.countDocuments({
-        created_at: { $lte: moment().startOf("day").valueOf() },
+        created_at: {
+          $gte: moment().subtract(1, "day").startOf("day").valueOf(),
+          $lte: moment().subtract(1, "day").endOf("day").valueOf(),
+        },
         ...query,
       }),
     };
@@ -257,7 +260,7 @@ router.get("/", async (req, res) => {
         hospitalYesterdayCount = result.yesterday;
       }
 
-      q.category = "Diagnostic Centre";
+      q.category = "Labs & Diagnostic Centers";
       const totalDC = await hospital.countDocuments(q);
 
       let totalDCTodayCount = 0;
@@ -266,7 +269,7 @@ router.get("/", async (req, res) => {
       if (user.role == "ADMIN" && req.query.type == "ADMIN") {
         const result = await getDocumentCount({
           dbSchema: hospital,
-          query: { category: "Diagnostic Centre" },
+          query: { category: "Labs & Diagnostic Centers" },
         });
         totalDCTodayCount = result.today;
         totalDCYesterdayCount = result.yesterday;
@@ -287,19 +290,6 @@ router.get("/", async (req, res) => {
         totalMedicalYesterdayCount = result.yesterday;
       }
 
-      q.category = "Pathology Lab";
-      const pathologyLab = await hospital.countDocuments(q);
-      let pathologyLabTodayCount = 0;
-      let pathologyLabYesterdayCount = 0;
-
-      if (user.role == "ADMIN" && req.query.type == "ADMIN") {
-        const result = await getDocumentCount({
-          dbSchema: hospital,
-          query: { category: "Pathology Lab" },
-        });
-        pathologyLabTodayCount = result.today;
-        pathologyLabYesterdayCount = result.yesterday;
-      }
       return res.status(200).json({
         status: "success",
         data: {
@@ -338,9 +328,6 @@ router.get("/", async (req, res) => {
           diagnostic_centers: totalDC,
           totalDCTodayCount,
           totalDCYesterdayCount,
-          pathology_lab: pathologyLab,
-          pathologyLabTodayCount,
-          pathologyLabYesterdayCount,
           medicals: totalMedical,
           totalMedicalTodayCount,
           totalMedicalYesterdayCount,

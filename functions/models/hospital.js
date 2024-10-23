@@ -106,6 +106,9 @@ const hospitalSchema = new mongoose.Schema({
     type: String,
     default: "ENABLE",
   },
+  signatureImage: {
+    type: String,
+  },
   contactPersonName: { type: String },
   contactPersonPhone: { type: String },
   uid: {

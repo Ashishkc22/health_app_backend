@@ -119,6 +119,7 @@ router.get("/", async (req, res) => {
     }
     const resp = await hospitalSch
       .find(qry)
+      .sort({ created_at: -1 })
       .skip(parseInt(req.query.page || 0) * parseInt(req.query.limit || "40"))
       .limit(parseInt(req.query.limit || "40"));
     const totalHosp = await hospitalSch.countDocuments();
@@ -234,6 +235,7 @@ router.post("/", async (req, res) => {
       timings: req.body.timings,
       address: req.body.address,
       pincode: req.body.pincode,
+      signatureImage: req.body.signatureImage,
       city: req.body.city,
       tel_no: req.body.tel_no,
       mobile_no: req.body.mobile_no,
@@ -391,6 +393,9 @@ router.patch("/:id", async (req, res) => {
     }
     if (body.status != null) {
       fields.status = body.status;
+    }
+    if (body.signatureImage != null) {
+      fields.signatureImage = body.signatureImage;
     }
     var id = req.params.id;
     if (id.length == 5) {
