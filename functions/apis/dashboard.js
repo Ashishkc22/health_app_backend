@@ -8,18 +8,72 @@ const tokenSch = require("../models/token");
 const moment = require("moment");
 const { isEmpty } = require("lodash");
 
-const getDocumentCount = async ({ query = {}, dbSchema }) => {
+const getDocumentCount = async ({
+  query = {},
+  dbSchema,
+  useStatusUpdatedAt = false,
+  isAvailableCardStatus = false,
+}) => {
   if (dbSchema) {
+    const todaysDate = moment().startOf("day").valueOf();
+    const yesterdayDateStart = moment()
+      .subtract(1, "day")
+      .startOf("day")
+      .valueOf();
+    const yesterdayDateEnd = moment().subtract(1, "day").endOf("day").valueOf();
     return {
       today: await dbSchema.countDocuments({
-        created_at: { $gte: moment().startOf("day").valueOf() },
+        ...(useStatusUpdatedAt
+          ? { status_updated_at: { $gte: new Date(todaysDate) } }
+          : isAvailableCardStatus
+          ? {
+              $or: [
+                {
+                  status_updated_at: {
+                    $gte: new Date(todaysDate),
+                  },
+                },
+                {
+                  created_at: { $gte: todaysDate },
+                },
+              ],
+            }
+          : {
+              created_at: { $gte: todaysDate },
+            }),
         ...query,
       }),
       yesterday: await dbSchema.countDocuments({
-        created_at: {
-          $gte: moment().subtract(1, "day").startOf("day").valueOf(),
-          $lte: moment().subtract(1, "day").endOf("day").valueOf(),
-        },
+        ...(useStatusUpdatedAt
+          ? {
+              status_updated_at: {
+                $gte: new Date(yesterdayDateStart),
+                $lte: new Date(yesterdayDateEnd),
+              },
+            }
+          : isAvailableCardStatus
+          ? {
+              $or: [
+                {
+                  status_updated_at: {
+                    $gte: new Date(todaysDate),
+                    $lte: new Date(yesterdayDateEnd),
+                  },
+                },
+                {
+                  created_at: {
+                    $gte: yesterdayDateStart,
+                    $lte: yesterdayDateEnd,
+                  },
+                },
+              ],
+            }
+          : {
+              created_at: {
+                $gte: yesterdayDateStart,
+                $lte: yesterdayDateEnd,
+              },
+            }),
         ...query,
       }),
     };
@@ -147,7 +201,10 @@ router.get("/", async (req, res) => {
       let todayTotalCards = 0;
       let yesterdayTotalCards = 0;
       if (user.role == "ADMIN" && req.query.type == "ADMIN") {
-        const result = await getDocumentCount({ dbSchema: cardSch });
+        const result = await getDocumentCount({
+          dbSchema: cardSch,
+          useStatusUpdatedAt: true,
+        });
         todayTotalCards = result.today;
         yesterdayTotalCards = result.yesterday;
       }
@@ -161,6 +218,8 @@ router.get("/", async (req, res) => {
           query: {
             status: { $in: ["SUBMITTED", "REPRINT"] },
           },
+          useStatusUpdatedAt: true,
+          isAvailableCardStatus: true,
         });
         availableToPrintTodayCount = result.today;
         availableToPrintYesterdayCount = result.yesterday;
@@ -176,6 +235,7 @@ router.get("/", async (req, res) => {
           query: {
             status: "PRINTED",
           },
+          useStatusUpdatedAt: true,
         });
         printedTodayCount = result.today;
         printedYesterdayCount = result.yesterday;
@@ -191,6 +251,7 @@ router.get("/", async (req, res) => {
           query: {
             status: "UNDELIVERED",
           },
+          useStatusUpdatedAt: true,
         });
         undeliveredCardsTodayCount = result.today;
         undeliveredCardsYesterdayCount = result.yesterday;
@@ -207,6 +268,7 @@ router.get("/", async (req, res) => {
           query: {
             status: "DELIVERED",
           },
+          useStatusUpdatedAt: true,
         });
         deliveredCardsTodayCount = result.today;
         deliveredCardsYesterdayCount = result.yesterday;
@@ -224,6 +286,7 @@ router.get("/", async (req, res) => {
           query: {
             status: "DISCARDED",
           },
+          useStatusUpdatedAt: true,
         });
         discardedCardsTodayCount = result.today;
         discardedCardsYesterdayCount = result.yesterday;

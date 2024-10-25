@@ -11,7 +11,7 @@ async function deleteDocumentsThreeDaysAgo() {
 
     const result = await bin.deleteMany({
       deleted_at: {
-        $gte: startOfDayThreeDaysAgo,
+        // $gte: startOfDayThreeDaysAgo,
         $lte: endOfDayThreeDaysAgo,
       },
     });

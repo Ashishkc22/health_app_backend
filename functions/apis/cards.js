@@ -1338,6 +1338,7 @@ router.post("/", async (req, res) => {
           },
         },
       ],
+      status_updated_at: new Date(),
       unique_number: uuid,
       s_no: req.body.s_no || "",
     });
