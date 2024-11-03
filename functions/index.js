@@ -1,6 +1,6 @@
 // require('dotenv').config();
 const express = require("express");
-// const functions = require("firebase-functions");
+const functions = require("firebase-functions");
 // const fs = require("fs");
 const cors = require("cors")({ origin: true });
 const cron = require("node-cron");
@@ -12,8 +12,8 @@ const mongoose = require("mongoose");
 //XGPbiYAWIqHvzsQl
 //arogyam-clustor
 mongoose.connect(
-  // "mongodb+srv://aarogyam7r:XGPbiYAWIqHvzsQl@arogyam-clustor.jqc6cqy.mongodb.net/?retryWrites=true&w=majority",
-  "mongodb+srv://Ashish224:AshishKc225@ticketsys.b27zde6.mongodb.net/health-upwork-dev?retryWrites=true&w=majority&appName=TicketSys",
+  "mongodb+srv://aarogyam7r:XGPbiYAWIqHvzsQl@arogyam-clustor.jqc6cqy.mongodb.net/?retryWrites=true&w=majority",
+  // "mongodb+srv://Ashish224:AshishKc225@ticketsys.b27zde6.mongodb.net/health-upwork-dev?retryWrites=true&w=majority&appName=TicketSys",
   { useNewUrlParser: true }
 );
 // mongoose.connect("mongodb+srv://lokeshpilani2010:Scanner1212@cluster0.yyqwqch.mongodb.net/?retryWrites=true&w=majority", { useNewUrlParser: true });
@@ -112,7 +112,6 @@ cron.schedule(
     timezone: "Asia/Kolkata", // Set your timezone
   }
 );
-
 app.use("/auth", loginRouter);
 app.use("/cards", cardRouter);
 app.use("/hospitals", hospitalRouter);
