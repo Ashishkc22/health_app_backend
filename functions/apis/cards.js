@@ -386,9 +386,8 @@ router.get("/", async (req, res) => {
         });
       finalList.push({
         date: t,
-        count: entires.length,
-        data: entires,
       });
+      finalList = finalList.concat(entires);
     }
     return res.status(200).json({
       status: "success",
@@ -890,7 +889,7 @@ router.get("/to-be-printed", async (req, res) => {
     {
       $addFields: {
         unifiedLocation: {
-          $concat: ["$state", "/", "$district", "/", "$tehsil"],
+          $concat: ["$district", " / ", "$tehsil"], //"$state", " / ",
         },
       },
     },
@@ -1296,9 +1295,7 @@ router.post("/", async (req, res) => {
     }
     try {
       const gmp = await areaSch.findOne({ name: area.split(",")[1] });
-      console.log(gmp);
       const ntehsil = await tehsilSch.findOne({ name: tehsil });
-      console.log(ntehsil);
       if ((gmp.tehsil || "" != "") && gmp.tehsil != ntehsil._id) {
         return res.status(200).json({
           status: "failed",
