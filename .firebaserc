@@ -1,6 +1,6 @@
 {
   "projects": {
-    "dev": "health-demo-dev"
+    "default": "arogyam-super"
   },
   "targets": {},
   "etags": {},

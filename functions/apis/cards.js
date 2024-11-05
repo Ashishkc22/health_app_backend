@@ -386,6 +386,7 @@ router.get("/", async (req, res) => {
         });
       finalList.push({
         date: t,
+        count: entires.length,
       });
       finalList = finalList.concat(entires);
     }
