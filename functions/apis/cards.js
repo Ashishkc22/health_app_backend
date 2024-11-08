@@ -387,8 +387,9 @@ router.get("/", async (req, res) => {
       finalList.push({
         date: t,
         count: entires.length,
+        data: entires,
       });
-      finalList = finalList.concat(entires);
+      // finalList = finalList.concat(entires);
     }
     return res.status(200).json({
       status: "success",
