@@ -92,6 +92,29 @@ const cardSchema = new mongoose.Schema({
   status_updated_at: {
     type: Date,
   },
+  card_type: {
+    type: String,
+    required: true,
+  },
+  family_members: [
+    {
+      name: String,
+      gender: { type: String, enum: ["Male", "Female", "Transgender"] },
+      birth_year: { type: String },
+      relation: { type: String },
+    },
+  ],
+  total_price_before_discount: Number,
+  total_price_after_discount: Number,
+  recevied_amount: Number,
+  plan_validity: String,
+  abha_id: {
+    type: String,
+    minlength: [14, "abha id must be 14 characters long"],
+    maxLength: [14, "abha id must be 14 characters long"],
+  },
+  notes: String,
+  pwd: Boolean,
 });
 
 module.exports = mongoose.model("Card", cardSchema);
