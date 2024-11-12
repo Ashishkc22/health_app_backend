@@ -72,7 +72,6 @@ const individual = {
   blood_group: joi
     .string()
     .valid("A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-")
-    .required()
     .messages({
       "string.valid":
         'Blood group must be one of "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-".',
@@ -89,6 +88,23 @@ const individual = {
   s_no: joi.string().optional().allow("").messages({
     "string.base": "Serial number must be a string.",
   }),
+  total_price_before_discount: joi.number().required(),
+  total_price_after_discount: joi
+    .number()
+    .max(joi.ref("total_price_before_discount"))
+    .required(),
+  recevied_amount: joi.number().required(),
+  plan_validity: joi.string().required(),
+  abha_id: joi
+    .string()
+    .pattern(/^\d{14}$/) // Matches exactly 14 digits
+    .required()
+    .messages({
+      "string.pattern.base": "ABHA ID must be a valid 14-digit number.",
+      "any.required": "ABHA ID is required.",
+    }),
+  notes: joi.string(),
+  pwd: joi.boolean(),
 };
 
 const familyCard = {
@@ -109,23 +125,6 @@ const familyCard = {
     .required()
     .min(1)
     .max(4),
-  total_price_before_discount: joi.number().required(),
-  total_price_after_discount: joi
-    .number()
-    .max(joi.ref("total_price_before_discount"))
-    .required(),
-  recevied_amount: joi.number().required(),
-  plan_validity: joi.string().required(),
-  abha_id: joi
-    .string()
-    .pattern(/^\d{14}$/) // Matches exactly 14 digits
-    .required()
-    .messages({
-      "string.pattern.base": "ABHA ID must be a valid 14-digit number.",
-      "any.required": "ABHA ID is required.",
-    }),
-  notes: joi.string(),
-  pwd: joi.boolean(),
 };
 
 module.exports = joi
