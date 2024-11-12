@@ -98,7 +98,6 @@ const individual = {
   abha_id: joi
     .string()
     .pattern(/^\d{14}$/) // Matches exactly 14 digits
-    .required()
     .messages({
       "string.pattern.base": "ABHA ID must be a valid 14-digit number.",
       "any.required": "ABHA ID is required.",
