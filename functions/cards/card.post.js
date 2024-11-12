@@ -95,13 +95,6 @@ const createCard = async (req, res) => {
     if (req.body.card_type === "Family") {
       family_member_details = {
         family_members: req.body.family_members,
-        total_price_before_discount: req.body.total_price_before_discount,
-        total_price_after_discount: req.body.total_price_after_discount,
-        recevied_amount: req.body.recevied_amount,
-        plan_validity: req.body.plan_validity,
-        abha_id: req.body.abha_id,
-        notes: req.body.notes,
-        pwd: req.body.pwd,
       };
     }
     const card = cardSch({
@@ -148,6 +141,14 @@ const createCard = async (req, res) => {
       s_no: req.body.s_no || "",
       card_type: req.body.card_type,
       ...family_member_details,
+      total_price_before_discount: req.body.total_price_before_discount,
+      total_price_after_discount: req.body.total_price_after_discount,
+      received_amount: req.body.received_amount,
+      remaining_amount: req.body.remaining_amount,
+      plan_validity: req.body.plan_validity,
+      ...(req.body.abha_id && { abha_id: req.body.abha_id }),
+      ...(req.body.notes && { notes: req.body.notes }),
+      pwd: req.body.pwd,
     });
     if (card == null) {
       return res.status(200).json({

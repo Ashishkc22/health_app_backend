@@ -93,7 +93,8 @@ const individual = {
     .number()
     .max(joi.ref("total_price_before_discount"))
     .required(),
-  recevied_amount: joi.number().required(),
+  received_amount: joi.number().required(),
+  remaining_amount: joi.number().required(),
   plan_validity: joi.string().required(),
   abha_id: joi
     .string()
