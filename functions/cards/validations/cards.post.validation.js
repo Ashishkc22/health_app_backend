@@ -1,6 +1,6 @@
 const joi = require("joi");
 
-const individual = {
+const Single = {
   image: joi.string().uri().optional().messages({
     "string.uri": "Image must be a valid URL.",
   }),
@@ -123,7 +123,7 @@ const familyCard = {
 
 module.exports = joi
   .object({
-    card_type: joi.string().valid("Individual", "Family").required(),
+    card_type: joi.string().valid("Single", "Family").required(),
     father_husband_name: joi
       .string()
       .min(2)
@@ -135,17 +135,17 @@ module.exports = joi
           "Father/Husband Name must be no more than 50 characters long.",
       })
       .when("card_type", {
-        is: "Individual",
+        is: "Single",
         then: joi.required(), // Make it required
         otherwise: joi.optional(), // Make it optional
       }),
   })
-  .when(joi.object({ card_type: joi.string().valid("Individual") }).unknown(), {
+  .when(joi.object({ card_type: joi.string().valid("Single") }).unknown(), {
     then: {
-      ...individual, // Add individual-specific fields
+      ...Single, // Add Single-specific fields
     },
     otherwise: {
-      ...individual, // Add individual fields first (common to both)
+      ...Single, // Add Single fields first (common to both)
       ...familyCard, // Add family-specific fields
     },
   });

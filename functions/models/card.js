@@ -95,8 +95,8 @@ const cardSchema = new mongoose.Schema({
   card_type: {
     type: String,
     required: true,
-    enum: ["Individual", "Family"],
-    default: "Individual",
+    enum: ["Single", "Family"],
+    default: "Single",
   },
   family_members: [
     {
