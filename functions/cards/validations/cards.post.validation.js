@@ -63,12 +63,6 @@ const individual = {
       "any.required": "Phone is required.",
     }),
 
-  father_husband_name: joi.string().min(2).max(50).required().messages({
-    "string.min": "Father/Husband Name must be at least 2 characters long.",
-    "string.max":
-      "Father/Husband Name must be no more than 50 characters long.",
-  }),
-
   blood_group: joi
     .string()
     .valid("A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-")
@@ -130,6 +124,21 @@ const familyCard = {
 module.exports = joi
   .object({
     card_type: joi.string().valid("Individual", "Family").required(),
+    father_husband_name: joi
+      .string()
+      .min(2)
+      .max(50)
+      .required()
+      .messages({
+        "string.min": "Father/Husband Name must be at least 2 characters long.",
+        "string.max":
+          "Father/Husband Name must be no more than 50 characters long.",
+      })
+      .when("card_type", {
+        is: "Individual",
+        then: joi.required(), // Make it required
+        otherwise: joi.optional(), // Make it optional
+      }),
   })
   .when(joi.object({ card_type: joi.string().valid("Individual") }).unknown(), {
     then: {
