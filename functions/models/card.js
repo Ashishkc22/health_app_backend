@@ -110,7 +110,10 @@ const cardSchema = new mongoose.Schema({
   total_price_after_discount: Number,
   received_amount: Number,
   remaining_amount: Number,
-  plan_validity: String,
+  plan_validity: {
+    value: Number,
+    type: { type: String, enum: ["Yr"] },
+  },
   abha_id: {
     type: String,
     minlength: [14, "abha id must be 14 characters long"],

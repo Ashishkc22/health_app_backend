@@ -89,7 +89,10 @@ const Single = {
     .required(),
   received_amount: joi.number().required(),
   remaining_amount: joi.number().required(),
-  plan_validity: joi.string().required(),
+  plan_validity: {
+    value: joi.number().required(),
+    type: joi.string().valid("Yr"),
+  },
   abha_id: joi
     .string()
     .pattern(/^\d{14}$/) // Matches exactly 14 digits

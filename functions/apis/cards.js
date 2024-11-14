@@ -1306,6 +1306,24 @@ router.patch("/:id", async (req, res) => {
 
     if (oldCard.status == "PRINTED" || userr.role == "ADMIN") {
       if (req.body.status != null) {
+        const statusFlowMapper = {
+          SUBMITTED: ["PRINTED", "DISCARDED"],
+          PRINTED: ["RECEIVED", "REPRINT", "DISCARDED"],
+          RECEIVED: ["DELIVERED", "DISCARDED"],
+          DELIVERED: ["DISCARDED", "DISCARDED"],
+          DISCARDED: ["DELIVERED", "REPRINT"],
+        };
+
+        if (
+          !statusFlowMapper[oldCard.status].includes(
+            req.body.status.toString().toUpperCase()
+          )
+        ) {
+          return res.status(400).json({
+            status: "Failed",
+            message: "Card status can not be updated.",
+          });
+        }
         if (
           [
             "SUBMITTED",
@@ -1578,6 +1596,25 @@ router.patch("/updateStatus", async (req, res) => {
       }
     );
 
+    const statusFlowMapper = {
+      SUBMITTED: ["PRINTED", "DISCARDED"],
+      PRINTED: ["RECEIVED", "REPRINT", "DISCARDED"],
+      RECEIVED: ["DELIVERED", "DISCARDED"],
+      DELIVERED: ["DISCARDED", "DISCARDED"],
+      DISCARDED: ["DELIVERED", "REPRINT"],
+    };
+
+    if (
+      !statusFlowMapper[oldCard.status].includes(
+        req.body.status.toString().toUpperCase()
+      )
+    ) {
+      return res.status(400).json({
+        status: "Failed",
+        message: "Card status can not be updated.",
+      });
+    }
+
     const cardUpdate = await cardSch.updateOne(req.query.id, {
       status: req.body.status.toString().toUpperCase(),
       $push: {
@@ -1656,12 +1693,11 @@ function weekName(day) {
   }
   return day.toString();
 }
-
+const cardPostValidation = require("../cards/validations/cards.post.validation");
 router.post(
   "/",
   (req, res, next) => {
     try {
-      const cardPostValidation = require("../cards/validations/cards.post.validation");
       const result = cardPostValidation.validate(req.body, {
         abortEarly: false,
       });
