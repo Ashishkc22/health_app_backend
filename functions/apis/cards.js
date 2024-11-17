@@ -1301,6 +1301,12 @@ router.patch("/:id", async (req, res) => {
     if (req.body.discard_reason != null) {
       fields.discard_reason = req.body.discard_reason;
     }
+    if (req.body.family_members != null) {
+      fields.family_members = req.body.family_members;
+    }
+    if (req.body.family_members != null && req.body.family_members.lenght > 4) {
+      throw new Error("Only four family members are allowed");
+    }
 
     const oldCard = await cardSch.findById(req.params.id);
 
@@ -1333,6 +1339,7 @@ router.patch("/:id", async (req, res) => {
             "DISCARDED",
             "RTO",
             "REPRINT",
+            "RECEIVED",
           ].includes(req.body.status.toString().toUpperCase())
         ) {
           fields.status = req.body.status.toString().toUpperCase();
