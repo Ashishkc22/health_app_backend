@@ -10,6 +10,7 @@ async function getCards({
   search,
   status = [],
   options = {},
+  created_by,
   sort = { created_at: -1, tehsil: 1, created_by: 1 },
 } = {}) {
   try {
@@ -27,6 +28,7 @@ async function getCards({
         ...(duration && {
           created_at: { $gte: moment().startOf(duration).valueOf() },
         }),
+        ...(created_by && { created_by }),
         ...options,
       })
       .sort(sort)
