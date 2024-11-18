@@ -1,5 +1,4 @@
 const cardSch = require("../models/card");
-const moment = require("moment");
 // const statusMapper = {
 //     SUBMITTED: ["REPRINT", "SUBMITTED"],
 //     OTHER: ["UNDELIVERED", "DELIVERED"],
@@ -14,13 +13,9 @@ async function getCardsCount({ _id } = {}) {
       $or: [{ status: "SUBMITTED" }, { status: "PRINTED" }],
       created_by: _id,
     });
-    const delivered = await cardSch.countDocuments({
-      status: "DELIVERED",
-      created_by: _id,
-    });
     const others = await cardSch.countDocuments({
       status: {
-        $in: ["UNDELIVERED", "DICARDED"],
+        $in: ["UNDELIVERED", "DELIVERED"],
       },
       created_by: _id,
     });
@@ -37,11 +32,10 @@ async function getCardsCount({ _id } = {}) {
     });
     return {
       submitted,
-      delivered,
       discarded,
+      received,
       others,
       total,
-      received,
     };
   } catch (error) {
     console.error("Get cards Count processord Failed", error.message);
