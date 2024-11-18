@@ -2,7 +2,7 @@ const getCardProcessor = require("../processors/getCards");
 
 const statusMapper = {
   SUBMITTED: ["REPRINT", "SUBMITTED"],
-  OTHER: ["UNDELIVERED", "DISCARDED"],
+  OTHER: ["UNDELIVERED", "DELIVERED"],
   REPRINT: ["REPRINT"],
   UNDELIVERED: ["UNDELIVERED"],
   DISCARDED: ["DISCARDED"],
@@ -91,9 +91,17 @@ async function getCards(req, res) {
         result[str] = {};
         result[str].date = str;
         result[str].count = 0;
+        result[str].recievedCount = 0;
+        result[str].discardedCount = 0;
       }
       if (!result[str].data) {
         result[str].data = [];
+      }
+      if (doc.status === "RECEIVED") {
+        result[str].recievedCount += 1;
+      }
+      if (doc.status === "DISCARDED") {
+        result[str].discardedCount += 1;
       }
       result[str].count += 1;
       result[str].data.push(doc);
