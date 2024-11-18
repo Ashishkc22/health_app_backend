@@ -1,8 +1,8 @@
 const getCardProcessor = require("../processors/getCards");
-
+const getCardCountProcessor = require("../processors/getCardCount");
 const statusMapper = {
   SUBMITTED: ["REPRINT", "SUBMITTED"],
-  OTHER: ["UNDELIVERED", "DELIVERED"],
+  OTHER: ["UNDELIVERED", "DISCARDED"],
   REPRINT: ["REPRINT"],
   UNDELIVERED: ["UNDELIVERED"],
   DISCARDED: ["DISCARDED"],
@@ -67,8 +67,28 @@ function weekName(day) {
 
 async function getCards(req, res) {
   try {
-    const { page, limit, from, to, duration, search, status, other } =
-      req.query;
+    const {
+      page,
+      limit,
+      from,
+      to,
+      duration,
+      search,
+      status,
+      other,
+      responseType,
+    } = req.query;
+
+    if (responseType === "COUNT") {
+      const cardCounts = await getCardCountProcessor({
+        _id: req.userDetails._id,
+      });
+      return res.status(200).json({
+        status: "success",
+        ...cardCounts,
+      });
+    }
+
     const cardData = await getCardProcessor({
       skip: parseInt(page || 0) * parseInt(limit || "40"),
       ...(limit && { limit: parseInt(limit) }),
@@ -91,17 +111,9 @@ async function getCards(req, res) {
         result[str] = {};
         result[str].date = str;
         result[str].count = 0;
-        result[str].recievedCount = 0;
-        result[str].discardedCount = 0;
       }
       if (!result[str].data) {
         result[str].data = [];
-      }
-      if (doc.status === "RECEIVED") {
-        result[str].recievedCount += 1;
-      }
-      if (doc.status === "DISCARDED") {
-        result[str].discardedCount += 1;
       }
       result[str].count += 1;
       result[str].data.push(doc);
