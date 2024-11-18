@@ -9,6 +9,45 @@ const { isEmpty, groupBy } = require("lodash");
 const moment = require("moment/moment");
 
 require("padleft");
+router.get(
+  "/new",
+  async (req, res, next) => {
+    try {
+      if (req.query.token == null) {
+        return res.status(200).json({
+          status: "failed",
+          message: "Invalid Token",
+        });
+      }
+      const token = await tokenSch.findOne({ token: req.query.token });
+      const tokenUser = await userSch.findById(token.uid);
+      if (tokenUser == null || tokenUser.status != "Verified") {
+        return res.status(200).json({
+          status: "failed",
+          message:
+            tokenUser == null
+              ? "Access Denied"
+              : `${tokenUser.status} User: Access Denied`,
+        });
+      }
+      if (token == null) {
+        return res.status(200).json({
+          status: "failed",
+          message: "Invalid Token",
+        });
+      }
+      req.userDetails = tokenUser;
+      next();
+    } catch (error) {
+      console.error("GET MIDDLEWARE Error", error.message);
+      res.status(500).json({
+        status: "failed",
+        message: "Something went wrong.",
+      });
+    }
+  },
+  require("../cards/cards.get")
+);
 
 router.get("/", async (req, res) => {
   // const cds = await cardSch.find();
@@ -319,7 +358,7 @@ router.get("/", async (req, res) => {
       const date = new Date(x.expiry_date || 0);
       x.expiry = `${monthName(date.getMonth())} ${date.getFullYear()}`;
       if (req.query.mode != "ADMIN") {
-        x.status = parseStatus(x.status);
+        x.status = x.status;
       }
       x.address = `${x.area}, ${x.tehsil}, ${x.district}, ${x.state}`;
       return x;
@@ -1701,6 +1740,7 @@ function weekName(day) {
   return day.toString();
 }
 const cardPostValidation = require("../cards/validations/cards.post.validation");
+
 router.post(
   "/",
   (req, res, next) => {
@@ -1723,5 +1763,5 @@ router.post(
       });
     }
   },
-  require("../cards/card.post")
+  require("../cards/cards.post")
 );
