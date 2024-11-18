@@ -27,12 +27,17 @@ async function getCardsCount({ _id } = {}) {
       status: "DISCARDED",
       created_by: _id,
     });
+    const delivered = await cardSch.countDocuments({
+      status: "DELIVERED",
+      created_by: _id,
+    });
     const total = await cardSch.countDocuments({
       created_by: _id,
     });
     return {
       submitted,
       discarded,
+      delivered,
       received,
       others,
       total,

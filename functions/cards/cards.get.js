@@ -1,7 +1,7 @@
 const getCardProcessor = require("../processors/getCards");
 const getCardCountProcessor = require("../processors/getCardCount");
 const statusMapper = {
-  SUBMITTED: ["REPRINT", "SUBMITTED"],
+  SUBMITTED: ["REPRINT", "SUBMITTED", "PRINTED"],
   OTHER: ["UNDELIVERED", "DISCARDED"],
   REPRINT: ["REPRINT"],
   UNDELIVERED: ["UNDELIVERED"],
@@ -14,56 +14,6 @@ const durationMapper = {
   "THIS WEEK": "week",
   "THIS MONTH": "month",
 };
-
-function monthName(month) {
-  switch (month) {
-    case 0:
-      return "JAN";
-    case 1:
-      return "FEB";
-    case 2:
-      return "MAR";
-    case 3:
-      return "APR";
-    case 4:
-      return "MAY";
-    case 5:
-      return "JUN";
-    case 6:
-      return "JUL";
-    case 7:
-      return "AUG";
-    case 8:
-      return "SEP";
-    case 9:
-      return "OCT";
-    case 10:
-      return "NOV";
-    case 11:
-      return "DEC";
-  }
-  return month.toString();
-}
-
-function weekName(day) {
-  switch (day) {
-    case 0:
-      return "SUN";
-    case 1:
-      return "MON";
-    case 2:
-      return "TUE";
-    case 3:
-      return "WED";
-    case 4:
-      return "THU";
-    case 5:
-      return "FRI";
-    case 6:
-      return "SAT";
-  }
-  return day.toString();
-}
 
 async function getCards(req, res) {
   try {
@@ -131,6 +81,56 @@ async function getCards(req, res) {
       message: "Something went wrong while get cards data.",
     });
   }
+}
+
+function monthName(month) {
+  switch (month) {
+    case 0:
+      return "JAN";
+    case 1:
+      return "FEB";
+    case 2:
+      return "MAR";
+    case 3:
+      return "APR";
+    case 4:
+      return "MAY";
+    case 5:
+      return "JUN";
+    case 6:
+      return "JUL";
+    case 7:
+      return "AUG";
+    case 8:
+      return "SEP";
+    case 9:
+      return "OCT";
+    case 10:
+      return "NOV";
+    case 11:
+      return "DEC";
+  }
+  return month.toString();
+}
+
+function weekName(day) {
+  switch (day) {
+    case 0:
+      return "SUN";
+    case 1:
+      return "MON";
+    case 2:
+      return "TUE";
+    case 3:
+      return "WED";
+    case 4:
+      return "THU";
+    case 5:
+      return "FRI";
+    case 6:
+      return "SAT";
+  }
+  return day.toString();
 }
 
 module.exports = getCards;
