@@ -602,298 +602,6 @@ router.get("/to-be-printed", async (req, res) => {
     ...qry,
   });
 
-  // New aggregation
-  // db.getCollection("cards").aggregate([
-  //   {
-  //     $match: {
-  //       status: { $in: ["REPRINT", "SUBMITTED"] },
-  //     },
-  //   },
-
-  //   {
-  //     $sort: {
-  //       created_at: -1,
-  //     },
-  //   },
-
-  //   {
-  //     $lookup: {
-  //       from: "users",
-  //       localField: "created_by_uid",
-  //       foreignField: "uid",
-  //       pipeline: [
-  //         {
-  //           $project: {
-  //             _id: 1,
-  //             uid: 1,
-  //             name: 1,
-  //             email: 1,
-  //             phone: 1,
-  //             team_leader_id: 1, // Include TL ID for the next lookup
-  //           },
-  //         },
-  //       ],
-  //       as: "userDetails",
-  //     },
-  //   },
-
-  //   {
-  //     $addFields: {
-  //       userDetails: { $arrayElemAt: ["$userDetails", 0] }, // Convert array to object
-  //     },
-  //   },
-
-  //   {
-  //     $group: {
-  //       _id: {
-  //         location: "$userDetails.team_leader_id",
-  //       },
-  //       cards: { $push: "$$ROOT" },
-  //       cardCount: { $sum: 1 },
-  //     },
-  //   },
-
-  //   {
-  //     $addFields: {
-  //       cards: {
-  //         $slice: [
-  //           "$cards", // The array to slice
-  //           0 * 100, // Skip amount
-  //           100, // Limit
-  //         ],
-  //       },
-  //     },
-  //   },
-
-  //   {
-  //     $unwind: "$cards", // Unwind the cards to access created_by_uid
-  //   },
-
-  //   {
-  //     $group: {
-  //       _id: {
-  //         team_leader_id: "$_id.location", // Keep grouping by team leader ID
-  //         created_by_uid: "$cards.created_by_uid", // Group by created_by_uid within each team leader
-  //       },
-  //       userDetails: { $first: "$cards.userDetails" },
-  //       cards: { $push: "$cards" }, // Push the card data for each user
-  //       cardCount: { $sum: 1 }, // Count the number of cards for each user
-  //     },
-  //   },
-
-  //   {
-  //     $sort: {
-  //       cardCount: -1,
-  //     },
-  //   },
-
-  //   {
-  //     $group: {
-  //       _id: "$_id.team_leader_id", // Final grouping by team_leader_id
-  //       users: {
-  //         $push: {
-  //           created_by_uid: "$_id.created_by_uid",
-  //           userDetails: "$userDetails",
-  //           cards: "$cards",
-  //           cardCount: "$cardCount",
-  //         },
-  //       },
-  //       totalCardCount: { $sum: "$cardCount" }, // Total card count for each team leader
-  //     },
-  //   },
-  //   {
-  //     $sort: {
-  //       totalCardCount: -1,
-  //     },
-  //   },
-  //   {
-  //     $lookup: {
-  //       from: "users",
-  //       localField: "_id",
-  //       foreignField: "tl_id",
-  //       pipeline: [
-  //         {
-  //           $match: {
-  //             role: "TL",
-  //           },
-  //         },
-  //         {
-  //           $project: {
-  //             _id: 0,
-  //             uid: 1,
-  //             name: 1,
-  //             email: 1,
-  //             phone: 1,
-  //             tl_id: 1,
-  //           },
-  //         },
-  //       ],
-  //       as: "teamLeaderDetails",
-  //     },
-  //   },
-
-  //   {
-  //     $addFields: {
-  //       teamLeaderDetails: { $arrayElemAt: ["$teamLeaderDetails", 0] }, // Convert array to object
-  //     },
-  //   },
-  // ]);
-
-  //-----------------------------------------------------------------------------------------------------------
-
-  // let cardData = await cardSch.aggregate([
-  //   {
-  //     $match: {
-  //       status: { $in: ["REPRINT", "SUBMITTED"] },
-  //       ...qry,
-  //     },
-  //   },
-
-  //   {
-  //     $sort: {
-  //       created_at: -1,
-  //     },
-  //   },
-
-  //   {
-  //     $lookup: {
-  //       from: "users",
-  //       localField: "created_by_uid",
-  //       foreignField: "uid",
-  //       pipeline: [
-  //         {
-  //           $project: {
-  //             _id: 1,
-  //             uid: 1,
-  //             name: 1,
-  //             email: 1,
-  //             phone: 1,
-  //             team_leader_id: 1, // Include TL ID for the next lookup
-  //           },
-  //         },
-  //       ],
-  //       as: "userDetails",
-  //     },
-  //   },
-
-  //   {
-  //     $addFields: {
-  //       userDetails: { $arrayElemAt: ["$userDetails", 0] }, // Convert array to object
-  //     },
-  //   },
-
-  //   {
-  //     $group: {
-  //       _id: {
-  //         location: "$userDetails.team_leader_id",
-  //       },
-  //       cards: { $push: "$$ROOT" },
-  //       cardCount: { $sum: 1 },
-  //     },
-  //   },
-
-  //   {
-  //     $addFields: {
-  //       cards: {
-  //         $slice: [
-  //           "$cards", // The array to slice
-  //           0 * 100, // Skip amount
-  //           100, // Limit
-  //         ],
-  //       },
-  //     },
-  //   },
-
-  //   {
-  //     $unwind: "$cards", // Unwind the cards to access created_by_uid
-  //   },
-
-  //   {
-  //     $group: {
-  //       _id: {
-  //         team_leader_id: "$_id.location", // Keep grouping by team leader ID
-  //         created_by_uid: "$cards.created_by_uid", // Group by created_by_uid within each team leader
-  //       },
-  //       userDetails: { $first: "$cards.userDetails" },
-  //       cards: { $push: "$cards" }, // Push the card data for each user
-  //       cardCount: { $sum: 1 }, // Count the number of cards for each user
-  //       cardIds: { $push: "$cards._id" },
-  //     },
-  //   },
-
-  //   {
-  //     $sort: {
-  //       cardCount: -1,
-  //     },
-  //   },
-
-  //   {
-  //     $group: {
-  //       _id: "$_id.team_leader_id", // Final grouping by team_leader_id
-  //       users: {
-  //         $push: {
-  //           created_by_uid: "$_id.created_by_uid",
-  //           userDetails: "$userDetails",
-  //           cards: "$cards",
-  //           cardCount: "$cardCount",
-  //           //             cardIds: "$cardIds"
-  //         },
-  //       },
-  //       cardIds: { $push: "$cardIds" },
-  //       totalCardCount: { $sum: "$cardCount" }, // Total card count for each team leader
-  //     },
-  //   },
-  //   {
-  //     $sort: {
-  //       totalCardCount: -1,
-  //     },
-  //   },
-  //   {
-  //     $project: {
-  //       users: 1,
-  //       totalCardCount: 1,
-  //       cardIds: {
-  //         $reduce: {
-  //           input: "$cardIds", // Flatten the collected arrays
-  //           initialValue: [],
-  //           in: { $concatArrays: ["$$value", "$$this"] },
-  //         },
-  //       },
-  //     },
-  //   },
-  //   {
-  //     $lookup: {
-  //       from: "users",
-  //       localField: "_id",
-  //       foreignField: "tl_id",
-  //       pipeline: [
-  //         {
-  //           $match: {
-  //             role: "TL",
-  //           },
-  //         },
-  //         {
-  //           $project: {
-  //             _id: 0,
-  //             uid: 1,
-  //             name: 1,
-  //             email: 1,
-  //             phone: 1,
-  //             tl_id: 1,
-  //           },
-  //         },
-  //       ],
-  //       as: "teamLeaderDetails",
-  //     },
-  //   },
-
-  //   {
-  //     $addFields: {
-  //       teamLeaderDetails: { $arrayElemAt: ["$teamLeaderDetails", 0] }, // Convert array to object
-  //     },
-  //   },
-  // ]);
-
   let cardData = await cardSch.aggregate([
     {
       $match: {
@@ -907,26 +615,6 @@ router.get("/to-be-printed", async (req, res) => {
         created_at: -1,
       },
     },
-    // ...(req?.query?.sortBy
-    //   ? [
-    //       {
-    //         $sort: {
-    //           status_updated_at: -1,
-    //         },
-    //       },
-    //     ]
-    //   : []),
-    // ...(documentCount > parseInt(req.query.limit || "40")
-    //   ? [
-    //       {
-    //         $skip:
-    //           parseInt(req.query.page || 0) * parseInt(req.query.limit || "40"), // Skip documents for previous pages
-    //       },
-    //     ]
-    //   : []),
-    // {
-    //   $limit: parseInt(req.query.limit || "40"), // Limit the number of documents to the page size
-    // },
     {
       $addFields: {
         unifiedLocation: {
@@ -1349,40 +1037,39 @@ router.patch("/:id", async (req, res) => {
 
     const oldCard = await cardSch.findById(req.params.id);
 
-    if (oldCard.status == "PRINTED" || userr.role == "ADMIN") {
-      if (req.body.status != null) {
-        const statusFlowMapper = {
-          SUBMITTED: ["PRINTED", "DISCARDED"],
-          PRINTED: ["RECEIVED", "REPRINT", "DISCARDED"],
-          RECEIVED: ["DELIVERED", "DISCARDED"],
-          DELIVERED: ["DISCARDED", "DISCARDED"],
-          DISCARDED: ["DELIVERED", "REPRINT"],
-        };
+    // if (oldCard.status == "PRINTED" || userr.role == "ADMIN") {
+    if (req.body.status != null) {
+      const statusFlowMapper = {
+        SUBMITTED: ["PRINTED", "DISCARDED"],
+        PRINTED: ["RECEIVED", "REPRINT", "DISCARDED"],
+        RECEIVED: ["DELIVERED", "DISCARDED"],
+        DELIVERED: ["DISCARDED", "DISCARDED"],
+        DISCARDED: ["DELIVERED", "REPRINT"],
+      };
 
-        if (
-          !statusFlowMapper[oldCard.status].includes(
-            req.body.status.toString().toUpperCase()
-          )
-        ) {
-          return res.status(400).json({
-            status: "Failed",
-            message: "Card status can not be updated.",
-          });
-        }
-        if (
-          [
-            "SUBMITTED",
-            "PRINTED",
-            "UNDELIVERED",
-            "DELIVERED",
-            "DISCARDED",
-            "RTO",
-            "REPRINT",
-            "RECEIVED",
-          ].includes(req.body.status.toString().toUpperCase())
-        ) {
-          fields.status = req.body.status.toString().toUpperCase();
-        }
+      if (
+        !statusFlowMapper[oldCard.status].includes(
+          req.body.status.toString().toUpperCase()
+        )
+      ) {
+        return res.status(400).json({
+          status: "Failed",
+          message: "Card status can not be updated.",
+        });
+      }
+      if (
+        [
+          "SUBMITTED",
+          "PRINTED",
+          "UNDELIVERED",
+          "DELIVERED",
+          "DISCARDED",
+          "RTO",
+          "REPRINT",
+          "RECEIVED",
+        ].includes(req.body.status.toString().toUpperCase())
+      ) {
+        fields.status = req.body.status.toString().toUpperCase();
       }
       if (oldCard.status != req.body.status && (req.body.status || "") != "") {
         var upMap = {};
@@ -1451,44 +1138,25 @@ router.patch("/:id", async (req, res) => {
         if (oldCard.status == "DISCARDED") {
           upMap["$inc"].dis_count = -1;
         }
-
-        // fields["$push"] = {
-        //   status_history: {
-        //     previous_status: oldCard.status,
-        //     updated_status: req.body.status,
-        //     created_at: new Date().valueOf(),
-        //     ...(req.body?.discard_reason && {
-        //       reason: req.body.discard_reason,
-        //     }),
-        //     updated_by: {
-        //       name: userr.name,
-        //       phone: userr.phone,
-        //       _id: userr._id,
-        //       uid: userr.uid,
-        //     },
-        //   },
-        // };
-
-        console.log(upMap);
         const usr = await userSch.findByIdAndUpdate(oldCard.created_by, upMap);
-      }
-      fields["$push"] = {
-        status_history: {
-          previous_status: oldCard.status,
-          updated_status: req.body.status,
-          created_at: new Date().valueOf(),
-          ...(req.body?.discard_reason && {
-            reason: req.body.discard_reason,
-          }),
-          updated_by: {
-            name: userr.name,
-            phone: userr.phone,
-            _id: userr._id,
-            uid: userr.uid,
+        fields["$push"] = {
+          status_history: {
+            previous_status: oldCard.status,
+            updated_status: req.body.status,
+            created_at: new Date().valueOf(),
+            ...(req.body?.discard_reason && {
+              reason: req.body.discard_reason,
+            }),
+            updated_by: {
+              name: userr.name,
+              phone: userr.phone,
+              _id: userr._id,
+              uid: userr.uid,
+            },
           },
-        },
-      };
-      fields.status_updated_at = new Date();
+        };
+        fields.status_updated_at = new Date();
+      }
     }
 
     const cardUpdate = await cardSch.findByIdAndUpdate(req.params.id, fields);
