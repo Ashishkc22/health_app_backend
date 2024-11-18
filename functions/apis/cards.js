@@ -1071,92 +1071,92 @@ router.patch("/:id", async (req, res) => {
       ) {
         fields.status = req.body.status.toString().toUpperCase();
       }
-      if (oldCard.status != req.body.status && (req.body.status || "") != "") {
-        var upMap = {};
-        if (req.body.status == "SUBMITTED") {
-          upMap = {
-            $inc: {
-              p2_count: 1,
-            },
-          };
-        }
-        if (req.body.status == "PRINTED") {
-          upMap = {
-            $inc: {
-              p_count: 1,
-            },
-          };
-          fields.isPrintedPreviously = true;
-        }
-        if (req.body.status == "DELIVERED") {
-          upMap = {
-            $inc: {
-              d_count: 1,
-            },
-          };
-        }
-        if (req.body.status == "UNDELIVERED") {
-          upMap = {
-            $inc: {
-              ud_count: 1,
-            },
-          };
-        }
-        if (req.body.status == "DISCARDED") {
-          upMap = {
-            $inc: {
-              dis_count: 1,
-            },
-          };
-        }
-        if (req.body.status == "REPRINT") {
-          upMap = {
-            $inc: {
-              reprint_count: 1,
-            },
-          };
-        }
-        if (req.body.status == "RTO") {
-          upMap = {
-            $inc: {
-              RTO_count: 1,
-            },
-          };
-        }
-        if (oldCard.status == "SUBMITTED") {
-          upMap["$inc"].p2_count = -1;
-        }
-        if (oldCard.status == "PRINTED") {
-          upMap["$inc"].p_count = -1;
-        }
-        if (oldCard.status == "DELIVERED") {
-          upMap["$inc"].d_count = -1;
-        }
-        if (oldCard.status == "UNDELIVERED") {
-          upMap["$inc"].ud_count = -1;
-        }
-        if (oldCard.status == "DISCARDED") {
-          upMap["$inc"].dis_count = -1;
-        }
-        const usr = await userSch.findByIdAndUpdate(oldCard.created_by, upMap);
-        fields["$push"] = {
-          status_history: {
-            previous_status: oldCard.status,
-            updated_status: req.body.status,
-            created_at: new Date().valueOf(),
-            ...(req.body?.discard_reason && {
-              reason: req.body.discard_reason,
-            }),
-            updated_by: {
-              name: userr.name,
-              phone: userr.phone,
-              _id: userr._id,
-              uid: userr.uid,
-            },
-          },
-        };
-        fields.status_updated_at = new Date();
-      }
+      // if (oldCard.status != req.body.status && (req.body.status || "") != "") {
+      //   var upMap = {};
+      //   if (req.body.status == "SUBMITTED") {
+      //     upMap = {
+      //       $inc: {
+      //         p2_count: 1,
+      //       },
+      //     };
+      //   }
+      //   if (req.body.status == "PRINTED") {
+      //     upMap = {
+      //       $inc: {
+      //         p_count: 1,
+      //       },
+      //     };
+      //     fields.isPrintedPreviously = true;
+      //   }
+      //   if (req.body.status == "DELIVERED") {
+      //     upMap = {
+      //       $inc: {
+      //         d_count: 1,
+      //       },
+      //     };
+      //   }
+      //   if (req.body.status == "UNDELIVERED") {
+      //     upMap = {
+      //       $inc: {
+      //         ud_count: 1,
+      //       },
+      //     };
+      //   }
+      //   if (req.body.status == "DISCARDED") {
+      //     upMap = {
+      //       $inc: {
+      //         dis_count: 1,
+      //       },
+      //     };
+      //   }
+      //   // if (req.body.status == "REPRINT") {
+      //   //   upMap = {
+      //   //     $inc: {
+      //   //       reprint_count: 1,
+      //   //     },
+      //   //   };
+      //   // }
+      //   if (req.body.status == "RTO") {
+      //     upMap = {
+      //       $inc: {
+      //         RTO_count: 1,
+      //       },
+      //     };
+      //   }
+      //   if (oldCard.status == "SUBMITTED") {
+      //     upMap["$inc"].p2_count = -1;
+      //   }
+      //   if (oldCard.status == "PRINTED") {
+      //     upMap["$inc"].p_count = -1;
+      //   }
+      //   if (oldCard.status == "DELIVERED") {
+      //     upMap["$inc"].d_count = -1;
+      //   }
+      //   if (oldCard.status == "UNDELIVERED") {
+      //     upMap["$inc"].ud_count = -1;
+      //   }
+      //   if (oldCard.status == "DISCARDED") {
+      //     upMap["$inc"].dis_count = -1;
+      //   }
+      //   const usr = await userSch.findByIdAndUpdate(oldCard.created_by, upMap);
+      //   fields["$push"] = {
+      //     status_history: {
+      //       previous_status: oldCard.status,
+      //       updated_status: req.body.status,
+      //       created_at: new Date().valueOf(),
+      //       ...(req.body?.discard_reason && {
+      //         reason: req.body.discard_reason,
+      //       }),
+      //       updated_by: {
+      //         name: userr.name,
+      //         phone: userr.phone,
+      //         _id: userr._id,
+      //         uid: userr.uid,
+      //       },
+      //     },
+      //   };
+      //   fields.status_updated_at = new Date();
+      // }
     }
 
     const cardUpdate = await cardSch.findByIdAndUpdate(req.params.id, fields);

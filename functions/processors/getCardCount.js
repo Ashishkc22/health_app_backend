@@ -10,7 +10,11 @@ const cardSch = require("../models/card");
 async function getCardsCount({ _id } = {}) {
   try {
     const submitted = await cardSch.countDocuments({
-      $or: [{ status: "SUBMITTED" }, { status: "PRINTED" }],
+      $or: [
+        { status: "SUBMITTED" },
+        { status: "PRINTED" },
+        { status: "REPRINT" },
+      ],
       created_by: _id,
     });
     const others = await cardSch.countDocuments({
