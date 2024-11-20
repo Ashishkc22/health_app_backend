@@ -66,6 +66,7 @@ async function getCards(req, res) {
         result[str].data = [];
       }
       result[str].count += 1;
+      doc.address = `${doc.area}, ${doc.tehsil}, ${doc.district}, ${doc.state}`;
       result[str].data.push(doc);
       return result;
     }, {});
