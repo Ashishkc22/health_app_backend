@@ -6,23 +6,7 @@ const tehsilSch = require("../models/new_tehsil");
 
 const createCard = async (req, res) => {
   try {
-    const token = await tokenSch.findOne({ token: req.query.token || "" });
-    if (token == null) {
-      return res.status(200).json({
-        status: "failed",
-        message: "Invalid Token",
-      });
-    }
-    const userr = await userSch.findById(token.uid);
-    if (userr == null || userr.status != "Verified") {
-      return res.status(200).json({
-        status: "failed",
-        message:
-          userr == null
-            ? "Access Denied"
-            : `${userr.status} User: Access Denied`,
-      });
-    }
+    const userr = req.userDetails;
     if (/[0-9]/.test(req.body.name || "")) {
       return res.status(200).json({
         status: "failed",

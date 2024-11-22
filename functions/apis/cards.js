@@ -951,229 +951,229 @@ router.get("/:id", getCard, async (req, res) => {
   }
 });
 
-router.patch("/:id", async (req, res) => {
-  try {
-    if (req.query.token == null) {
-      return res.status(200).json({
-        status: "failed",
-        message: "Invalid Token",
-      });
-    }
-    const token = await tokenSch.findOne({ token: req.query.token });
-    if (token == null) {
-      return res.status(200).json({
-        status: "failed",
-        message: "Invalid Token",
-      });
-    }
-    const userr = await userSch.findById(token.uid);
-    if (userr == null || userr.status != "Verified") {
-      return res.status(200).json({
-        status: "failed",
-        message:
-          userr == null
-            ? "Access Denied"
-            : `${userr.status} User: Access Denied`,
-      });
-    }
-    var fields = {};
-    if (req.body.image != null) {
-      fields.image = req.body.image;
-    }
-    if (req.body.name != null) {
-      fields.name = req.body.name;
-    }
-    if (req.body.birth_year != null) {
-      fields.birth_year = req.body.birth_year;
-    }
-    if (req.body.gender != null) {
-      fields.gender = req.body.gender;
-    }
-    if (req.body.id_proof != null) {
-      fields.id_proof = req.body.id_proof;
-    }
-    if (req.body.state != null) {
-      fields.state = req.body.state;
-    }
-    if (req.body.district != null) {
-      fields.district = req.body.district;
-    }
-    if (req.body.tehsil != null) {
-      fields.tehsil = req.body.tehsil;
-    }
-    if (req.body.area != null) {
-      fields.area = req.body.area;
-    }
-    if (req.body.phone != null) {
-      fields.phone = req.body.phone;
-    }
-    if (req.body.father_husband_name != null) {
-      fields.father_husband_name = req.body.father_husband_name;
-    }
-    if (req.body.blood_group != null) {
-      fields.blood_group = req.body.blood_group;
-    }
-    if (req.body.emergency_contact != null) {
-      fields.emergency_contact = req.body.emergency_contact;
-    }
-    // if (req.body.issue_date != null) {
-    //     fields.issue_date = parseInt(req.body.issue_date.toString());
-    // }
-    if (req.body.expiry_date != null) {
-      fields.expiry_date = parseInt(req.body.expiry_date.toString());
-    }
-    if (req.body.expiry_years != null) {
-      fields.expiry_years = parseInt(req.body.expiry_years.toString());
-    }
-    if (req.body.discard_reason != null) {
-      fields.discard_reason = req.body.discard_reason;
-    }
-    if (req.body.family_members != null) {
-      fields.family_members = req.body.family_members;
-    }
-    if (req.body.family_members != null && req.body.family_members.lenght > 4) {
-      throw new Error("Only four family members are allowed");
-    }
+// router.patch("/:id", async (req, res) => {
+//   try {
+//     if (req.query.token == null) {
+//       return res.status(200).json({
+//         status: "failed",
+//         message: "Invalid Token",
+//       });
+//     }
+//     const token = await tokenSch.findOne({ token: req.query.token });
+//     if (token == null) {
+//       return res.status(200).json({
+//         status: "failed",
+//         message: "Invalid Token",
+//       });
+//     }
+//     const userr = await userSch.findById(token.uid);
+//     if (userr == null || userr.status != "Verified") {
+//       return res.status(200).json({
+//         status: "failed",
+//         message:
+//           userr == null
+//             ? "Access Denied"
+//             : `${userr.status} User: Access Denied`,
+//       });
+//     }
+//     var fields = {};
+//     if (req.body.image != null) {
+//       fields.image = req.body.image;
+//     }
+//     if (req.body.name != null) {
+//       fields.name = req.body.name;
+//     }
+//     if (req.body.birth_year != null) {
+//       fields.birth_year = req.body.birth_year;
+//     }
+//     if (req.body.gender != null) {
+//       fields.gender = req.body.gender;
+//     }
+//     if (req.body.id_proof != null) {
+//       fields.id_proof = req.body.id_proof;
+//     }
+//     if (req.body.state != null) {
+//       fields.state = req.body.state;
+//     }
+//     if (req.body.district != null) {
+//       fields.district = req.body.district;
+//     }
+//     if (req.body.tehsil != null) {
+//       fields.tehsil = req.body.tehsil;
+//     }
+//     if (req.body.area != null) {
+//       fields.area = req.body.area;
+//     }
+//     if (req.body.phone != null) {
+//       fields.phone = req.body.phone;
+//     }
+//     if (req.body.father_husband_name != null) {
+//       fields.father_husband_name = req.body.father_husband_name;
+//     }
+//     if (req.body.blood_group != null) {
+//       fields.blood_group = req.body.blood_group;
+//     }
+//     if (req.body.emergency_contact != null) {
+//       fields.emergency_contact = req.body.emergency_contact;
+//     }
+//     // if (req.body.issue_date != null) {
+//     //     fields.issue_date = parseInt(req.body.issue_date.toString());
+//     // }
+//     if (req.body.expiry_date != null) {
+//       fields.expiry_date = parseInt(req.body.expiry_date.toString());
+//     }
+//     if (req.body.expiry_years != null) {
+//       fields.expiry_years = parseInt(req.body.expiry_years.toString());
+//     }
+//     if (req.body.discard_reason != null) {
+//       fields.discard_reason = req.body.discard_reason;
+//     }
+//     if (req.body.family_members != null) {
+//       fields.family_members = req.body.family_members;
+//     }
+//     if (req.body.family_members != null && req.body.family_members.lenght > 4) {
+//       throw new Error("Only four family members are allowed");
+//     }
 
-    const oldCard = await cardSch.findById(req.params.id);
+//     const oldCard = await cardSch.findById(req.params.id);
 
-    // if (oldCard.status == "PRINTED" || userr.role == "ADMIN") {
-    if (req.body.status != null) {
-      const statusFlowMapper = {
-        SUBMITTED: ["PRINTED", "DISCARDED"],
-        PRINTED: ["RECEIVED", "REPRINT", "DISCARDED"],
-        RECEIVED: ["DELIVERED", "DISCARDED"],
-        DELIVERED: ["DISCARDED", "DISCARDED"],
-        DISCARDED: ["DELIVERED", "REPRINT"],
-      };
+//     // if (oldCard.status == "PRINTED" || userr.role == "ADMIN") {
+//     if (req.body.status != null) {
+//       const statusFlowMapper = {
+//         SUBMITTED: ["PRINTED", "DISCARDED"],
+//         PRINTED: ["RECEIVED", "REPRINT", "DISCARDED"],
+//         RECEIVED: ["DELIVERED", "DISCARDED"],
+//         DELIVERED: ["DISCARDED", "DISCARDED"],
+//         DISCARDED: ["DELIVERED", "REPRINT"],
+//       };
 
-      if (
-        !statusFlowMapper[oldCard.status].includes(
-          req.body.status.toString().toUpperCase()
-        )
-      ) {
-        return res.status(400).json({
-          status: "Failed",
-          message: "Card status can not be updated.",
-        });
-      }
-      if (
-        [
-          "SUBMITTED",
-          "PRINTED",
-          "UNDELIVERED",
-          "DELIVERED",
-          "DISCARDED",
-          "RTO",
-          "REPRINT",
-          "RECEIVED",
-        ].includes(req.body.status.toString().toUpperCase())
-      ) {
-        fields.status = req.body.status.toString().toUpperCase();
-      }
-      // if (oldCard.status != req.body.status && (req.body.status || "") != "") {
-      //   var upMap = {};
-      //   if (req.body.status == "SUBMITTED") {
-      //     upMap = {
-      //       $inc: {
-      //         p2_count: 1,
-      //       },
-      //     };
-      //   }
-      //   if (req.body.status == "PRINTED") {
-      //     upMap = {
-      //       $inc: {
-      //         p_count: 1,
-      //       },
-      //     };
-      //     fields.isPrintedPreviously = true;
-      //   }
-      //   if (req.body.status == "DELIVERED") {
-      //     upMap = {
-      //       $inc: {
-      //         d_count: 1,
-      //       },
-      //     };
-      //   }
-      //   if (req.body.status == "UNDELIVERED") {
-      //     upMap = {
-      //       $inc: {
-      //         ud_count: 1,
-      //       },
-      //     };
-      //   }
-      //   if (req.body.status == "DISCARDED") {
-      //     upMap = {
-      //       $inc: {
-      //         dis_count: 1,
-      //       },
-      //     };
-      //   }
-      //   // if (req.body.status == "REPRINT") {
-      //   //   upMap = {
-      //   //     $inc: {
-      //   //       reprint_count: 1,
-      //   //     },
-      //   //   };
-      //   // }
-      //   if (req.body.status == "RTO") {
-      //     upMap = {
-      //       $inc: {
-      //         RTO_count: 1,
-      //       },
-      //     };
-      //   }
-      //   if (oldCard.status == "SUBMITTED") {
-      //     upMap["$inc"].p2_count = -1;
-      //   }
-      //   if (oldCard.status == "PRINTED") {
-      //     upMap["$inc"].p_count = -1;
-      //   }
-      //   if (oldCard.status == "DELIVERED") {
-      //     upMap["$inc"].d_count = -1;
-      //   }
-      //   if (oldCard.status == "UNDELIVERED") {
-      //     upMap["$inc"].ud_count = -1;
-      //   }
-      //   if (oldCard.status == "DISCARDED") {
-      //     upMap["$inc"].dis_count = -1;
-      //   }
-      //   const usr = await userSch.findByIdAndUpdate(oldCard.created_by, upMap);
-      //   fields["$push"] = {
-      //     status_history: {
-      //       previous_status: oldCard.status,
-      //       updated_status: req.body.status,
-      //       created_at: new Date().valueOf(),
-      //       ...(req.body?.discard_reason && {
-      //         reason: req.body.discard_reason,
-      //       }),
-      //       updated_by: {
-      //         name: userr.name,
-      //         phone: userr.phone,
-      //         _id: userr._id,
-      //         uid: userr.uid,
-      //       },
-      //     },
-      //   };
-      //   fields.status_updated_at = new Date();
-      // }
-    }
+//       if (
+//         !statusFlowMapper[oldCard.status].includes(
+//           req.body.status.toString().toUpperCase()
+//         )
+//       ) {
+//         return res.status(400).json({
+//           status: "Failed",
+//           message: "Card status can not be updated.",
+//         });
+//       }
+//       if (
+//         [
+//           "SUBMITTED",
+//           "PRINTED",
+//           "UNDELIVERED",
+//           "DELIVERED",
+//           "DISCARDED",
+//           "RTO",
+//           "REPRINT",
+//           "RECEIVED",
+//         ].includes(req.body.status.toString().toUpperCase())
+//       ) {
+//         fields.status = req.body.status.toString().toUpperCase();
+//       }
+//       // if (oldCard.status != req.body.status && (req.body.status || "") != "") {
+//       //   var upMap = {};
+//       //   if (req.body.status == "SUBMITTED") {
+//       //     upMap = {
+//       //       $inc: {
+//       //         p2_count: 1,
+//       //       },
+//       //     };
+//       //   }
+//       //   if (req.body.status == "PRINTED") {
+//       //     upMap = {
+//       //       $inc: {
+//       //         p_count: 1,
+//       //       },
+//       //     };
+//       //     fields.isPrintedPreviously = true;
+//       //   }
+//       //   if (req.body.status == "DELIVERED") {
+//       //     upMap = {
+//       //       $inc: {
+//       //         d_count: 1,
+//       //       },
+//       //     };
+//       //   }
+//       //   if (req.body.status == "UNDELIVERED") {
+//       //     upMap = {
+//       //       $inc: {
+//       //         ud_count: 1,
+//       //       },
+//       //     };
+//       //   }
+//       //   if (req.body.status == "DISCARDED") {
+//       //     upMap = {
+//       //       $inc: {
+//       //         dis_count: 1,
+//       //       },
+//       //     };
+//       //   }
+//       //   // if (req.body.status == "REPRINT") {
+//       //   //   upMap = {
+//       //   //     $inc: {
+//       //   //       reprint_count: 1,
+//       //   //     },
+//       //   //   };
+//       //   // }
+//       //   if (req.body.status == "RTO") {
+//       //     upMap = {
+//       //       $inc: {
+//       //         RTO_count: 1,
+//       //       },
+//       //     };
+//       //   }
+//       //   if (oldCard.status == "SUBMITTED") {
+//       //     upMap["$inc"].p2_count = -1;
+//       //   }
+//       //   if (oldCard.status == "PRINTED") {
+//       //     upMap["$inc"].p_count = -1;
+//       //   }
+//       //   if (oldCard.status == "DELIVERED") {
+//       //     upMap["$inc"].d_count = -1;
+//       //   }
+//       //   if (oldCard.status == "UNDELIVERED") {
+//       //     upMap["$inc"].ud_count = -1;
+//       //   }
+//       //   if (oldCard.status == "DISCARDED") {
+//       //     upMap["$inc"].dis_count = -1;
+//       //   }
+//       //   const usr = await userSch.findByIdAndUpdate(oldCard.created_by, upMap);
+//       //   fields["$push"] = {
+//       //     status_history: {
+//       //       previous_status: oldCard.status,
+//       //       updated_status: req.body.status,
+//       //       created_at: new Date().valueOf(),
+//       //       ...(req.body?.discard_reason && {
+//       //         reason: req.body.discard_reason,
+//       //       }),
+//       //       updated_by: {
+//       //         name: userr.name,
+//       //         phone: userr.phone,
+//       //         _id: userr._id,
+//       //         uid: userr.uid,
+//       //       },
+//       //     },
+//       //   };
+//       //   fields.status_updated_at = new Date();
+//       // }
+//     }
 
-    const cardUpdate = await cardSch.findByIdAndUpdate(req.params.id, fields);
-    const card = await cardSch.findById(req.params.id);
-    return res.status(200).json({
-      status: "success",
-      message: "Card updated successfully",
-      data: card,
-      cardUpdate,
-    });
-  } catch (err) {
-    return res.status(200).json({
-      status: "failed",
-      message: err.message,
-    });
-  }
-});
+//     const cardUpdate = await cardSch.findByIdAndUpdate(req.params.id, fields);
+//     const card = await cardSch.findById(req.params.id);
+//     return res.status(200).json({
+//       status: "success",
+//       message: "Card updated successfully",
+//       data: card,
+//       cardUpdate,
+//     });
+//   } catch (err) {
+//     return res.status(200).json({
+//       status: "failed",
+//       message: err.message,
+//     });
+//   }
+// });
 
 module.exports = router;
 
@@ -1409,8 +1409,39 @@ function weekName(day) {
 }
 const cardPostValidation = require("../cards/validations/cards.post.validation");
 
+const tokenValidation = async (req, res, next) => {
+  try {
+    const token = await tokenSch.findOne({ token: req.query.token || "" });
+    if (token == null) {
+      return res.status(200).json({
+        status: "failed",
+        message: "Invalid Token",
+      });
+    }
+    const userr = await userSch.findById(token.uid);
+    if (userr == null || userr.status != "Verified") {
+      return res.status(200).json({
+        status: "failed",
+        message:
+          userr == null
+            ? "Access Denied"
+            : `${userr.status} User: Access Denied`,
+      });
+    }
+    req.userDetails = userr;
+    next();
+  } catch (error) {
+    console.error("Failed at tokenvalidation", error.message);
+    res.status(500).json({
+      status: "failed",
+      message: "Invalid or expired token.",
+    });
+  }
+};
+router.patch("/:id", tokenValidation, require("../cards/updateCardByid.patch"));
 router.post(
   "/",
+  tokenValidation,
   (req, res, next) => {
     try {
       const result = cardPostValidation.validate(req.body, {

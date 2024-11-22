@@ -2,7 +2,7 @@ const getCardProcessor = require("../processors/getCards");
 const getCardCountProcessor = require("../processors/getCardCount");
 const statusMapper = {
   SUBMITTED: ["REPRINT", "SUBMITTED", "PRINTED"],
-  OTHER: ["UNDELIVERED", "DISCARDED"],
+  OTHER: ["UNDELIVERED", "DELIVERED"],
   REPRINT: ["REPRINT"],
   UNDELIVERED: ["UNDELIVERED"],
   DISCARDED: ["DISCARDED"],
