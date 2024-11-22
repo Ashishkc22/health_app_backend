@@ -1438,7 +1438,7 @@ const tokenValidation = async (req, res, next) => {
     });
   }
 };
-const updateCardById = require("../cards/updateCardByid.patch");
+const updateCardById = require("../cards/updateCardById.patch");
 router.patch("/:id", tokenValidation, updateCardById);
 router.post(
   "/",
