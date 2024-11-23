@@ -20,6 +20,12 @@ router.get(
         });
       }
       const token = await tokenSch.findOne({ token: req.query.token });
+      if (token == null) {
+        return res.status(200).json({
+          status: "failed",
+          message: "Invalid or Missing Token",
+        });
+      }
       const tokenUser = await userSch.findById(token.uid);
       if (tokenUser == null || tokenUser.status != "Verified") {
         return res.status(200).json({
@@ -28,12 +34,6 @@ router.get(
             tokenUser == null
               ? "Access Denied"
               : `${tokenUser.status} User: Access Denied`,
-        });
-      }
-      if (token == null) {
-        return res.status(200).json({
-          status: "failed",
-          message: "Invalid Token",
         });
       }
       req.userDetails = tokenUser;
