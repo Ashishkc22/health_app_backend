@@ -4,7 +4,9 @@ async function updateCardById({ id, updatedData = {} } = {}) {
     if (!id) {
       throw new Error("Missing card Id.");
     }
-    return await cardSch.findByIdAndUpdate(id, updatedData);
+    return await cardSch.findByIdAndUpdate(id, updatedData, {
+      returnDocument: "after",
+    });
   } catch (error) {
     console.error("Failed in update card by id processor", error.message);
     throw error;

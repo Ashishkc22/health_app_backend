@@ -109,7 +109,7 @@ async function updateCardById(req, res) {
       }),
     };
     if (req.body.reSubmit) {
-      req.body.status = "SUBMITTED";
+      updatedData.status = "SUBMITTED";
     } else if (req.body.status) {
       await updateUserById({
         id,
