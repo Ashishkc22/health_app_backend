@@ -96,7 +96,7 @@ const createCard = async (req, res) => {
       father_husband_name: req.body.father_husband_name,
       blood_group: req.body.blood_group,
       emergency_contact: req.body.emergency_contact,
-      created_by: token.uid,
+      created_by: userDetails._id || userDetails.id,
       created_at: parseInt(Date.now()),
       status: "SUBMITTED",
       expiry_date: parseInt(Date.now()) + 2 * 365 * 24 * 60 * 60 * 1000,
