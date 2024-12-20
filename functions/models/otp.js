@@ -1,18 +1,19 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const otpSchema = new mongoose.Schema({
-    code: {
-        type: Number
-    },
-    time: {
-        type: Number
-    },
-    token: {
-        type: String
-    },
-    user_id: {
-        type: String
-    }
+  code: {
+    type: Number,
+  },
+  time: {
+    type: Number,
+  },
+  token: {
+    type: String,
+  },
+  user_id: {
+    type: String,
+  },
+  email: { type: String },
 });
 
-module.exports = mongoose.model('otps', otpSchema);
+module.exports = mongoose.model("otps", otpSchema);

@@ -1,11 +1,13 @@
-// require('dotenv').config();
+require("dotenv").config();
 const express = require("express");
 const functions = require("firebase-functions");
 // const fs = require("fs");
 const cors = require("cors")({ origin: true });
 const cron = require("node-cron");
 const app = express();
-
+const { BaseError } = require("./utils/custom-errors");
+const { logger } = require("./utils/logger");
+const PORT = process.env.PORT || 6060;
 process.env.TZ = "Asia/Calcutta";
 const mongoose = require("mongoose");
 //aarogyam7r
@@ -20,76 +22,14 @@ mongoose.connect(
 // mongoose.set({ strictQuery: true });
 const db = mongoose.connection;
 db.on("error", (err) => {
-  console.error(err);
+  logger.error(`Failed to connnect DB.`);
+  process.exit(1);
 });
-
-const cardSch = require("./models/card");
-// const userSch = require('./models/user');
 db.once("open", async function () {
-  console.log("connected to database");
-  // await cardSch.updateMany({
-  //     status: "DELIVERED"
-  // }, { status: "SUBMITTED" });
-  // await userSch({
-  //     name: "Lokesh",
-  //     password: "Lokesh@1234",
-  //     phone: "9887999888",
-  //     email: "lokeshpilani2010@gmail.com",
-  //     device_id: "1212",
-  //     status: "Verified",
-  // }).save();
-  // console.log(await userSch.find());
-  // await cardSch.create({
-  //     email: '7rogyam@gmail.com',
-  //     password: 'Aa@123456',
-  //     name: 'Aarogyam Admin',
-  //     device_id: 'ADMIN',
-  //     role: 'ADMIN',
-  //     status: 'Verified',
-  //     uid: "FE00000",
-  //     phone: "9999999999",
-  // });
-  // const usrs = await userSch.find();
-  // for (let x of usrs) {
-  //     console.log(x.uid);
-  //     const submitted = await cardSch.count({
-  //         created_by: x._id,
-  //     });
-  //     const p2 = await cardSch.count({
-  //         created_by: x._id,
-  //         status: 'SUBMITTED'
-  //     });
-  //     const p = await cardSch.count({
-  //         created_by: x._id,
-  //         status: 'PRINTED'
-  //     });
-  //     const delivered = await cardSch.count({
-  //         created_by: x._id,
-  //         status: 'DELIVERED'
-  //     });
-  //     const undelivered = await cardSch.count({
-  //         created_by: x._id,
-  //         status: 'UNDELIVERED'
-  //     });
-  //     const dis = await cardSch.count({
-  //         created_by: x._id,
-  //         status: 'DISCARDED'
-  //     });
-  //     await userSch.findByIdAndUpdate(x._id, {
-  //         score: submitted,
-  //         p2_count: p2,
-  //         p_count: p,
-  //         d_count: delivered,
-  //         ud_count: undelivered,
-  //         dis_count: dis
-  //     });
-  // }
+  logger.info(`connected to database`);
 });
-
-// const expressIp = require("express-ip");
 app.use(express.json({ limit: "10mb" }));
 app.use(cors);
-// app.use(expressIp().getIp);
 
 const loginRouter = require("./apis/login");
 const cardRouter = require("./apis/cards");
@@ -112,18 +52,33 @@ cron.schedule(
     timezone: "Asia/Kolkata", // Set your timezone
   }
 );
-app.use("/auth", loginRouter);
-app.use("/cards", cardRouter);
-app.use("/hospitals", hospitalRouter);
-app.use("/settings", settingRouter);
-app.use("/address", addressRouter);
-app.use("/dashboard", dashboardRouter);
-app.use("/bin", require("./apis/bin"));
-app.get("/", (req, res) => res.send("Express on Vercel"));
-app.get("/test", (req, res) => res.send("TEST Express on Vercel"));
 
-app.listen(6060, async () => {
-  console.log("Listening on post 6060");
+app.use(require("./controllers"));
+// app.use("/auth", loginRouter);
+// app.use("/cards", cardRouter);
+// app.use("/hospitals", hospitalRouter);
+// app.use("/settings", settingRouter);
+// app.use("/address", addressRouter);
+// app.use("/dashboard", dashboardRouter);
+// app.use("/bin", require("./apis/bin"));
+// app.get("/", (req, res) => res.send("Express on Vercel"));
+// app.get("/test", (req, res) => res.send("TEST Express on Vercel"));
+
+// HTTP Error Handling
+app.use(require("./middlewares/ErrorHandler"));
+// Handle uncaught exceptions
+process.on("uncaughtException", (error) => {
+  if (error instanceof BaseError) {
+    logger.error(err.description);
+  } else {
+    logger.crit("Uncaught exception.");
+    // process.exit(1);
+  }
+});
+
+// APP Listing
+app.listen(PORT, async () => {
+  logger.info(`Listening on port ${PORT}`);
 });
 
 // exports.app = functions

@@ -122,6 +122,10 @@ const userSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  RECEIVE_count: {
+    type: Number,
+    default: 0,
+  },
   ratio: {
     type: Number,
   },
@@ -154,6 +158,12 @@ const userSchema = new mongoose.Schema({
   suspension_reason: {
     type: String,
   },
+  services: [
+    {
+      serviceId: { type: mongoose.Schema.Types.ObjectId, required: true },
+      roleId: { type: mongoose.Schema.Types.ObjectId, require: true },
+    },
+  ],
 });
 
 module.exports = mongoose.model("User", userSchema);
