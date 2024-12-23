@@ -104,7 +104,7 @@ module.exports = {
     permissions: ["RESTORE_DATA"],
   },
   // Cards route
-  "/cards": {
+  "/cards/add-cards": {
     name: "create-new-card",
     services: ["ADMIN", "AGENT"],
     permissions: ["ADD_CARDS"],
@@ -124,7 +124,7 @@ module.exports = {
     services: ["AGENT", "ADMIN"],
     permissions: ["EDIT_CARDS"],
   },
-  "/cards": {
+  "/cards/get-cards": {
     name: "get-all-cards",
     services: ["AGENT", "ADMIN"],
     permissions: ["VIEW_USER_CARDS"],
@@ -143,6 +143,11 @@ module.exports = {
     name: "get-card-users",
     services: ["ADMIN"],
     permissions: ["VIEW_CARDS_USER_LIST"],
+  },
+  "/cards/get-my-cards": {
+    name: "get-users-cards",
+    services: ["AGENT"],
+    permissions: ["VIEW_MY_CARDS"],
   },
   // Dashboard
   "/dashboard": {

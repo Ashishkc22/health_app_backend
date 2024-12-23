@@ -8,7 +8,7 @@ const getCardUsers = require("./get-card-users");
 const { applyValidation } = require("../../utils/validation-helper");
 
 router.post(
-  "/",
+  "/add-card",
   (req, res, next) => applyValidation(addCardValidation, req.body, res, next),
   require("./add-card")
 );
@@ -29,7 +29,7 @@ router.patch(
   require("./update-card-by-id")
 );
 
-router.get("/", require("./get-cards"));
+router.get("/get-cards", require("./get-cards"));
 router.get("/get-my-cards", require("./get-my-cards"));
 router.get("/to-be-printed", require("./get-to-be-printed"));
 router.get("/get-card-by-id", getCardById);

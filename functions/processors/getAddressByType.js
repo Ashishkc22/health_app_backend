@@ -104,9 +104,14 @@ async function getAddressByType({
       case "janPanchayat":
         return await tehsilSchema.find(query).sort(sort);
       case "gramPanchayat":
+        const refId = query.ref_id;
+        delete query.ref_id;
         return await areaSchema
           .find(
-            { $or: [{ ref_id: query.ref_id }, { teshil: query.ref_id }] },
+            {
+              $or: [{ tehsil: refId }, { ref_id: refId }],
+              ...query,
+            },
             projection
           )
           .sort(sort);
