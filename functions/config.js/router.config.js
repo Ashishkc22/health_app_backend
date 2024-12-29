@@ -104,7 +104,7 @@ module.exports = {
     permissions: ["RESTORE_DATA"],
   },
   // Cards route
-  "/cards/add-cards": {
+  "/cards/add-card": {
     name: "create-new-card",
     services: ["ADMIN", "AGENT"],
     permissions: ["ADD_CARDS"],
@@ -186,5 +186,19 @@ module.exports = {
     name: "get-hospitals",
     services: ["ADMIN"],
     permissions: ["GET_SETTINGS"],
+  },
+  // Payment
+  "/payment/get-plans": {
+    name: "get-plans",
+    isPublic: true,
+    services: [],
+    permissions: [],
+  },
+  "/payment/purchase-plan": {
+    name: "purchase-plan",
+    // for testing this route is public
+    isPublic: true,
+    services: ["CUSTOMER"],
+    permissions: ["PURCHASE_PLAN"],
   },
 };
