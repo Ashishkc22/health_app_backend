@@ -10,4 +10,6 @@ module.exports = {
   DefaultRolePermissions,
   RegexEnum: require("./Regex"),
   CardEnums: require("./CardEnums"),
+  PaymentEnums: require("./PaymentEnums"),
+  TransactionEnums: require("./TransactionEnums"),
 };

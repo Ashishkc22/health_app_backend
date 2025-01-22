@@ -129,6 +129,11 @@ module.exports = {
         "Customers can access the platform to avail services and manage their accounts.",
     },
   },
+  USER: {
+    name: "USER",
+    description: "User that is logging in from landing page",
+    permissions: [],
+  },
   PERMISSIONS: {
     CardsPermission,
     UsersPermission,

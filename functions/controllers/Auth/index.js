@@ -61,6 +61,21 @@ router.post(
   require("./sign-up-user")
 );
 
+router.get(
+  "/user-exists",
+  (re, res, next) =>
+    applyValidation(
+      require("./validation.js/user-exists.validation"),
+      re.query,
+      res,
+      next
+    ),
+  require("./user-exists")
+);
+
+// google sign in/sign up routes
+router.use(require("./google-sign-in-sign-up"));
+
 // router.get("/user", require("./get-user-by-tl-id"));
 
 module.exports = router;

@@ -106,15 +106,43 @@ async function getAddressByType({
       case "gramPanchayat":
         const refId = query.ref_id;
         delete query.ref_id;
-        return await areaSchema
-          .find(
-            {
+        const aggregatePipline = [
+          {
+            $match: {
               $or: [{ tehsil: refId }, { ref_id: refId }],
               ...query,
             },
-            projection
-          )
-          .sort(sort);
+          },
+          { $project: projection },
+        ];
+        if (showGrams) {
+          aggregatePipline.push({
+            $lookup: {
+              from: "grams", // The collection to join
+              let: { areaId: { $toString: "$_id" }, areaName: "$name" }, // Pass area _id and name
+              pipeline: [
+                {
+                  $match: {
+                    $expr: {
+                      $eq: ["$ref_id", "$$areaId"], // Match ref_id with the area _id
+                    },
+                  },
+                },
+                { $project: { name: 1 } },
+                {
+                  $sort: { name: 1 },
+                },
+                {
+                  $addFields: {
+                    grampanchayat_name: "$$areaName",
+                  },
+                },
+              ],
+              as: "grams",
+            },
+          });
+        }
+        return await areaSchema.aggregate(aggregatePipline);
       case "gram":
         return gramWithTeshilId
           ? await getGramPanchayatWithGrams({

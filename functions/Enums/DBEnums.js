@@ -6,6 +6,7 @@ module.exports = {
     Pending: "Verification Pending",
     Unverified: "Unverified",
     Verified: "Verified",
+    Incomplete: "Incomplete",
   },
   CARD_STATUS: {
     UNDELIVERED: "UNDELIVERED",
@@ -22,5 +23,22 @@ module.exports = {
     TL: "TL",
     ADMIN: "ADMIN",
     SUBADMIN: "SUBADMIN",
+    USER: "USER",
+  },
+  PLAN_NAME: {
+    SOLO_LITE: "Solo Lite",
+    SOLO: "Solo",
+    SOLO_PREMIUM: "Solo Premium",
+    COUPLE: "Couple",
+    FAMILY: "Family",
+    FAMILY_PLUS: "Family+",
+  },
+  PLAN_TYPE: {
+    INDIVIDUAL: "INDIVIDUAL",
+    FAMILY: "FAMILY",
+  },
+  PLAN_STATUS: {
+    ACTIVE: "ACTIVE",
+    INACTIVE: "INACTIVE",
   },
 };

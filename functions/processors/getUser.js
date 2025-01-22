@@ -2,6 +2,7 @@ const { userSchema } = require("../models");
 const { CustomError } = require("../utils/custom-errors");
 const { logger } = require("../utils/logger");
 const { ProcessorErrors } = require("../Enums");
+const { isEmpty } = require("lodash");
 const mongoose = require("mongoose");
 
 const getUser = async ({
@@ -10,10 +11,11 @@ const getUser = async ({
   phone = "",
   tlID = "",
   uid = "",
+  searchOptions= {},
   projection = {},
 }) => {
   try {
-    if (!id && !email && !phone && !tlID && !uid)
+    if (!id && !email && !phone && !tlID && !uid && isEmpty(searchOptions))
       throw new CustomError(ProcessorErrors.USERS.GET_USER_ERROR);
 
     return await userSchema.findOne(
@@ -23,6 +25,7 @@ const getUser = async ({
         ...(phone && { phone }),
         ...(tlID && { tl_id: tlID }),
         ...(uid && { uid }),
+        ...searchOptions
       },
       projection
     );

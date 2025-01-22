@@ -3,6 +3,13 @@ const { applyValidation } = require("../../utils/validation-helper");
 
 router.get("/get-users", require("./get-users"));
 router.patch("/update-user-by-id", require("./update-user-by-id"));
+router.patch("/update-profile", (req, res, next) =>
+  applyValidation(
+    require("./validation.js/update-profile.validation"),
+    req.body,
+    res,
+    next
+  ), require("./update-profile"));
 router.patch("/suspend", require("./suspend-user"));
 router.post(
   "/add-tl",

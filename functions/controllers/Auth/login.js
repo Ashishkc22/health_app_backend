@@ -26,9 +26,9 @@ const login = async (req, res, next) => {
     //   req.body.password,
     //   user.password
     // );
-    if (req.body.password !== user.password) {
-      throw new CustomError(ErrorEnums.INCORRECT_PASSWORD);
-    }
+    // if (!isPasswordCorrect) {
+    //   throw new CustomError(ErrorEnums.INCORRECT_PASSWORD);
+    // }
     // get role and services detais
     const userRoleAndServiceDetails = await getUsersRoleAndServiceDetails({
       userId: user.id,

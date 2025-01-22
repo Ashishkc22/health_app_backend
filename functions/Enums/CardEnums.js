@@ -6,4 +6,8 @@ module.exports = {
     DELIVERED: ["DISCARDED"],
     DISCARDED: ["DELIVERED", "REPRINT", "SUBMITTED"],
   },
+  CARD_TYPE: {
+    Single: "Single",
+    Family: "Family",
+  },
 };

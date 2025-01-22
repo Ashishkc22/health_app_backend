@@ -17,4 +17,11 @@ module.exports = {
   tehsilSchema: require("./tehsil"),
   tokenSchema: require("./token"),
   userSchema: require("./user"),
+  newTehsilSchema: require("./new_tehsil"),
+  // Payment Modelss
+  orderSchema: require("./orders"),
+  transactionSchema: require("./transactions"),
+  walletSchema: require("./wallet"),
+  planSchema: require("./plans"),
+  purchasedPlanSchema: require("./purchasedPlans"),
 };

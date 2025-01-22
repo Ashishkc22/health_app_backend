@@ -10,6 +10,8 @@ const { logger } = require("./utils/logger");
 const PORT = process.env.PORT || 6060;
 process.env.TZ = "Asia/Calcutta";
 const mongoose = require("mongoose");
+const passport = require("passport");
+const GoogleStrategy = require("passport-google-oauth20").Strategy;
 //aarogyam7r
 //XGPbiYAWIqHvzsQl
 //arogyam-clustor
@@ -31,38 +33,51 @@ db.once("open", async function () {
 app.use(express.json({ limit: "10mb" }));
 app.use(cors);
 
-const loginRouter = require("./apis/login");
-const cardRouter = require("./apis/cards");
-const hospitalRouter = require("./apis/hospitals");
-const settingRouter = require("./apis/settings");
-const addressRouter = require("./apis/address");
-const dashboardRouter = require("./apis/dashboard");
-const updateUserStatus = require("./crons/updateUserStatus");
-const cleanbin = require("./crons/cleanBin");
-
 // Schedule the cron job to run every day at 11:00 PM
-cron.schedule(
-  "0 23 * * *",
-  () => {
-    updateUserStatus.updateUserStatus();
-    cleanbin.deleteDocumentsThreeDaysAgo();
-  },
-  {
-    scheduled: true,
-    timezone: "Asia/Kolkata", // Set your timezone
-  }
+// cron.schedule(
+//   "0 23 * * *",
+//   () => {
+//     updateUserStatus.updateUserStatus();
+//     cleanbin.deleteDocumentsThreeDaysAgo();
+//   },
+//   {
+//     scheduled: true,
+//     timezone: "Asia/Kolkata", // Set your timezone
+//   }
+// );
+
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_OAUTH_CLIENT_ID;
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_OAUTH_CLIENT_SECRET;
+
+console.log("GOOGLE_CLIENT_ID", GOOGLE_CLIENT_ID);
+console.log("GOOGLE_CLIENT_SECRET", GOOGLE_CLIENT_SECRET);
+
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: GOOGLE_CLIENT_ID,
+      clientSecret: GOOGLE_CLIENT_SECRET,
+      callbackURL: "/auth/google/callback",
+    },
+    require("./controllers/Auth/handle-google-user")
+  )
 );
+// // Save the session to the cookie
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+// Read the session from the cookie
+passport.deserializeUser((id, done) => {
+  // User.findById(id).then(user => {
+  //   done(null, user);
+  // });
+  done(null, id);
+});
+
+app.use(passport.initialize());
 
 app.use(require("./controllers"));
-// app.use("/auth", loginRouter);
-// app.use("/cards", cardRouter);
-// app.use("/hospitals", hospitalRouter);
-// app.use("/settings", settingRouter);
-// app.use("/address", addressRouter);
-// app.use("/dashboard", dashboardRouter);
-// app.use("/bin", require("./apis/bin"));
-// app.get("/", (req, res) => res.send("Express on Vercel"));
-// app.get("/test", (req, res) => res.send("TEST Express on Vercel"));
 
 // HTTP Error Handling
 app.use(require("./middlewares/ErrorHandler"));

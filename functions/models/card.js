@@ -101,7 +101,7 @@ const cardSchema = new mongoose.Schema({
   family_members: [
     {
       name: String,
-      gender: { type: String, enum: ["Male", "Female", "Transgender"] },
+      gender: { type: String, enum: ["Male", "Female", "Transgender","Other"] },
       birth_year: { type: String },
       relation: { type: String },
     },
@@ -121,6 +121,9 @@ const cardSchema = new mongoose.Schema({
   },
   notes: String,
   pwd: Boolean,
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+  },
 });
 
 module.exports = mongoose.model("Card", cardSchema);

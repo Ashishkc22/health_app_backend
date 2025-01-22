@@ -6,6 +6,9 @@ module.exports = async (err, req, res, next) => {
     if (err instanceof BaseError) {
       logger.error(err.description);
     }
+    if (err.isGoogleLoginError) {
+      return res.status(400).redirect(err.redirectUrl);
+    }
     res.status(400).json({
       status: "failed",
       code: err?.httpCode,

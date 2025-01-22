@@ -1,6 +1,10 @@
 const { userSchema } = require("../models");
 const { DBEnums } = require("../Enums");
 const { bcrptyPassword } = require("../utils/bcrypt-util");
+const  addUserRole  = require("./addUserRole");
+const getServiceByName  = require("./getServiceByName");
+const {DefaultRolePermissions,ErrorEnums} = require("../Enums");
+const { isEmpty } = require("lodash");
 
 async function getUuid({ role = "" } = {}) {
   try {
@@ -28,6 +32,15 @@ async function addUser({ data = {}, role = "FE", session } = {}) {
 
     const hashedPassword = bcrptyPassword.hashPassword({ text: data.password });
 
+    const roleDetails = await addUserRole({ session,role });
+    const service = await getServiceByName({
+      name: DefaultRolePermissions.SERVICES.AGENT.name,
+    });
+
+    if (isEmpty(service)) {
+      throw new CustomError(ErrorEnums.SERVICE_NOT_FOUND);
+    }
+
     const user = userSchema({
       uid: uxid,
       name: data.name,
@@ -54,10 +67,15 @@ async function addUser({ data = {}, role = "FE", session } = {}) {
       device_id: data.device_id,
       created_at: parseInt(Date.now()),
       role: role,
-      status: DBEnums.USER_STATUS.Unverified,
+      status: data?.status || DBEnums.USER_STATUS.Unverified,
       lat: parseFloat(data.lat) || 0.0,
       lon: parseFloat(data.lon) || 0.0,
-      services: data.services,
+      services:[
+        {
+          serviceId: service._id,
+          roleId: roleDetails._id,
+        },
+      ],
     });
     return await user.save(session && { session });
   } catch (error) {

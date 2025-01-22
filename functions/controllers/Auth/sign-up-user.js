@@ -1,12 +1,10 @@
 const { isEmpty } = require("lodash");
 const {
   getUser,
-  addUserRole,
-  getServiceByName,
   addUser,
 } = require("../../processors");
 const { CustomError } = require("../../utils/custom-errors");
-const { ErrorEnums, DefaultRolePermissions } = require("../../Enums");
+const { ErrorEnums, DBEnums } = require("../../Enums");
 const mongoose = require("mongoose");
 // assign default services ["agent"]
 // create FE role in roles collection
@@ -20,20 +18,15 @@ const userSignUp = async (req, res, next) => {
       email: req.body.email,
       phone: req.body.phone,
     });
+
+    const role = req.body?.role || DBEnums.USER_ROLES.USER;
+
     if (!isEmpty(user)) {
       throw new CustomError(ErrorEnums.USER_ALREADY_EXISTS);
     }
 
     session = await mongoose.startSession();
     session.startTransaction();
-
-    const roleDetails = await addUserRole({ session });
-    const service = await getServiceByName({
-      name: DefaultRolePermissions.SERVICES.AGENT.name,
-    });
-    if (isEmpty(service)) {
-      throw new CustomError(ErrorEnums.SERVICE_NOT_FOUND);
-    }
 
     const userData = await addUser({
       data: {
@@ -51,13 +44,9 @@ const userSignUp = async (req, res, next) => {
         device_id: req.body.device_id,
         lat: req.body.lat || 0.0,
         lon: req.body.lon || 0.0,
-        services: [
-          {
-            serviceId: service._id,
-            roleId: roleDetails._id,
-          },
-        ],
+        status: DBEnums.USER_STATUS.Incomplete,
       },
+      role,
       session,
     });
 
@@ -70,7 +59,7 @@ const userSignUp = async (req, res, next) => {
       data: userData,
     });
   } catch (error) {
-    await session.abortTransaction();
+    if (!isEmpty(session)) await session.abortTransaction();
     next(error);
   } finally {
     session.endSession();

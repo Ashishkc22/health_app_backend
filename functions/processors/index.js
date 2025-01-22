@@ -22,4 +22,12 @@ module.exports = {
   getCardById,
   getCardsByIds: require("./getCardsByIds"),
   updateCardStatus: require("./updateCardStatus"),
+  createPaymentOrder: require("./createPaymentOrder"),
+  getPlans: require("./getPlans"),
+  getPlanById: require("./getPlanById"),
+  getTransactionByRazorpayOrderId: require("./getTransactionByRazorpayOrderId"),
+  updateOrderAndTransaction: require("./updateOrderAndTransaction"),
+  addPurchasePlanDetails: require("./addPurchasePlanDetails"),
+  getPurchaedPlanDetails: require("./getPurchaedPlanDetails"),
+  addCard: require("./addCard"),
 };

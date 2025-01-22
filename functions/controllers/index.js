@@ -6,13 +6,15 @@ const { authHandler } = require("../middlewares");
 // };
 router.use("/auth", require("./Auth"));
 router.use("/user", authHandler, require("./User"));
+router.use("/payment", authHandler, require("./Payment"));
 router.use("/cards", authHandler, require("./Cards"));
-router.use("/hospitals", authHandler, require("./Hospitals.js"));
-router.use("/settings", authHandler, require("./Settings.js"));
-router.use("/address", authHandler, require("./Address.js"));
-router.use("/dashboard", authHandler, require("./Dashboard.js"));
+router.use("/hospitals", authHandler, require("./Hospitals"));
+router.use("/settings", authHandler, require("./Settings"));
+router.use("/address", authHandler, require("./Address"));
+router.use("/dashboard", authHandler, require("./Dashboard"));
 router.use("/bin", authHandler, require("./Bin"));
 router.use("/ping", (req, res) => res.send("pong"));
+router.use("/plans", authHandler, require("./Plans"));
 
 // Route not found middleware
 router.use((req, res, next) => {

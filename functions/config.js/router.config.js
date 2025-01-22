@@ -51,6 +51,11 @@ module.exports = {
     services: ["ADMIN"],
     permissions: ["EDIT_USERS"],
   },
+  "/user/update-profile": {
+    name: "update-user-profile",
+    services: ["USER"],
+    permissions: [],
+  },
   "/user/add-tl": {
     name: "add-new-tl",
     services: ["ADMIN"],
@@ -124,6 +129,11 @@ module.exports = {
     services: ["AGENT", "ADMIN"],
     permissions: ["EDIT_CARDS"],
   },
+  "/cards/update-user-card": {
+    name: "update-card-by-id",
+    services: ["USER"],
+    permissions: [],
+  },
   "/cards/get-cards": {
     name: "get-all-cards",
     services: ["AGENT", "ADMIN"],
@@ -149,6 +159,11 @@ module.exports = {
     services: ["AGENT"],
     permissions: ["VIEW_MY_CARDS"],
   },
+  "/cards/get-my-card": {
+    name: "get-users-card",
+    services: ["USER"],
+    permissions: [],
+  },
   // Dashboard
   "/dashboard": {
     name: "get-dashboard-details",
@@ -168,8 +183,9 @@ module.exports = {
   },
   "/hospitals/get-hospitals": {
     name: "get-hospitals",
-    services: ["ADMIN"],
-    permissions: ["VIEW_HOSPITALS"],
+    isPublic: true,
+    // services: ["ADMIN"],
+    // permissions: ["VIEW_HOSPITALS"],
   },
   "/hospitals/update-hospital-by-id": {
     name: "get-hospitals",
@@ -196,9 +212,30 @@ module.exports = {
   },
   "/payment/purchase-plan": {
     name: "purchase-plan",
-    // for testing this route is public
-    isPublic: true,
-    services: ["CUSTOMER"],
+    services: ["USER"],
     permissions: ["PURCHASE_PLAN"],
+  },
+  "/payment/plan-checkout": {
+    name: "plan-checkout",
+    services: ["USER"],
+    permissions: ["PLAN_CHECKOUT"],
+  },
+  //plans
+  "/plans/get-plans": {
+    name: "get-plans",
+    isPublic: true,
+    services: [],
+    permissions: [],
+  },
+  "/plans/get-my-plan": {
+    name: "get-my-plan",
+    services: ["USER"],
+    permissions: ["GET_MY_PLAN"],
+  },
+  "/cards/add-user-card": {
+    name: "add-user-card",
+    // isPublic: true,
+    services: ["USER"],
+    permissions: [/*"ADD_USER_CARD"*/],
   },
 };

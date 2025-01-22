@@ -106,4 +106,39 @@ module.exports = {
     httpCode: 421,
     description: "User id not found in card details.",
   },
+  NO_PLANS_FOUND: {
+    name: "NO-PLANS-FOUND",
+    httpCode: 422,
+    description: "No plans found.",
+  },
+  FAILED_TO_CREATE_ORDER: {
+    name: "FAILED-TO-CREATE-ORDER",
+    httpCode: 423,
+    description: "Failed to create order.",
+  },
+  INVALID_SIGNATURE: {
+    name: "INVALID-SIGNATURE",
+    httpCode: 424,
+    description: "Invalid signature.",
+  },
+  FAILED_TO_CREATE_ROLE: {
+    name: "FAILED-TO-CREATE-ROLE",
+    httpCode: 425,
+    description: "Failed to create role for google user..",
+  },
+  FAILED_TO_ADD_CARD: {
+    name: "FAILED-TO-ADD-CARD",
+    httpCode: 426,
+    description: "Failed to add card.",
+  },
+  CARD_ALREADY_EXISTS: {
+    name: "CARD-ALREADY-EXISTS",
+    httpCode: 427,
+    description: "Card already exists.",
+  },
+  NO_ACTIVE_PLAN_FOUND: {
+    name: "NO-ACTIVE-PLAN-FOUND",
+    httpCode: 428,
+    description: "No active plan found.",
+  },
 };
