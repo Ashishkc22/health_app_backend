@@ -72,20 +72,19 @@ async function updateOrderAndTransaction({
       throw new CustomError(ProcessorErrors.TRANSACTION_NOT_FOUND);
     }
 
-    await successCallback({ session,order })
+    await successCallback({ session, order, transactionData });
 
     await session.commitTransaction();
-
+    session.endSession();
     return {
       order,
       transaction,
     };
   } catch (error) {
     await session.abortTransaction();
+    session.endSession();
     logger.error("Error updating order and transaction:", error);
     throw error;
-  } finally {
-    session.endSession();
   }
 }
 

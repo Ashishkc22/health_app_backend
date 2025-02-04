@@ -38,12 +38,30 @@ const Single = {
     value: joi.string().required(),
   }),
 
-  state: joi.string().required().messages({
-    "string.empty": "State is empty.",
-  }),
+  pincode: joi
+    .string()
+    .pattern(/^\d{6}$/)
+    .optional()
+    .messages({
+      "string.pattern.base": "Pincode must be a 6-digit number.",
+    }),
 
-  district: joi.string().optional().messages({
-    "string.empty": "District is empty.",
+  state: joi.string().when("pincode", {
+    is: joi.exist(),
+    then: joi.string().optional(),
+    otherwise: joi.string().required().messages({
+      "string.empty": "State is empty.",
+    }),
+  }),
+  city:joi.string().required().messages({
+    "string.empty": "City is empty.",
+  }),
+  district: joi.string().when("pincode", {
+    is: joi.exist(),
+    then: joi.string().optional(),
+    otherwise: joi.string().required().messages({
+      "string.empty": "District is empty.",
+    }),
   }),
 
   tehsil: joi.string().optional().messages({

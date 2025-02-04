@@ -36,4 +36,28 @@ router.get(
   require("./get-user-by-id")
 );
 
+router.get(
+  "/get-team-member-stats",
+  (req, res, next) =>
+    applyValidation(
+      require("./validation.js/get-team-member-stats.validation"),
+      req.query,
+      res,
+      next
+    ),
+  require("./get-team-member-stats")
+);
+
+router.patch(
+  "/update-user-profile",
+  (req, res, next) =>
+    applyValidation(
+      require("./validation.js/update-user-profile.validation"),
+      req.body,
+      res,
+      next
+    ),
+  require("./update-user-profile")
+);
+
 module.exports = router;

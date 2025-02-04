@@ -41,4 +41,8 @@ module.exports = {
     ACTIVE: "ACTIVE",
     INACTIVE: "INACTIVE",
   },
+  WALLET_STATUS: {
+    ACTIVE: "active",
+    INACTIVE: "inactive",
+  },
 };

@@ -8,11 +8,11 @@ const { PLAN_NOT_FOUND } = require("../Enums/ProcessorErrors");
  * @returns {Promise<Object>} The plan document if found
  * @throws {Error} If plan not found or other errors occur
  */
-async function getPurchaedPlanDetails(searchQuery) {
+async function getPurchaedPlanDetails(searchQuery, throwError = true) {
   try {
     const plan = await purchasedPlanSchema.findOne(searchQuery);
 
-    if (!plan) {
+    if (!plan && throwError) {
       throw new CustomError(PLAN_NOT_FOUND);
     }
     return plan;

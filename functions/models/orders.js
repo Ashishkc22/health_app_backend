@@ -10,6 +10,10 @@ const orderSchema = new mongoose.Schema(
     planId: {
       type: mongoose.Schema.Types.ObjectId,
     },
+    plan: {
+      isRenew: { type: Boolean, default: false },
+      isPurchase: { type: Boolean, default: true },
+    },
     orderId: {
       type: String,
       unique: true,

@@ -30,6 +30,18 @@ module.exports = {
     services: [],
     permissions: [],
   },
+  "/auth/get-login-otp": {
+    name: "get-login-otp",
+    isPublic: true,
+    services: [],
+    permissions: [],
+  },
+  "/auth/verify-login-otp": {
+    name: "verify-login-otp",
+    isPublic: true,
+    services: [],
+    permissions: [],
+  },
   // Users routes
   "/user/get-my-details": {
     name: "get-user-details",
@@ -64,6 +76,16 @@ module.exports = {
   "/user/suspend": {
     name: "change-user-status-to-suspend",
     services: ["ADMIN"],
+    permissions: [],
+  },
+  "/user/get-team-member-stats": {
+    name: "get-team-member-stats",
+    services: ["AGENT"],
+    permissions: ["VIEW_TEAM_MEMBER_STATS"],
+  },
+  "/user/update-user-profile": {
+    name: "update-user-profile",
+    services: ["USER"],
     permissions: [],
   },
   // Address
@@ -219,6 +241,11 @@ module.exports = {
     name: "plan-checkout",
     services: ["USER"],
     permissions: ["PLAN_CHECKOUT"],
+  },
+  "/payment/p2p-coin": {
+    name: "p2p-coin",
+    services: ["AGENT"],
+    permissions: [/*"P2P_COIN"*/],
   },
   //plans
   "/plans/get-plans": {

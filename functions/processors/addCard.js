@@ -38,6 +38,8 @@ const addCard = async ({
       ...(data.id_proof && { id_proof: data.id_proof }),
       ...(data.state && { state: data.state }),
       ...(data.district && { district: data.district }),
+      ...(data.city && { city: data.city }),
+      ...(data.pincode && { pincode: data.pincode }),
       ...(data.tehsil && { tehsil: data.tehsil }),
       ...(data.area && { area: data.area }),
       ...(data.phone && { phone: data.phone }),

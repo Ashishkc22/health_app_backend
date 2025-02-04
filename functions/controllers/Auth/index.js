@@ -73,6 +73,30 @@ router.get(
   require("./user-exists")
 );
 
+router.post(
+  "/get-login-otp",
+  (re, res, next) =>
+    applyValidation(
+      require("./validation.js/get-login-otp.validation"),
+      re.body,
+      res,
+      next
+    ),
+  require("./get-login-otp")
+);
+
+router.post(
+  "/verify-login-otp",
+  (re, res, next) =>
+    applyValidation(
+      require("./validation.js/verify-login-otp.validation"),
+      re.body,
+      res,
+      next
+    ),
+  require("./verify-login-otp")
+);
+
 // google sign in/sign up routes
 router.use(require("./google-sign-in-sign-up"));
 

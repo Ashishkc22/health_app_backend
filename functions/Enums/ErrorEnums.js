@@ -141,4 +141,29 @@ module.exports = {
     httpCode: 428,
     description: "No active plan found.",
   },
+  PLAN_ALREADY_ACTIVE: {
+    name: "PLAN-ALREADY-ACTIVE",
+    httpCode: 429,
+    description: "Plan is already active.",
+  },
+  PLAN_NOT_RENEWABLE: {
+    name: "PLAN-NOT-RENEWABLE",
+    httpCode: 430,
+    description: "Plan is not renewable.",
+  },
+  UNAUTHORIZED: {
+    name: "UNAUTHORIZED",
+    httpCode: 431,
+    description: "Unauthorized",
+  },
+  INSUFFICIENT_BALANCE: {
+    name: "INSUFFICIENT_BALANCE",
+    httpCode: 432,
+    description: "Insufficient balance",
+  },
+  WALLET_DOES_NOT_EXIST: {
+    name: "WALLET_DOES_NOT_EXIST",
+    httpCode: 433,
+    description: "Wallet does not exist",
+  },
 };

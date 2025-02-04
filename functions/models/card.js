@@ -17,6 +17,12 @@ const cardSchema = new mongoose.Schema({
   id_proof: {
     type: Object,
   },
+  pincode: {
+    type: String,
+  },
+  city: {
+    type: String,
+  },
   state: {
     type: String,
   },

@@ -20,8 +20,6 @@ async function createTransaction(transactionData, session) {
       throw new CustomError(ProcessorErrors.AMOUNT_REQUIRED);
     if (!transactionData.transferType)
       throw new CustomError(ProcessorErrors.TRANSFER_TYPE_REQUIRED);
-    if (!transactionData.description)
-      throw new CustomError(ProcessorErrors.DESCRIPTION_REQUIRED);
 
     // Build transaction object using spread operator for conditional fields
     const transactionObj = {

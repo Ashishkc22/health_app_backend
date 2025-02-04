@@ -30,4 +30,8 @@ module.exports = {
   addPurchasePlanDetails: require("./addPurchasePlanDetails"),
   getPurchaedPlanDetails: require("./getPurchaedPlanDetails"),
   addCard: require("./addCard"),
+  updatePurchasedPlanDetails: require("./updatePurcharePlanDetails"),
+  updateWallet: require("./updateWallet"),
+  getWalletDetails: require("./getWalletDetails"),
+  createTransaction: require("./createTransaction"),
 };

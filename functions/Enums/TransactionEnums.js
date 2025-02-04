@@ -7,10 +7,11 @@ module.exports = {
     P2P_RECEIVED: "p2p_received",
   },
   TRANSFER_TYPE: {
-    WALLET_LOAD: "wallet_load",
     P2P_TRANSFER: "p2p_transfer",
     PLAN_PURCHASE: "plan_purchase",
+    PLAN_RENEW: "plan_renew",
     REFUND: "refund",
+    COIN_PURCHASE: "coin_purchase",
   },
   STATUS: {
     PENDING: "pending",

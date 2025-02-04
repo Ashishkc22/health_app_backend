@@ -35,7 +35,12 @@ const updateSchema = Joi.object({
       "any.required": "ID proof value is required.",
     }),
   }).optional(),
-
+  pincode: Joi.string().optional().messages({
+    "string.empty": "Pincode cannot be empty.",
+  }),
+  city: Joi.string().optional().messages({
+    "string.empty": "City cannot be empty.",
+  }),
   state: Joi.string().optional().messages({
     "string.empty": "State cannot be empty.",
   }),

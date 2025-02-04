@@ -1,11 +1,17 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const userSch = require("../models/user");
 const cardSchema = require("../models/card");
 const hospitalSchema = require("../models/hospital");
 
-async function updateUserById({ id, updatedData = {},updateCards = true,updateHospitals = true } = {}) {
+async function updateUserById({
+  id,
+  updatedData = {},
+  updateCards = true,
+  updateHospitals = true,
+  useUserId = false,
+} = {}) {
   const session = await mongoose.startSession();
-  
+
   try {
     if (!id) {
       throw new Error("Missing user Id.");
@@ -15,19 +21,21 @@ async function updateUserById({ id, updatedData = {},updateCards = true,updateHo
     await session.startTransaction();
 
     // Update user
-    const updatedUser = await userSch.findByIdAndUpdate(id, updatedData, { session });
+    const updatedUser = await userSch.findByIdAndUpdate(id, updatedData, {
+      session,
+    });
 
     // If name is present in updatedData, update related cards and hospitals
     if (updatedData.name) {
       // Update all cards created by this user
-      if(updateCards){
+      if (updateCards) {
         await cardSchema.updateMany(
-          { created_by: id },
-          { created_by_name: updatedData.name },
+          { ...(useUserId ? { userId: id } : { created_by: id }) },
+          { ...(useUserId ? { name: updatedData.name } : {created_by_name: updatedData.name}) },
           { session }
         );
       }
-      if(updateHospitals){
+      if (updateHospitals) {
         await hospitalSchema.updateMany(
           { created_by: id },
           { created_by_name: updatedData.name },

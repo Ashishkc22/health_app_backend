@@ -73,4 +73,9 @@ module.exports = {
     httpCode: 513,
     description: "Failed to add purchase plan details.",
   },
+  PURCHASED_PLAN_NOT_FOUND: {
+    name: "PURCHASED_PLAN_NOT_FOUND",
+    httpCode: 514,
+    description: "Purchased plan not found.",
+  },
 };

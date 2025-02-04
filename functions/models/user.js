@@ -73,6 +73,9 @@ const userSchema = new mongoose.Schema({
   current_location_type: {
     type: String,
   },
+  current_city: {
+    type: String,
+  },
   current_janpad: {
     type: String,
   },
@@ -146,6 +149,9 @@ const userSchema = new mongoose.Schema({
     type: Number,
   },
   janPanchayat: {
+    type: String,
+  },
+  gender: {
     type: String,
   },
   signatureImage: { type: String },

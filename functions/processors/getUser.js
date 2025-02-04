@@ -10,6 +10,7 @@ const getUser = async ({
   email = "",
   phone = "",
   tlID = "",
+  teamLeaderID = "",
   uid = "",
   searchOptions= {},
   projection = {},
@@ -24,6 +25,7 @@ const getUser = async ({
         ...(email && { email }),
         ...(phone && { phone }),
         ...(tlID && { tl_id: tlID }),
+        ...(teamLeaderID && { team_leader_id: teamLeaderID }),
         ...(uid && { uid }),
         ...searchOptions
       },

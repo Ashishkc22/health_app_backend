@@ -43,6 +43,7 @@ async function addUser({ data = {}, role = "FE", session } = {}) {
 
     const user = userSchema({
       uid: uxid,
+      tl_id: uxid,
       name: data.name,
       phone: data.phone,
       ...(data.legalName && { legalName: data.legalName }),

@@ -6,14 +6,17 @@ const {
   getPurchaedPlanDetails,
 } = require("../../processors");
 const mongoose = require("mongoose");
-const { addCard,getCardById } = require("../../processors");
+const { addCard, getCardById } = require("../../processors");
 const { isEmpty } = require("lodash");
 const { CustomError } = require("../../utils/custom-errors");
 
 const createCard = async (req, res, next) => {
   try {
-
-    const cardExists = await getCardById({  adhaarValue: req.body.id_proof.value });
+    const userId = req.userDetails.id;
+    const cardExists = await getCardById({
+      adhaarValue: req.body.id_proof.value,
+      userId,
+    });
     if (cardExists) {
       throw new CustomError(ErrorEnums.CARD_ALREADY_EXISTS);
     }
@@ -51,18 +54,21 @@ const createCard = async (req, res, next) => {
     }
 
     const card = await addCard({
-      data: {...req.body,status_history: [
-        {
+      data: {
+        ...req.body,
+        status_history: [
+          {
             previous_status: DBEnums.CARD_STATUS.PENDING,
-            updated_status:DBEnums.CARD_STATUS.PENDING,
+            updated_status: DBEnums.CARD_STATUS.PENDING,
             created_at: new Date().valueOf(),
             updated_by: {
               name: userDetails?.name || "",
               phone: userDetails?.phone || "",
               uid: userDetails?.uid || "",
             },
-          }
-      ]},
+          },
+        ],
+      },
       userId: userDetails.id,
       creatorDetails: agentDetails,
       planDetails: planDetails,

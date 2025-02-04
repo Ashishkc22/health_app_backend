@@ -25,4 +25,29 @@ router.post(
   require("./plan-checkout")
 );
 
+// Add this with the other routes
+router.post(
+  "/renew-plan",
+  (req, res, next) =>
+    applyValidation(
+      require("./validation/renew-plan.validation"),
+      req.body,
+      res,
+      next
+    ),
+  require("./renew-plan")
+);
+
+router.post(
+  "/p2p-coin",
+  (req, res, next) =>
+    applyValidation(
+      require("./validation/p2p-coin.validation"),
+      req.body,
+      res,
+      next
+    ),
+  require("./p2p-coin")
+);
+
 module.exports = router;

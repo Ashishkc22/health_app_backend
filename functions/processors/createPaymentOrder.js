@@ -13,6 +13,7 @@ async function createPaymentOrder({
   userDetails,
   deviceDetails = {},
   planId,
+  plan = {},
   transactionDetails = {},
 }) {
   let razorpayOrder;
@@ -30,7 +31,7 @@ async function createPaymentOrder({
       recipientWalletId: transactionDetails.recipientWalletId,
     }),
     metadata: {
-      source: TransactionEnums.METADATA.source.WEB,
+      source: transactionDetails?.metadata?.source || TransactionEnums.METADATA.source.WEB,
       ...(deviceDetails?.deviceInfo && {
         deviceInfo: deviceDetails.deviceInfo,
       }),
@@ -71,6 +72,7 @@ async function createPaymentOrder({
         amount,
         currency,
         notes,
+     ... (plan && { plan }),
         status: PaymentEnums.orderStatus.FAILED,
         userId: userDetails.id,
         amountInPaise: amount * 100,
@@ -88,6 +90,7 @@ async function createPaymentOrder({
       amount,
       currency,
       notes,
+     ... (plan && { plan }),
       status: PaymentEnums.orderStatus.CREATED,
       userId: userDetails.id,
       razorpayOrderId: razorpayOrder.id,
