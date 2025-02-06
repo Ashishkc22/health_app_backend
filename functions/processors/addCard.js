@@ -60,7 +60,7 @@ const addCard = async ({
       created_by: creatorDetails?._id || "User",
       created_by_uid: creatorDetails?.uid || "USER######",
       created_at: parseInt(Date.now()),
-      status: DBEnums.CARD_STATUS.PENDING,
+      status: DBEnums.CARD_STATUS.SUBMITTED,
       expiry_years:
         planDetails?.membershipDetails?.validityPeriod?.duration || 1,
       ...(userId && { userId: mongoose.Types.ObjectId(userId) }),

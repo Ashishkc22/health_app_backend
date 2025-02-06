@@ -15,6 +15,8 @@ router.use("/dashboard", authHandler, require("./Dashboard"));
 router.use("/bin", authHandler, require("./Bin"));
 router.use("/ping", (req, res) => res.send("pong"));
 router.use("/plans", authHandler, require("./Plans"));
+router.use("/wallet", authHandler, require("./Wallet"));
+router.use("/other", require("./Other"));
 router.use("/download-app", require("./downloadApp"));
 
 // Route not found middleware

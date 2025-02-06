@@ -205,9 +205,9 @@ module.exports = {
   },
   "/hospitals/get-hospitals": {
     name: "get-hospitals",
-    isPublic: true,
-    // services: ["ADMIN"],
-    // permissions: ["VIEW_HOSPITALS"],
+    // isPublic: true,
+    services: ["ADMIN","AgENT"],
+    permissions: ["VIEW_HOSPITALS"],
   },
   "/hospitals/update-hospital-by-id": {
     name: "get-hospitals",
@@ -264,5 +264,19 @@ module.exports = {
     // isPublic: true,
     services: ["USER"],
     permissions: [/*"ADD_USER_CARD"*/],
+  },
+  // wallet
+  "/wallet/get-my-wallet-details": {
+    name: "get-my-wallet-details",
+    services: ["AGENT"],
+    permissions: [],
+    // GET_MY_WALLET_DETAILS
+  },
+  // Other
+  "/other/add-hospital": {
+    name: "add-hospital",
+    isPublic: true,
+    services: [],
+    permissions: [],
   },
 };

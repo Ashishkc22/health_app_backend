@@ -45,4 +45,9 @@ module.exports = {
     ACTIVE: "active",
     INACTIVE: "inactive",
   },
+  HOSPITAL_STATUS: {
+    SUBMITTED: "SUBMITTED",
+    ENABLED: "ENABLED",
+    REJECTED: "REJECTED",
+  },
 };

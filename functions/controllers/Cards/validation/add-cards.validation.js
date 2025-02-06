@@ -42,11 +42,11 @@ const Single = {
     "string.empty": "State is empty.",
   }),
 
-  district: joi.string().optional().messages({
+  district: joi.string().required().messages({
     "string.empty": "District is empty.",
   }),
 
-  tehsil: joi.string().optional().messages({
+  tehsil: joi.string().required().messages({
     "string.empty": "Tehsil is empty.",
   }),
 
