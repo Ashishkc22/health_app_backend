@@ -22,12 +22,12 @@ const createCard = async (req, res, next) => {
     }
 
     const userDetails = req.userDetails;
-    const purchasedPlan = await getPurchaedPlanDetails({
-      userId: mongoose.Types.ObjectId(req.userDetails.id),
-      status: DBEnums.PLAN_STATUS.ACTIVE,
-    });
+    // const purchasedPlan = await getPurchaedPlanDetails({
+    //   userId: mongoose.Types.ObjectId(req.userDetails.id),
+    //   status: DBEnums.PLAN_STATUS.ACTIVE,
+    // });
 
-    const planDetails = await getPlanById(purchasedPlan.planId, {
+    const planDetails = await getPlanById(req.body.planId, {
       project: { membershipDetails: 1 },
     });
 
@@ -56,6 +56,7 @@ const createCard = async (req, res, next) => {
     const card = await addCard({
       data: {
         ...req.body,
+        selectedPlanId: req.body.planId,
         status_history: [
           {
             previous_status: DBEnums.CARD_STATUS.SUBMITTED,
@@ -72,6 +73,7 @@ const createCard = async (req, res, next) => {
       userId: userDetails.id,
       creatorDetails: agentDetails || userDetails,
       planDetails: planDetails,
+      status: DBEnums.CARD_STATUS.PENDING,
     });
 
     if (!card) {

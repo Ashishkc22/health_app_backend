@@ -26,10 +26,11 @@ const Single = {
 
   gender: joi
     .string()
-    .valid("Male", "Female", "Transgender","Other")
+    .valid("Male", "Female", "Transgender", "Other")
     .required()
     .messages({
-      "any.only": 'Gender must be one of "Male", "Female","Transgender" or "Other".',
+      "any.only":
+        'Gender must be one of "Male", "Female","Transgender" or "Other".',
       "any.required": "Gender is required.",
     }),
 
@@ -53,7 +54,7 @@ const Single = {
       "string.empty": "State is empty.",
     }),
   }),
-  city:joi.string().required().messages({
+  city: joi.string().required().messages({
     "string.empty": "City is empty.",
   }),
   district: joi.string().when("pincode", {
@@ -127,7 +128,10 @@ const familyCard = {
     .items(
       joi.object({
         name: joi.string().required(),
-        gender: joi.string().valid("Male", "Female", "Transgender","Other").required(),
+        gender: joi
+          .string()
+          .valid("Male", "Female", "Transgender", "Other")
+          .required(),
         birth_year: joi
           .number()
           .min(1100)
@@ -144,6 +148,7 @@ const familyCard = {
 module.exports = joi
   .object({
     card_type: joi.string().valid("Single", "Family").required(),
+    planId: joi.string().required(),
     father_husband_name: joi
       .string()
       .min(2)

@@ -4,6 +4,7 @@ const functions = require("firebase-functions");
 // const fs = require("fs");
 const cors = require("cors")({ origin: true });
 const cron = require("node-cron");
+const path = require("path");
 const app = express();
 const { BaseError } = require("./utils/custom-errors");
 const { logger } = require("./utils/logger");
@@ -76,6 +77,8 @@ passport.deserializeUser((id, done) => {
 });
 
 app.use(passport.initialize());
+// serve gallery images
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use(require("./controllers"));
 

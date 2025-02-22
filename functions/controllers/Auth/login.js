@@ -40,6 +40,7 @@ const login = async (req, res, next) => {
         status: user.status,
         email: user.email,
         phone: user.phone,
+        name: user.name,
         team_leader_id: user.team_leader_id,
         tl_id: user.tl_id,
         uid: user.uid,

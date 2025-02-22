@@ -64,7 +64,7 @@ async function handleGoogleUserLoginAndsignUp(
     if (session) {
       await session.abortTransaction();
     }
-    error.redirectUrl = "http://localhost:5173/google-sign-in-error";
+    error.redirectUrl = `${process.env.GOOGLE_SIGIN_REDIRECTION_URL}/google-sign-in-error`;
     error.isGoogleLoginError = true;
     callback(error, profile);
   } finally {

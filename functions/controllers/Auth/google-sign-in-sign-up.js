@@ -36,21 +36,23 @@ router.get(
         },
       });
       return res.redirect(
-        `http://localhost:5173/dashboard?token=${genratedToken}`
+        `${process.env.GOOGLE_SIGIN_REDIRECTION_URL}/dashboard?token=${genratedToken}`
       );
     } catch (error) {
-      return res.redirect("http://localhost:5173/google-sign-in-error");
+      return res.redirect(
+        `${process.env.GOOGLE_SIGIN_REDIRECTION_URL}/google-sign-in-error`
+      );
     }
   }
 );
 
 router.get("/failed", (req, res) => {
   console.log("Google sign in failed");
-  res.redirect("http://localhost:5173");
+  res.redirect(`${process.env.GOOGLE_SIGIN_REDIRECTION_URL}`);
 });
 router.get("/success", (req, res) => {
   console.log("Google sign in success");
-  res.redirect("http://localhost:5173");
+  res.redirect(`${process.env.GOOGLE_SIGIN_REDIRECTION_URL}`);
 });
 
 module.exports = router;

@@ -13,7 +13,6 @@ const { CustomError } = require("../../utils/custom-errors");
 
 const updateCard = async (req, res, next) => {
   try {
-
     const userDetails = req.userDetails;
     const cardExists = await getCardById({
       adhaarValue: req.body.id_proof.value,
@@ -23,14 +22,14 @@ const updateCard = async (req, res, next) => {
       throw new CustomError(ErrorEnums.CARD_DOES_NOT_EXIST);
     }
 
-    const purchasedPlan = await getPurchaedPlanDetails({
-      userId: mongoose.Types.ObjectId(req.userDetails.id),
-      status: DBEnums.PLAN_STATUS.ACTIVE,
-    });
+    // const purchasedPlan = await getPurchaedPlanDetails({
+    //   userId: mongoose.Types.ObjectId(req.userDetails.id),
+    //   status: DBEnums.PLAN_STATUS.ACTIVE,
+    // });
 
-    if(!purchasedPlan){
-      throw new CustomError(ErrorEnums.NO_ACTIVE_PLAN_FOUND);
-    }
+    // if(!purchasedPlan){
+    //   throw new CustomError(ErrorEnums.NO_ACTIVE_PLAN_FOUND);
+    // }
 
     if (/[0-9]/.test(req.body.name || "")) {
       return res.status(200).json({

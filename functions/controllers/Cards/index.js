@@ -5,6 +5,7 @@ const { ErrorEnums } = require("../../Enums");
 const addCardValidation = require("./validation/add-cards.validation");
 const addUserCardValidation = require("./validation/add-user-card.validation");
 const getCardById = require("./get-card-by-id");
+const getCardByUserId = require("./get-card-by-userid");
 const getCardUsers = require("./get-card-users");
 const { applyValidation } = require("../../utils/validation-helper");
 
@@ -47,6 +48,7 @@ router.patch(
 );
 
 router.get("/get-cards", require("./get-cards"));
+router.get("/get-card-by-userid", getCardByUserId);
 router.get("/get-my-cards", require("./get-my-cards"));
 router.get("/get-my-card", require("./get-my-card"));
 router.get("/to-be-printed", require("./get-to-be-printed"));

@@ -18,6 +18,9 @@ router.use("/plans", authHandler, require("./Plans"));
 router.use("/wallet", authHandler, require("./Wallet"));
 router.use("/other", require("./Other"));
 router.use("/download-app", require("./downloadApp"));
+router.use("/upload", authHandler, require("./gallery-upload"));
+router.use("/testimonial-videos", authHandler, require("./upload-videos"));
+router.use("/faq", authHandler, require("./faq"));
 
 // Route not found middleware
 router.use((req, res, next) => {

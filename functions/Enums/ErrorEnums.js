@@ -166,4 +166,9 @@ module.exports = {
     httpCode: 433,
     description: "Wallet does not exist",
   },
+  PASSWORD_ALREADY_SET: {
+    name: "PASSWORD_ALREADY_SET",
+    httpCode: 434,
+    description: "Password already set.",
+  },
 };

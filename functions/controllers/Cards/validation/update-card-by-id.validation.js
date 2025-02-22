@@ -56,6 +56,7 @@ const updateSchema = Joi.object({
   area: Joi.string().optional().messages({
     "string.empty": "Area cannot be empty.",
   }),
+  // selectedPlanId: Joi.string().optional(),
 
   phone: Joi.string()
     .pattern(/^[0-9]{10}$/)

@@ -88,6 +88,26 @@ module.exports = {
     services: ["USER"],
     permissions: [],
   },
+  "/user/get-customer": {
+    name: "get-customer",
+    services: ["ADMIN"],
+    permissions: [],
+  },
+  "/user/verify-customer": {
+    name: "verify-customer",
+    services: ["ADMIN"],
+    permissions: [],
+  },
+  "/user/get-team-member-status": {
+    name: "get-team-member-status",
+    services: ["AGENT"],
+    permissions: [],
+  },
+  "/user/set-my-password": {
+    name: "set-my-password",
+    services: ["USER"],
+    permissions: [],
+  },
   // Address
   "/address/add-address": {
     name: "add-address",
@@ -186,6 +206,11 @@ module.exports = {
     services: ["USER"],
     permissions: [],
   },
+  "/cards/get-card-by-userid": {
+    name: "get-card-by-userid",
+    services: ["ADMIN"],
+    permissions: [],
+  },
   // Dashboard
   "/dashboard": {
     name: "get-dashboard-details",
@@ -206,7 +231,7 @@ module.exports = {
   "/hospitals/get-hospitals": {
     name: "get-hospitals",
     // isPublic: true,
-    services: ["ADMIN","AgENT"],
+    services: ["ADMIN", "AgENT"],
     permissions: ["VIEW_HOSPITALS"],
   },
   "/hospitals/update-hospital-by-id": {
@@ -245,7 +270,9 @@ module.exports = {
   "/payment/p2p-coin": {
     name: "p2p-coin",
     services: ["AGENT"],
-    permissions: [/*"P2P_COIN"*/],
+    permissions: [
+      /*"P2P_COIN"*/
+    ],
   },
   //plans
   "/plans/get-plans": {
@@ -263,7 +290,9 @@ module.exports = {
     name: "add-user-card",
     // isPublic: true,
     services: ["USER"],
-    permissions: [/*"ADD_USER_CARD"*/],
+    permissions: [
+      /*"ADD_USER_CARD"*/
+    ],
   },
   // wallet
   "/wallet/get-my-wallet-details": {
@@ -277,6 +306,74 @@ module.exports = {
     name: "add-hospital",
     isPublic: true,
     services: [],
+    permissions: [],
+  },
+  "/upload/gallery-upload": {
+    name: "upload-gallery",
+    services: ["ADMIN"],
+    permissions: [],
+  },
+  "/upload/delete": {
+    name: "delete-gallery",
+    services: ["ADMIN"],
+    permissions: [],
+  },
+  "/upload/get-images": {
+    name: "get-gallery",
+    isPublic: true,
+    services: [],
+    permissions: [],
+  },
+  "/testimonial-videos/upload-video": {
+    name: "testimonial-upload-video",
+    services: ["ADMIN"],
+    permissions: [],
+  },
+  "/testimonial-videos/get-videos": {
+    name: "testimonial-get-videos",
+    isPublic: true,
+    services: [],
+    permissions: [],
+  },
+  "/testimonial-videos/delete-video": {
+    name: "testimonial-delete-video",
+    services: ["ADMIN"],
+    permissions: [],
+  },
+  "/faq/allFAQ": {
+    name: "get-all-faqs",
+    services: ["ADMIN"],
+    permissions: [],
+  },
+  "/faq/faq": {
+    name: "get-faq-by-id",
+    services: ["ADMIN"],
+    permissions: [],
+  },
+  "/faq": {
+    name: "add-faq",
+    isPublic: true,
+    services: [],
+    permissions: [],
+  },
+  "/faq/addFaq": {
+    name: "add-faq",
+    services: ["ADMIN"],
+    permissions: [],
+  },
+  "/faq/update-faq-by-id": {
+    name: "update-faq",
+    services: ["ADMIN"],
+    permissions: [],
+  },
+  "/faq/delete-faq-by-id": {
+    name: "delete-faq",
+    services: ["ADMIN"],
+    permissions: [],
+  },
+  "/faq/disable-faq": {
+    name: "disable-faq",
+    services: ["ADMIN"],
     permissions: [],
   },
 };

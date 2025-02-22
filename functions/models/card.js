@@ -107,7 +107,10 @@ const cardSchema = new mongoose.Schema({
   family_members: [
     {
       name: String,
-      gender: { type: String, enum: ["Male", "Female", "Transgender","Other"] },
+      gender: {
+        type: String,
+        enum: ["Male", "Female", "Transgender", "Other"],
+      },
       birth_year: { type: String },
       relation: { type: String },
     },
@@ -120,6 +123,7 @@ const cardSchema = new mongoose.Schema({
     value: Number,
     type: { type: String, enum: ["Yr"] },
   },
+  selectedPlanId: { type: String },
   abha_id: {
     type: String,
     minlength: [14, "abha id must be 14 characters long"],

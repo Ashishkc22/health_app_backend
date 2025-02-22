@@ -40,6 +40,7 @@ module.exports = {
   PLAN_STATUS: {
     ACTIVE: "ACTIVE",
     INACTIVE: "INACTIVE",
+    SELECTED: "SELECTED",
   },
   WALLET_STATUS: {
     ACTIVE: "active",

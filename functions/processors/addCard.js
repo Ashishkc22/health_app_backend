@@ -27,11 +27,13 @@ const addCard = async ({
   creatorDetails = {},
   planDetails = {},
   userId = "",
+  status = DBEnums.CARD_STATUS.SUBMITTED,
 }) => {
   try {
     const issueDate = new Date(parseInt(Date.now()));
     const cardData = {
       ...(data.image && { image: data.image }),
+      ...(data.selectedPlanId && { selectedPlanId: data.selectedPlanId }),
       ...(data.birth_year && { birth_year: data.birth_year }),
       ...(data.name && { name: data.name }),
       ...(data.gender && { gender: data.gender }),
@@ -60,7 +62,7 @@ const addCard = async ({
       created_by: creatorDetails?._id || "User",
       created_by_uid: creatorDetails?.uid || "USER######",
       created_at: parseInt(Date.now()),
-      status: DBEnums.CARD_STATUS.SUBMITTED,
+      status,
       expiry_years:
         planDetails?.membershipDetails?.validityPeriod?.duration || 1,
       ...(userId && { userId: mongoose.Types.ObjectId(userId) }),

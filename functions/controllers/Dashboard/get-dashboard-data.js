@@ -415,18 +415,22 @@ const getDashboardData = async (req, res) => {
         0
       ).getTime();
     }
+    if (req.query.period == "ALL") {
+      time = null;
+    }
     const cards = await cardSchema
       .find({
-        created_at: {
-          $gt: time,
-        },
+        ...(time && {
+          created_at: {
+            $gt: time,
+          },
+        }),
       })
       .select({
         created_by: 1,
         created_at: 1,
         status: 1,
       });
-    console.log(cards);
     var sts = Array();
     for (let a of cards) {
       if (
@@ -441,9 +445,6 @@ const getDashboardData = async (req, res) => {
         const delivered = thisCards.filter((x) => {
           return x.status.toUpperCase() == "DELIVERED";
         });
-        console.log(
-          `ID:${a.created_by} - SCORE: ${score} , DELIVERED: ${delivered.length}`
-        );
         const ratio = delivered.length == 0 ? 0 : delivered.length / score;
         let user;
         try {
@@ -456,6 +457,7 @@ const getDashboardData = async (req, res) => {
             name: user.name,
             location: user.district,
             score: score,
+            image: user.image,
             ratio: ratio * 100,
             uid: user._id,
           });
@@ -470,7 +472,6 @@ const getDashboardData = async (req, res) => {
         return e.score;
       })
     );
-    console.log(maxScore);
     var newSts = Array();
     for (let x of sts) {
       x.rank = sts.indexOf(x) + 1;

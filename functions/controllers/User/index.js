@@ -3,13 +3,17 @@ const { applyValidation } = require("../../utils/validation-helper");
 
 router.get("/get-users", require("./get-users"));
 router.patch("/update-user-by-id", require("./update-user-by-id"));
-router.patch("/update-profile", (req, res, next) =>
-  applyValidation(
-    require("./validation.js/update-profile.validation"),
-    req.body,
-    res,
-    next
-  ), require("./update-profile"));
+router.patch(
+  "/update-profile",
+  (req, res, next) =>
+    applyValidation(
+      require("./validation.js/update-profile.validation"),
+      req.body,
+      res,
+      next
+    ),
+  require("./update-profile")
+);
 router.patch("/suspend", require("./suspend-user"));
 router.post(
   "/add-tl",
@@ -58,6 +62,30 @@ router.patch(
       next
     ),
   require("./update-user-profile")
+);
+router.get("/get-customer", require("./get-customer"));
+router.get("/verify-customer", require("./verify-customer"));
+router.get(
+  "/get-team-member-status",
+  (req, res, next) =>
+    applyValidation(
+      require("./validation.js/get-team-member-status.validation"),
+      req.query,
+      res,
+      next
+    ),
+  require("./get-team-member-status")
+);
+router.post(
+  "/set-my-password",
+  (req, res, next) =>
+    applyValidation(
+      require("./validation.js/set-my-password.validation"),
+      req.body,
+      res,
+      next
+    ),
+  require("./set-my-password")
 );
 
 module.exports = router;

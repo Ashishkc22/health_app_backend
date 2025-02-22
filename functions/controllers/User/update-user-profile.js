@@ -4,15 +4,20 @@ const { DBEnums } = require("../../Enums");
 const updateProfile = async (req, res, next) => {
   try {
     const id = req.userDetails.id;
-    req.body.status = DBEnums.USER_STATUS.Verified
-    const user = await updateUserById({ id, updatedData: req.body, updateHospitals: false,userId: true, });
+    req.body.status = DBEnums.USER_STATUS.Unverified;
+    const user = await updateUserById({
+      id,
+      updatedData: req.body,
+      updateHospitals: false,
+      userId: true,
+    });
     return res.status(200).json({
       status: "success",
       message: "User updated successfully",
       data: user,
     });
   } catch (error) {
- next(error);
+    next(error);
   }
 };
 

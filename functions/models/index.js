@@ -24,4 +24,6 @@ module.exports = {
   walletSchema: require("./wallet"),
   planSchema: require("./plans"),
   purchasedPlanSchema: require("./purchasedPlans"),
+  pincode: require("./pincode"),
+  faqs: require("./FAQs"),
 };
