@@ -171,4 +171,9 @@ module.exports = {
     httpCode: 434,
     description: "Password already set.",
   },
+  NO_FE_FOUND: {
+    name: "NO-FE-FOUND",
+    httpCode: 435,
+    description: "No FE found.",
+  },
 };

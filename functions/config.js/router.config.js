@@ -211,11 +211,31 @@ module.exports = {
     services: ["ADMIN"],
     permissions: [],
   },
+  "/cards/get-available-card-locations": {
+    name: "get-available-card-locations",
+    services: ["ADMIN"],
+    permissions: [],
+  },
+  "/cards/get-cards-data-by-location": {
+    name: "get-cards-data-by-location",
+    services: ["ADMIN"],
+    permissions: [],
+  },
+  "/cards/get-my-team-cards": {
+    name: "get-my-team-members-cards",
+    services: ["AGENT"],
+    permissions: [],
+  },
   // Dashboard
   "/dashboard": {
     name: "get-dashboard-details",
     services: ["ADMIN", "AGENT"],
     permissions: ["GET_DASHBOARD_DETAILS"],
+  },
+  "/dashboard/get-my-leaderboard": {
+    name: "get-my-leaderboard",
+    services: ["AGENT"],
+    permissions: [],
   },
   // Hospitals
   "/hospitals/add-hospital": {

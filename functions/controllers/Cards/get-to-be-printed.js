@@ -1,5 +1,5 @@
 const { userSchema, cardSchema } = require("../../models");
-
+// REMOVE THIS ROUTE ONCE GET-CARD-DATA-BY-LOCATION IS COMPLETED
 const getToBePrintedCards = async (req, res, next) => {
   try {
     const userdetails = req.userDetails;
@@ -14,7 +14,9 @@ const getToBePrintedCards = async (req, res, next) => {
             : `${tokenUser.status} User: Access Denied`,
       });
     }
-    var qry = {};
+    var qry = {
+      userId: null,
+    };
     var createdQry = {};
     if (req.query.from != null && req.query.to != null) {
       qry.created_at = {
@@ -296,7 +298,7 @@ const getToBePrintedCards = async (req, res, next) => {
 
     const tehsilCount = await cardSchema.aggregate([
       // !isEmpty(qry) ? { $match: qry } : null,
-      { $match: { status: { $in: ["REPRINT", "SUBMITTED"] } } },
+      { $match: { status: { $in: ["REPRINT", "SUBMITTED"] }, userId: null } },
       {
         $group: {
           _id: "$tehsil",
@@ -323,9 +325,11 @@ const getToBePrintedCards = async (req, res, next) => {
       Object.keys(object).forEach((key) => (newTehsilCount[key] = object[key]));
     });
 
-    const totalCards = await cardSchema.countDocuments();
+    const totalCards = await cardSchema.countDocuments({ userId: null });
     const totalQryCards = await cardSchema.countDocuments(qry);
-    var x = {};
+    var x = {
+      userId: null,
+    };
     for (let v of Object.keys(qry)) {
       if (v != "status") {
         x[v] = qry[v];
@@ -334,6 +338,7 @@ const getToBePrintedCards = async (req, res, next) => {
     x.status = { $in: ["REPRINT", "SUBMITTED"] };
     const totalPrintCardsShowing = await cardSchema.countDocuments(x);
     const totalPrintCards = await cardSchema.countDocuments({
+      userId: null,
       status: { $in: ["REPRINT", "SUBMITTED"] },
       ...(req?.query?.isPrintMode && {
         $or: [

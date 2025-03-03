@@ -9,10 +9,11 @@ const getCardUsers = async (req, res) => {
               {
                 $match: {
                   status: { $in: ["REPRINT", "SUBMITTED"] },
+                  userId: null,
                 },
               },
             ]
-          : []),
+          : [{ $match: { userId: null } }]),
         {
           $group: {
             _id: "$created_by",

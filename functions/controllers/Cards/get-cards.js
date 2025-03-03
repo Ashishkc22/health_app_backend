@@ -62,7 +62,9 @@ const getCards = async (req, res, next) => {
             : `${tokenUser.status} User: Access Denied`,
       });
     }
-    var qry = {};
+    var qry = {
+      userId: null,
+    };
     var createdQry = {};
     if (req.query.from != null && req.query.to != null) {
       qry.created_at = {
@@ -195,9 +197,11 @@ const getCards = async (req, res, next) => {
         })
         .skip(parseInt(req.query.page || 0) * parseInt(req.query.limit || "40"))
         .limit(parseInt(req.query.limit || "40"));
-      const totalCards = await cardSchema.countDocuments();
+      const totalCards = await cardSchema.countDocuments({ userId: null });
       const totalQryCards = await cardSchema.countDocuments(qry);
-      var x = {};
+      var x = {
+        userId: null,
+      };
       for (let v of Object.keys(qry)) {
         if (v != "status") {
           x[v] = qry[v];
@@ -208,6 +212,7 @@ const getCards = async (req, res, next) => {
       const totalPrintCardsShowing = await cardSchema.countDocuments(x);
       const totalPrintCards = await cardSchema.countDocuments({
         status: { $in: ["REPRINT", "SUBMITTED"] },
+        userId: null,
         $or: [
           {
             created_at: {
@@ -230,19 +235,23 @@ const getCards = async (req, res, next) => {
       const submitted = await cardSchema.countDocuments({
         $or: [{ status: "SUBMITTED" }, { status: "PRINTED" }],
         created_by: tokenUser._id,
+        userId: null,
       });
       const delivered = await cardSchema.countDocuments({
         status: "DELIVERED",
         created_by: tokenUser._id,
+        userId: null,
       });
       const others = await cardSchema.countDocuments({
         status: {
           $in: ["UNDELIVERED", "DISCARDED"],
         },
+        userId: null,
         created_by: tokenUser._id,
       });
       const total = await cardSchema.countDocuments({
         created_by: tokenUser._id,
+        userId: null,
       });
       return res.status(200).json({
         status: "success",
@@ -262,7 +271,7 @@ const getCards = async (req, res, next) => {
       const statusCount =
         (
           await cardSchema.aggregate([
-            // { $match: qry },
+            { $match: { userId: null } },
             {
               $group: {
                 _id: "$status",
@@ -333,12 +342,13 @@ const getCards = async (req, res, next) => {
       });
       if (req.query.responseType == "LIST") {
         const totalCards = await cardSchema.countDocuments({
+          userId: null,
           // $or: [
           //   { created_at: { $lt: moment().startOf("day").hour(10).valueOf() } },
           // ],
         });
         const totalQryCards = await cardSchema.countDocuments(qry);
-        var x = {};
+        var x = { userId: null };
         for (let v of Object.keys(qry)) {
           if (v != "status") {
             x[v] = qry[v];
@@ -349,6 +359,7 @@ const getCards = async (req, res, next) => {
         const totalPrintCardsShowing = await cardSchema.countDocuments(x);
         const totalPrintCards = await cardSchema.countDocuments({
           status: { $in: ["REPRINT", "SUBMITTED"] },
+          userId: null,
           // $or: [
           //   {
           //     created_at: {

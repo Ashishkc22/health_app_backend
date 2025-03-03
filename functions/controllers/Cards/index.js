@@ -16,7 +16,8 @@ router.post(
 );
 router.post(
   "/add-user-card",
-  (req, res, next) => applyValidation(addUserCardValidation, req.body, res, next),
+  (req, res, next) =>
+    applyValidation(addUserCardValidation, req.body, res, next),
   require("./add-user-card")
 );
 router.post("/mark-cards-as-printed", require("./mark-cards-as-printed"));
@@ -48,6 +49,15 @@ router.patch(
 );
 
 router.get("/get-cards", require("./get-cards"));
+router.get(
+  "/get-available-card-locations",
+  require("./get-available-card-locations")
+);
+router.get(
+  "/get-cards-data-by-location",
+  require("./get-cards-data-by-location")
+);
+router.get("/get-my-team-cards", require("./get-my-team-cards"));
 router.get("/get-card-by-userid", getCardByUserId);
 router.get("/get-my-cards", require("./get-my-cards"));
 router.get("/get-my-card", require("./get-my-card"));
