@@ -59,8 +59,8 @@ const createCard = async (req, res, next) => {
         selectedPlanId: req.body.planId,
         status_history: [
           {
-            previous_status: DBEnums.CARD_STATUS.SUBMITTED,
-            updated_status: DBEnums.CARD_STATUS.SUBMITTED,
+            previous_status: DBEnums.CARD_STATUS.PENDING,
+            updated_status: DBEnums.CARD_STATUS.PENDING,
             created_at: new Date().valueOf(),
             updated_by: {
               name: userDetails?.name || "",

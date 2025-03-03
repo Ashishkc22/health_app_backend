@@ -4,6 +4,7 @@ const {
   areaSchema,
   tehsilSchema,
 } = require("../../models");
+const { DBEnums } = require("../../Enums");
 
 const createCard = async (req, res) => {
   try {
@@ -99,7 +100,7 @@ const createCard = async (req, res) => {
       emergency_contact: req.body.emergency_contact,
       created_by: userr._id || userr.id,
       created_at: parseInt(Date.now()),
-      status: "SUBMITTED",
+      status: DBEnums.CARD_STATUS.PENDING,
       expiry_date: parseInt(Date.now()) + 2 * 365 * 24 * 60 * 60 * 1000,
       expiry_years: 2,
       created_by_uid: userr.uid,
@@ -111,8 +112,8 @@ const createCard = async (req, res) => {
         .padStart(2, "0")}/${issueDate.getFullYear()}`,
       status_history: [
         {
-          previous_status: "SUBMITTED",
-          updated_status: "SUBMITTED",
+          previous_status: DBEnums.CARD_STATUS.PENDING,
+          updated_status: DBEnums.CARD_STATUS.PENDING,
           created_at: new Date().valueOf(),
           updated_by: {
             name: userr.name,
