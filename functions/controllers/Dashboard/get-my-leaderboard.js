@@ -126,6 +126,7 @@ const getMyLeaderboard = async (req, res, next) => {
         },
         { $match: { card: { $ne: [] } } },
         { $addFields: { card: { $arrayElemAt: ["$card", 0] } } },
+        { $sort: { "card.totalCount": -1 } },
       ]);
       res.status(200).json({
         status: "success",
