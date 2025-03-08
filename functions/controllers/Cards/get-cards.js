@@ -1,5 +1,5 @@
 const { userSchema, cardSchema } = require("../../models");
-
+const moment = require("moment");
 function monthName(month) {
   switch (month) {
     case 0:
@@ -268,7 +268,7 @@ const getCards = async (req, res, next) => {
       if (req.query.mode != "ADMIN") {
         qry.created_by = tokenUser._id;
       }
-      const statusCount =
+      let statusCount =
         (
           await cardSchema.aggregate([
             { $match: { userId: null } },
@@ -296,6 +296,14 @@ const getCards = async (req, res, next) => {
             },
           ])
         )?.[0] || [];
+      const temp = {};
+      Object.keys(statusCount).forEach((k) =>
+        k === "SUBMITTED"
+          ? (temp["SUBMITTED"] =
+              statusCount["REPRINT"] + statusCount["SUBMITTED"])
+          : statusCount[k]
+      );
+      statusCount = temp;
       const documentCount = await cardSchema.countDocuments(qry);
       let skip = 0;
       let sort = {};

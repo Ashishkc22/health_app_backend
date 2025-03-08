@@ -88,4 +88,6 @@ router.post(
   require("./set-my-password")
 );
 
+router.get("/get-agent-details-by-uid", require("./get-agent-details-by-uid"));
+
 module.exports = router;

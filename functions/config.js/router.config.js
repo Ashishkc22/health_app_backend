@@ -108,6 +108,11 @@ module.exports = {
     services: ["USER"],
     permissions: [],
   },
+  "/user/get-agent-details-by-uid": {
+    name: "get-agent-details-by-uid",
+    services: ["ADMIN"],
+    permissions: [],
+  },
   // Address
   "/address/add-address": {
     name: "add-address",
@@ -225,6 +230,17 @@ module.exports = {
     name: "get-my-team-members-cards",
     services: ["AGENT"],
     permissions: [],
+  },
+  "/cards/get-card-counts": {
+    name: "get-card-counts",
+    services: ["ADMIN"],
+    permissions: [],
+  },
+  "/cards/get-cards-data": {
+    name: "get-cards-data",
+    services: ["ADMIN"],
+    permissions: [],
+    // Used to get card for to-be-printed
   },
   // Dashboard
   "/dashboard": {

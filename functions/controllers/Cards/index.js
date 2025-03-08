@@ -49,6 +49,7 @@ router.patch(
 );
 
 router.get("/get-cards", require("./get-cards"));
+router.get("/get-cards-count", require("./get-card-counts"));
 router.get(
   "/get-available-card-locations",
   require("./get-available-card-locations")
@@ -57,6 +58,7 @@ router.get(
   "/get-cards-data-by-location",
   require("./get-cards-data-by-location")
 );
+router.get("/get-cards-data", require("./get-cards-data"));
 router.get("/get-my-team-cards", require("./get-my-team-cards"));
 router.get("/get-card-by-userid", getCardByUserId);
 router.get("/get-my-cards", require("./get-my-cards"));
