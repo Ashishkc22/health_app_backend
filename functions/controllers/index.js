@@ -21,6 +21,7 @@ router.use("/download-app", require("./downloadApp"));
 router.use("/upload", authHandler, require("./gallery-upload"));
 router.use("/testimonial-videos", authHandler, require("./upload-videos"));
 router.use("/faq", authHandler, require("./faq"));
+router.use("/send-inquiry-email", require("./sendInquiryEmail"));
 
 // Route not found middleware
 router.use((req, res, next) => {

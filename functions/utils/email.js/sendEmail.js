@@ -13,7 +13,7 @@ oAuth2Client.setCredentials({
   refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
 });
 
-async function sendEmail(toEmail, body) {
+async function sendEmail(toEmail, body, options = {}) {
   try {
     const accessToken = await oAuth2Client.getAccessToken();
     let transporter = nodemailer.createTransport({
@@ -32,9 +32,11 @@ async function sendEmail(toEmail, body) {
     });
 
     let mailOptions = {
-      from: "" + process.env.GOOGLE_APP_NAME + " <" + process.env.EMAIL + ">",
+      from:
+        options?.from ||
+        "" + process.env.GOOGLE_APP_NAME + " <" + process.env.EMAIL + ">",
       to: toEmail,
-      subject: EmailEnums.subject,
+      subject: options?.subject || EmailEnums.subject,
       text: body,
       replyTo: process.env.EMAIL,
     };
