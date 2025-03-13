@@ -58,7 +58,7 @@ passport.use(
     {
       clientID: GOOGLE_CLIENT_ID,
       clientSecret: GOOGLE_CLIENT_SECRET,
-      callbackURL: `${process.env.DEPLOYED_URL}/auth/google/callback`,
+      callbackURL: `auth/google/callback`,
     },
     require("./controllers/Auth/handle-google-user")
   )
