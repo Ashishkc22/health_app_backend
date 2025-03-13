@@ -38,7 +38,7 @@ const bodyValidationSchema = Joi.object({
   discount_opd: Joi.number().min(0).max(100).optional(),
   discount_medicine: Joi.number().min(0).max(100).optional(),
   discount_diagnostic: Joi.number().min(0).max(100).optional(),
-  acknowledge: Joi.boolean().optional(),
+  acknowledge: Joi.string().optional(),
   auth_sign: Joi.string().optional(),
   date_of_agreement: Joi.string()
     .pattern(/^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[0-2])-\d{4}$/)

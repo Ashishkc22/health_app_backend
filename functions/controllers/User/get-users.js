@@ -9,7 +9,9 @@ const getUsers = async (req, res, next) => {
   try {
     const user = await getUser({ id: req.userDetails.id });
 
-    var qry = {};
+    var qry = {
+      role: { $ne: "USER" },
+    };
     if (req.query.q != null) {
       if (phoneRegex.test(req.query.q)) {
         qry.phone = {
@@ -114,7 +116,6 @@ const getUsers = async (req, res, next) => {
           $gte: parseInt(req.query.duration),
           $lte: ltDur,
         };
-        console.log(qry);
       }
     }
     if ((req.query.onlyInfo || "").toString() == "true") {

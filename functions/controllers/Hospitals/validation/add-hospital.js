@@ -38,7 +38,7 @@ const hospitalSchema = Joi.object({
   discount_opd: Joi.number().min(0).max(100).required(),
   discount_medicine: Joi.number().min(0).max(100).required(),
   discount_diagnostic: Joi.number().min(0).max(100).required(),
-  acknowledge: Joi.boolean().required(),
+  acknowledge: Joi.string().required(),
   auth_sign: Joi.string().required(),
   date_of_agreement: Joi.date().required(),
   images: Joi.array().items(Joi.string().uri()).optional(),
