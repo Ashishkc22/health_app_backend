@@ -39,6 +39,7 @@ router.get(
         `${process.env.GOOGLE_SIGIN_REDIRECTION_URL}/dashboard?token=${genratedToken}`
       );
     } catch (error) {
+      console.log("GOOGLE ERROR", error);
       return res.redirect(
         `${process.env.GOOGLE_SIGIN_REDIRECTION_URL}/google-sign-in-error`
       );
