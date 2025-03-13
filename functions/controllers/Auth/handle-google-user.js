@@ -3,10 +3,52 @@ const {
   addUser,
   addUserRole,
   getServiceByName,
+  updateUserByEmail,
 } = require("../../processors");
 const { DBEnums, ErrorEnums } = require("../../Enums");
 const mongoose = require("mongoose");
 const { CustomError } = require("../../utils/custom-errors");
+
+const axios = require("axios");
+
+/**
+ * Fetches an image from a source API and sends it to a destination API.
+ * @param {string} imageUrl - The URL of the image to fetch.
+ * @param {string} uploadUrl - The destination API URL to send the image.
+ */
+async function fetchAndSendImage({
+  email,
+  imageUrl,
+  uploadUrl = process.env.FILE_UPLOAD_URL,
+} = {}) {
+  try {
+    // Fetch the image from the source API
+    const response = await axios.get(imageUrl, { responseType: "arraybuffer" });
+    // Extract the content type (e.g., image/jpeg, image/png)
+    const contentType = response.headers["content-type"];
+
+    // Convert buffer to Blob
+    const imageBlob = new Blob([response.data], { type: contentType });
+
+    // Create FormData and append the Blob
+    const formData = new FormData();
+    formData.append("file", imageBlob, "image.jpg");
+
+    // Send the image to the destination API
+    const uploadResponse = await axios.post(uploadUrl, formData);
+    let uploadedImageUrl = "";
+    if (uploadResponse.data.status === "success") {
+      uploadedImageUrl = uploadResponse.data.path;
+    }
+    await updateUserByEmail({
+      email,
+      updateFields: { image: uploadedImageUrl },
+    });
+    console.log("Image sent successfully:", uploadResponse.data);
+  } catch (error) {
+    console.error("Error:", error.message);
+  }
+}
 
 async function handleGoogleUserLoginAndsignUp(
   accessToken,
@@ -55,6 +97,12 @@ async function handleGoogleUserLoginAndsignUp(
         role: DBEnums.USER_ROLES.USER,
         session,
       });
+      if (userDetails.picture) {
+        await fetchAndSendImage({
+          email: userDetails.email,
+          imageUrl: userDetails.picture,
+        });
+      }
     }
     if (session) {
       await session.commitTransaction();
