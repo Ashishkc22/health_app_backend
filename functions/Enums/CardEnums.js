@@ -6,6 +6,7 @@ module.exports = {
     DELIVERED: ["DISCARDED"],
     PENDING: ["SUBMITTED"],
     DISCARDED: ["DELIVERED", "REPRINT", "SUBMITTED"],
+    UNDELIVERED: ["DELIVERED", "REPRINT", "SUBMITTED"],
   },
   CARD_TYPE: {
     Single: "Single",
