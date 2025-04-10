@@ -4,8 +4,8 @@ const moment = require("moment");
 
 const getMyLeaderboard = async (req, res, next) => {
   try {
-    const { role, team_leader_id } = req.userDetails;
-
+    const { role, team_leader_id, tl_id } = req.userDetails;
+    const { isTeam } = req.query;
     const dateTimeMap = {
       TODAY: moment().startOf("day").valueOf(),
       "THIS WEEK": moment().startOf("week").valueOf(),
@@ -18,12 +18,16 @@ const getMyLeaderboard = async (req, res, next) => {
     const cardCreatedAt = req.query.period
       ? dateTimeMap[req.query.period]
       : null;
-    if (role === DBEnums.USER_ROLES.FE) {
+    if (
+      role === DBEnums.USER_ROLES.FE ||
+      (isTeam && role === DBEnums.USER_ROLES.TL)
+    ) {
       const leaderboardData = await userSchema.aggregate([
         {
           $match: {
             role: DBEnums.USER_ROLES.FE,
-            team_leader_id: team_leader_id,
+            team_leader_id:
+              isTeam && role === DBEnums.USER_ROLES.TL ? tl_id : team_leader_id,
           },
         },
         {
