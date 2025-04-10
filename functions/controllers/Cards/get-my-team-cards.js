@@ -16,7 +16,7 @@ const getMyTeamCards = async (req, res, next) => {
     users = users.map((us) => us.uid);
 
     const cards = await cardSchema.find({
-      status: status || DBEnums.CARD_STATUS.SUBMITTED,
+      ...(status && { status: status }),
       created_by_uid: { $in: users },
     });
     res.status(200).json({
