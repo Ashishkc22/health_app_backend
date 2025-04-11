@@ -5,7 +5,7 @@ const { isEmpty } = require("lodash");
 const getMyTeamCards = async (req, res, next) => {
   try {
     const { tl_id } = req.userDetails;
-    const { status, page = 1, limit = 20 } = req.query;
+    const { status, page = 1, limit = 20, listMode = "true" } = req.query;
 
     let users = await userSchema.find(
       { team_leader_id: tl_id },
@@ -25,7 +25,7 @@ const getMyTeamCards = async (req, res, next) => {
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    const [cards, total] = await Promise.all([
+    let [cards, total] = await Promise.all([
       cardSchema
         .find(query)
         .skip(skip)
@@ -34,29 +34,30 @@ const getMyTeamCards = async (req, res, next) => {
       cardSchema.countDocuments(query),
     ]);
 
-    // Grouping the data by date
-    const groupedCardData = cards.reduce((result, doc) => {
-      const date = new Date(doc.created_at);
-      const str = `${weekName(date.getDay())} ${date.getDate()} ${monthName(
-        date.getMonth()
-      )} ${date.getFullYear()}`;
-      if (!result[str]) {
-        result[str] = {};
-        result[str].date = str;
-        result[str].count = 0;
-      }
-      if (!result[str].data) {
-        result[str].data = [];
-      }
-      result[str].count += 1;
-      doc.address = `${doc.area}, ${doc.tehsil}, ${doc.district}, ${doc.state}`;
-      result[str].data.push(doc);
-      return result;
-    }, {});
-
+    if (listMode === "false") {
+      // Grouping the data by date
+      cards = cards.reduce((result, doc) => {
+        const date = new Date(doc.created_at);
+        const str = `${weekName(date.getDay())} ${date.getDate()} ${monthName(
+          date.getMonth()
+        )} ${date.getFullYear()}`;
+        if (!result[str]) {
+          result[str] = {};
+          result[str].date = str;
+          result[str].count = 0;
+        }
+        if (!result[str].data) {
+          result[str].data = [];
+        }
+        result[str].count += 1;
+        doc.address = `${doc.area}, ${doc.tehsil}, ${doc.district}, ${doc.state}`;
+        result[str].data.push(doc);
+        return result;
+      }, {});
+    }
     res.status(200).json({
       status: "success",
-      data: groupedCardData,
+      data: cards,
       meta: {
         total,
         page: parseInt(page),
