@@ -57,7 +57,7 @@ const getMyTeamCards = async (req, res, next) => {
     }
     res.status(200).json({
       status: "success",
-      data: cards,
+      data: Object.values(cards),
       meta: {
         total,
         page: parseInt(page),
