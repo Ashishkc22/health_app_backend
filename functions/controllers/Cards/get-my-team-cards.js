@@ -30,7 +30,11 @@ const getMyTeamCards = async (req, res, next) => {
         .find(query)
         .skip(skip)
         .limit(parseInt(limit))
-        .populate({ path: "created_by", model: "User", select: "image _id" }),
+        .populate({
+          path: "created_by",
+          model: "User",
+          select: "image _id name",
+        }),
       cardSchema.countDocuments(query),
     ]);
 
