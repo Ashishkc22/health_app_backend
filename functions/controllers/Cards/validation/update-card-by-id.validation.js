@@ -5,6 +5,7 @@ const updateSchema = Joi.object({
   image: Joi.string().uri().optional().messages({
     "string.uri": "Image must be a valid URL.",
   }),
+  s_no: Joi.string().optional(),
   card_type: Joi.string().valid("Single", "Family").optional(),
   name: Joi.string().min(2).max(50).optional().messages({
     "string.empty": "Name cannot be empty.",
