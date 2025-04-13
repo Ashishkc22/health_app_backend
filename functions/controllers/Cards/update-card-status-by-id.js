@@ -5,6 +5,16 @@ const { ErrorEnums, CardEnums, DBEnums } = require("../../Enums");
 
 async function updateCardStatusById(req, res, next) {
   try {
+    const { role } = req.userDetails;
+    if (
+      role !== DBEnums.USER_ROLES.TL &&
+      req.body.status === DBEnums.CARD_STATUS.SUBMITTED &&
+      CardEnums.ROLES_ALLOWED_TO_UPDATE_STATUS[role].includes(
+        req.body.status.toString().toUpperCase()
+      )
+    ) {
+      throw new CustomError(ErrorEnums.NOT_ALLOWED_TO_CHANGE_STATUS);
+    }
     const cardDetails = await getCardById({
       id: req.body.id,
       project: { status: 1 },

@@ -8,6 +8,22 @@ module.exports = {
     DISCARDED: ["DELIVERED", "REPRINT", "SUBMITTED"],
     UNDELIVERED: ["DELIVERED", "REPRINT", "SUBMITTED"],
   },
+  ROLES_ALLOWED_TO_UPDATE_STATUS: {
+    TL: ["SUBMITTED", "PRINTED", "DISCARDED", "OFD", "RTO", "DELIVERED"],
+    FE: ["RECEIVED", "OFD", "DELIVERED", "RTO"],
+    ADMIN: [
+      "SUBMITTED",
+      "PRINTED",
+      "REPRINT",
+      "RECEIVED",
+      "OFD",
+      "DELIVERED",
+      "RTO",
+      "PENDING",
+      "DISCARDED",
+      "UNDELIVERED",
+    ],
+  },
   CARD_TYPE: {
     Single: "Single",
     Family: "Family",

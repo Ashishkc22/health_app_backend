@@ -23,6 +23,13 @@ router.post(
 router.post("/mark-cards-as-printed", require("./mark-cards-as-printed"));
 router.patch(
   "/update-card-status-by-id",
+  (req, res, next) =>
+    applyValidation(
+      require("./validation/update-card-status.validation"),
+      req.body,
+      res,
+      next
+    ),
   require("./update-card-status-by-id")
 );
 router.patch(

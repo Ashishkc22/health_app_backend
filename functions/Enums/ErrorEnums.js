@@ -176,4 +176,14 @@ module.exports = {
     httpCode: 435,
     description: "No FE found.",
   },
+  NOT_ALLOWED_TO_CHANGE_STATUS: {
+    name: "NOT-ALLOWED-TO-CHANGE-STATUS",
+    httpCode: 436,
+    description: "Not allowed to change status.",
+  },
+  CARD_STATUS_ALREADY_SUBMITTED: {
+    name: "CARD-STATUS-ALREADY-SUBMITTED",
+    httpCode: 437,
+    description: "Card status already submitted.",
+  },
 };

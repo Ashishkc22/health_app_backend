@@ -2,15 +2,24 @@ const { isEmpty } = require("lodash");
 const { cardSchema } = require("../../models");
 const { updateCardById: updateCardByIdProcessor } = require("../../processors");
 const { CustomError } = require("../../utils/custom-errors");
-const { ErrorEnums } = require("../../Enums");
+const { ErrorEnums, DBEnums } = require("../../Enums");
 
 async function updateCardById(req, res, next) {
   try {
+    const { role } = req.userDetails;
     // Handle validation
     if (req.body.family_members && req.body.family_members.length > 4) {
       throw new Error("Only four family members are allowed");
     }
     const oldCard = await cardSchema.findById(req.body.id);
+
+    if (
+      role === DBEnums.USER_ROLES.FE &&
+      oldCard.status === DBEnums.CARD_STATUS.SUBMITTED
+    ) {
+      throw new CustomError(ErrorEnums.CARD_STATUS_ALREADY_SUBMITTED);
+    }
+
     if (isEmpty(oldCard)) {
       throw new CustomError(ErrorEnums.CARD_NOT_FOUND);
     }
