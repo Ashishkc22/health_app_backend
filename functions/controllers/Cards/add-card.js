@@ -29,7 +29,7 @@ const createCard = async (req, res) => {
       const qry = await cardSchema.countDocuments({ unique_number: x });
       if ((qry || 0) == 0) {
         uuid = x;
-        break;
+        break; 
       }
     }
     var state = req.body.state;
