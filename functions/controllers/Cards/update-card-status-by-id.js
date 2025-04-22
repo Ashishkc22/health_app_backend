@@ -33,12 +33,21 @@ async function updateCardStatusById(req, res, next) {
     ) {
       throw new CustomError(ErrorEnums.CARD_STATUS_CAN_NOT_BE_UPDATED);
     }
+    let discard_reason = "";
+    if (
+      req.body.status.toString().toUpperCase() === DBEnums.CARD_STATUS.DISCARDED
+    ) {
+      discard_reason = req.body.discard_reason;
+    }
 
     return res.status(200).json({
       status: "success",
       data: await updateCardStatus({
         id: req.body.id,
         status: req.body.status.toString().toUpperCase(),
+        ...(discard_reason && {
+          discard_reason,
+        }),
         userDetails: req.userDetails,
       }),
     });

@@ -22,7 +22,12 @@ const increaseMapper = {
   RECEIVED: { RECEIVE_count: 1 },
   REPRINT: { reprint_count: 1 },
 };
-async function updateCardStatus({ id = "", status = "", userDetails = {} }) {
+async function updateCardStatus({
+  id = "",
+  status = "",
+  discard_reason = "",
+  userDetails = {},
+}) {
   let session;
   try {
     session = await mongoose.startSession();
@@ -32,6 +37,7 @@ async function updateCardStatus({ id = "", status = "", userDetails = {} }) {
       {
         $set: {
           status,
+          ...(discard_reason && { discard_reason }),
           status_updated_at: new Date(),
         },
         $push: {
