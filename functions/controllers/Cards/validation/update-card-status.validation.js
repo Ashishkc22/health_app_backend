@@ -6,6 +6,9 @@ const updateCardStatusValidation = Joi.object({
     "any.required": "Card ID is required",
     "string.empty": "Card ID cannot be empty",
   }),
+  discard_reason: Joi.string().allow("").optional().messages({
+    "string.empty": "Discard reason cannot be empty",
+  }),
   status: Joi.string()
     .valid(...Object.values(DBEnums.CARD_STATUS))
     .required()
