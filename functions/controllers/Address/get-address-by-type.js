@@ -1,13 +1,3 @@
-const {
-  statesSchema,
-  districtSchema,
-  newTehsilSchema,
-  tehsilSchema,
-  areaSchema,
-  gramSchema,
-  cardSchema,
-} = require("../../models");
-const { sortBy } = require("lodash");
 const { getAddressByType } = require("../../processors");
 const { DBEnums } = require("../../Enums");
 
@@ -24,6 +14,7 @@ const getAddessByType = async (req, res, next) => {
       type: req.query.type,
       showGrams: !isUserAdmin,
       gramWithTeshilId: req.query?.isTeshilId || false,
+      showCardCount: req.query.showCardCount || false,
     });
     return res.status(200).json({
       status: "success",

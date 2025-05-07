@@ -68,6 +68,12 @@ module.exports = {
     services: ["USER"],
     permissions: [],
   },
+  "/user/update-my-location": {
+    name: "update-my-location",
+    services: ["AGENT"],
+    permissions: [],
+    // Agent can update their location
+  },
   "/user/add-tl": {
     name: "add-new-tl",
     services: ["ADMIN"],
@@ -169,7 +175,8 @@ module.exports = {
   "/cards/update-card-status-by-id": {
     name: "update-card-status",
     services: ["AGENT", "ADMIN"],
-    permissions: ["UPDATE_CARDS_STATUS"],
+    permissions: [],
+    //UPDATE_CARDS_STATUS
   },
   "/cards/update-card-by-id": {
     name: "update-card-by-id",
@@ -295,12 +302,12 @@ module.exports = {
   },
   "/payment/purchase-plan": {
     name: "purchase-plan",
-    services: ["USER"],
+    services: ["USER", "AGENT"],
     permissions: ["PURCHASE_PLAN"],
   },
   "/payment/plan-checkout": {
     name: "plan-checkout",
-    services: ["USER"],
+    services: ["USER", "AGENT"],
     permissions: ["PLAN_CHECKOUT"],
   },
   "/payment/p2p-coin": {

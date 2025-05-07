@@ -186,4 +186,34 @@ module.exports = {
     httpCode: 437,
     description: "Card status already submitted.",
   },
+  STATE_NOT_FOUND: {
+    name: "STATE-NOT-FOUND",
+    httpCode: 438,
+    description: "State not found.",
+  },
+  DISTRICT_NOT_FOUND: {
+    name: "DISTRICT-NOT-FOUND",
+    httpCode: 439,
+    description: "District not found.",
+  },
+  TEHSIL_NOT_FOUND: {
+    name: "TEHSIL-NOT-FOUND",
+    httpCode: 440,
+    description: "Tehsil not found.",
+  },
+  JANPAD_NOT_FOUND: {
+    name: "JANPAD-NOT-FOUND",
+    httpCode: 441,
+    description: "Janpad not found.",
+  },
+  GRAM_PANCHAYAT_NOT_FOUND: {
+    name: "GRAM-PANCHAYAT-NOT-FOUND",
+    httpCode: 442,
+    description: "Gram panchayat not found.",
+  },
+  GRAM_NOT_FOUND: {
+    name: "GRAM-NOT-FOUND",
+    httpCode: 443,
+    description: "Gram not found.",
+  },
 };

@@ -8,11 +8,18 @@ const {
   gramSchema,
 } = require("../models");
 
-async function getTehsil(ref_id) {
+async function getTehsil(query, showCardCount) {
+  if (!showCardCount) {
+    return await newTehsilSchema.find({
+      ref_id: query.ref_id,
+      ...(query.active ? { active: query.active } : {}),
+    });
+  }
   return await newTehsilSchema.aggregate([
     {
       $match: {
-        ref_id: ref_id,
+        ref_id: query.ref_id,
+        ...(query.active ? { active: query.active } : {}),
       },
     },
     {
@@ -92,6 +99,7 @@ async function getAddressByType({
   showGrams = false,
   gramWithTeshilId = false,
   projection = { name: 1 },
+  showCardCount = false,
 } = {}) {
   try {
     switch (type) {
@@ -100,7 +108,7 @@ async function getAddressByType({
       case "district":
         return await districtSchema.find(query).sort(sort);
       case "tehsil":
-        return await getTehsil(query.ref_id);
+        return await getTehsil(query, showCardCount);
       case "janPanchayat":
         return await tehsilSchema.find(query).sort(sort);
       case "gramPanchayat":
@@ -125,6 +133,7 @@ async function getAddressByType({
                   $match: {
                     $expr: {
                       $eq: ["$ref_id", "$$areaId"], // Match ref_id with the area _id
+                      ...(query.active ? { active: query.active } : {}),
                     },
                   },
                 },
@@ -148,6 +157,7 @@ async function getAddressByType({
           ? await getGramPanchayatWithGrams({
               showGrams: true,
               ref_id: query.ref_id,
+              ...(query.active ? { active: query.active } : {}),
             })
           : await gramSchema.find(query).sort(sort);
       default:

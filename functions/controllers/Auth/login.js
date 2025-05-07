@@ -22,13 +22,15 @@ const login = async (req, res, next) => {
       throw new CustomError(ErrorEnums.USER_NOT_FOUND);
     }
 
-    // const isPasswordCorrect = await bcrypt.compareSync(
-    //   req.body.password,
-    //   user.password
-    // );
-    // if (!isPasswordCorrect) {
-    //   throw new CustomError(ErrorEnums.INCORRECT_PASSWORD);
-    // }
+    if (process.env.NODE_ENV === "production") {
+      const isPasswordCorrect = await bcrypt.compareSync(
+        req.body.password,
+        user.password
+      );
+      if (!isPasswordCorrect) {
+        throw new CustomError(ErrorEnums.INCORRECT_PASSWORD);
+      }
+    }
     // get role and services detais
     const userRoleAndServiceDetails = await getUsersRoleAndServiceDetails({
       userId: user.id,

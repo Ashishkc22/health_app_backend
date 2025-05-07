@@ -38,22 +38,34 @@ const Single = {
     value: joi.string().required(),
   }),
 
-  state: joi.string().required().messages({
-    "string.empty": "State is empty.",
-  }),
+  state: joi
+    .string()
+    .pattern(/^[0-9a-fA-F]{24}$/)
+    .optional(),
+  district: joi
+    .string()
+    .pattern(/^[0-9a-fA-F]{24}$/)
+    .optional(),
+  tehsil: joi
+    .string()
+    .pattern(/^[0-9a-fA-F]{24}$/)
+    .optional(),
+  janpad: joi
+    .string()
+    .pattern(/^[0-9a-fA-F]{24}$/)
+    .optional(),
+  gramPanchayat: joi
+    .string()
+    .pattern(/^[0-9a-fA-F]{24}$/)
+    .optional(),
+  gram: joi
+    .string()
+    .pattern(/^[0-9a-fA-F]{24}$/)
+    .optional(),
 
-  district: joi.string().required().messages({
-    "string.empty": "District is empty.",
-  }),
-
-  tehsil: joi.string().required().messages({
-    "string.empty": "Tehsil is empty.",
-  }),
-
-  area: joi.string().optional().messages({
-    "string.empty": "Area is empty.",
-  }),
-  address: joi.string(),
+  // area: joi.string().optional().messages({
+  //   "string.empty": "Area is empty.",
+  // }),
   phone: joi
     .string()
     .pattern(/^[0-9]{10}$/)

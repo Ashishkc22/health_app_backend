@@ -146,8 +146,16 @@ const getUsers = async (req, res, next) => {
         if (req.query.mode != "ADMIN") {
           x.status = x.status;
         } else {
-          const ct = x.score;
+          let ct = x.score;
           const delivered = x.d_count;
+          if (ct < delivered) {
+            ct =
+              (x.p2_count || 0) +
+              (x.p_count || 0) +
+              (x.d_count || 0) +
+              (x.ud_count || 0) -
+              (x.dis_count || 0);
+          }
           x.ratio = delivered == 0 ? 0 : (delivered / ct) * 100;
         }
         if (req.query.mode != "ADMIN" || user.role != "ADMIN") {

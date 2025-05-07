@@ -42,23 +42,28 @@ const updateSchema = Joi.object({
   city: Joi.string().optional().messages({
     "string.empty": "City cannot be empty.",
   }),
-  state: Joi.string().optional().messages({
-    "string.empty": "State cannot be empty.",
-  }),
-
-  district: Joi.string().optional().messages({
-    "string.empty": "District cannot be empty.",
-  }),
-
-  tehsil: Joi.string().optional().messages({
-    "string.empty": "Tehsil cannot be empty.",
-  }),
-
-  area: Joi.string().optional().messages({
-    "string.empty": "Area cannot be empty.",
-  }),
+  state: Joi.string()
+    .pattern(/^[0-9a-fA-F]{24}$/)
+    .optional(),
+  district: Joi.string()
+    .pattern(/^[0-9a-fA-F]{24}$/)
+    .optional(),
+  tehsil: Joi.string()
+    .pattern(/^[0-9a-fA-F]{24}$/)
+    .optional(),
+  janpad: Joi.string()
+    .pattern(/^[0-9a-fA-F]{24}$/)
+    .optional(),
+  gramPanchayat: Joi.string()
+    .pattern(/^[0-9a-fA-F]{24}$/)
+    .optional(),
+  gram: Joi.string()
+    .pattern(/^[0-9a-fA-F]{24}$/)
+    .optional(),
   // selectedPlanId: Joi.string().optional(),
 
+  abha_id: Joi.string().optional(),
+  notes: Joi.string().optional(),
   phone: Joi.string()
     .pattern(/^[0-9]{10}$/)
     .optional()

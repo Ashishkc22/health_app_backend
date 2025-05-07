@@ -14,6 +14,17 @@ router.patch(
     ),
   require("./update-profile")
 );
+router.patch(
+  "/update-my-location",
+  (req, res, next) =>
+    applyValidation(
+      require("./validation.js/update-my-location.validation"),
+      req.body,
+      res,
+      next
+    ),
+  require("./update-my-location")
+);
 router.patch("/suspend", require("./suspend-user"));
 router.post(
   "/add-tl",

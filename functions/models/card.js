@@ -32,6 +32,15 @@ const cardSchema = new mongoose.Schema({
   tehsil: {
     type: String,
   },
+  janpad: {
+    type: String,
+  },
+  gramPanchayat: {
+    type: String,
+  },
+  gram: {
+    type: String,
+  },
   area: {
     type: String,
   },

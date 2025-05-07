@@ -1,14 +1,108 @@
 const {
-  cardSchema,
-  userSchema,
+  statesSchema,
+  districtSchema,
+  newTehsilSchema,
   areaSchema,
   tehsilSchema,
+  gramSchema,
+  cardSchema,
+  userSchema,
 } = require("../../models");
-const { DBEnums } = require("../../Enums");
+const { DBEnums, ErrorEnums } = require("../../Enums");
+const mongoose = require("mongoose");
+const { CustomError } = require("../../utils/custom-errors");
+
+async function getLocationDetails({
+  state,
+  district,
+  janpad,
+  gramPanchayat,
+  tehsil,
+  gram,
+}) {
+  // State
+  const stateExists = await statesSchema.findOne({
+    _id: mongoose.Types.ObjectId(state),
+  });
+  if (!stateExists) throw new CustomError(ErrorEnums.STATE_NOT_FOUND);
+  // District
+  const districtExists = await districtSchema.findOne({
+    _id: mongoose.Types.ObjectId(district),
+    ref_id: state,
+  });
+  if (!districtExists) throw new CustomError(ErrorEnums.DISTRICT_NOT_FOUND);
+  // Tehsil
+  let tehsilExists,
+    janpadExists,
+    gramPanchayatExists,
+    gramExists = {};
+
+  if (tehsil) {
+    tehsilExists = await newTehsilSchema.findOne({
+      _id: mongoose.Types.ObjectId(tehsil),
+      ref_id: district,
+    });
+    if (!tehsilExists) throw new CustomError(ErrorEnums.TEHSIL_NOT_FOUND);
+  }
+
+  if (janpad) {
+    janpadExists = await tehsilSchema.findOne({
+      _id: mongoose.Types.ObjectId(janpad),
+      ref_id: district,
+    });
+    if (!janpadExists) throw new CustomError(ErrorEnums.JANPAD_NOT_FOUND);
+  }
+
+  if (gramPanchayat) {
+    gramPanchayatExists = await areaSchema.findOne({
+      _id: mongoose.Types.ObjectId(gramPanchayat),
+      ref_id: janpad,
+    });
+    if (!gramPanchayatExists)
+      throw new CustomError(ErrorEnums.GRAM_PANCHAYAT_NOT_FOUND);
+  }
+
+  if (gram) {
+    gramExists = await gramSchema.findOne({
+      _id: mongoose.Types.ObjectId(gram),
+      ref_id: gramPanchayat,
+    });
+    if (!gramExists) throw new CustomError(ErrorEnums.GRAM_NOT_FOUND);
+  }
+  return {
+    state: stateExists.name,
+    district: districtExists.name,
+    ...(tehsilExists && { tehsil: tehsilExists.name }),
+    ...(janpadExists && { janpad: janpadExists.name }),
+    ...(gramPanchayatExists && { gramPanchayat: gramPanchayatExists.name }),
+    ...(gramExists && { gram: gramExists.name }),
+  };
+}
 
 const createCard = async (req, res) => {
   try {
-    const userr = await userSchema.findById(req.userDetails.id);
+    const userr = await userSchema
+      .findById(req.userDetails.id)
+      .populate("current_state", "name")
+      .populate("current_district", "name")
+      .populate("current_tehsil", "name")
+      .populate("current_gram_panchayat", "name")
+      .populate("current_gram", "name")
+      .populate("current_janpad", "name");
+
+    if (
+      !userr.current_state ||
+      !userr.current_district ||
+      !userr.current_tehsil ||
+      !userr.current_gram_panchayat ||
+      !userr.current_gram
+    ) {
+      return res.status(200).json({
+        status: "failed",
+        message: "Agent location not found. Please reset the location.",
+      });
+    }
+
     if (/[0-9]/.test(req.body.name || "")) {
       return res.status(200).json({
         status: "failed",
@@ -29,53 +123,61 @@ const createCard = async (req, res) => {
       const qry = await cardSchema.countDocuments({ unique_number: x });
       if ((qry || 0) == 0) {
         uuid = x;
-        break; 
+        break;
       }
     }
-    var state = req.body.state;
-    var district = req.body.district;
-    var tehsil = req.body.tehsil;
-    var area = req.body.area;
+    let state,
+      district,
+      tehsil,
+      janpad,
+      gramPanchayat,
+      gram = null;
+
     if (
-      (state || "") == "" ||
-      (district || "") == "" ||
-      (tehsil || "") == "" ||
-      (area || "") == ""
+      req.body.state &&
+      req.body.district &&
+      req.body.tehsil &&
+      req.body.janpad &&
+      req.body.gramPanchayat &&
+      req.body.gram
     ) {
-      state = userr.current_state || state;
-      district = userr.current_district || district;
-      tehsil = userr.current_tehsil || tehsil;
-      area = userr.current_gram_panchayat || area;
-    }
-    if (
-      (state || "") == "" ||
-      (district || "") == "" ||
-      (tehsil || "") == "" ||
-      (area || "") == ""
-    ) {
-      if ((req.body.address || "") != "") {
-        const adrs = req.body.address.toString().split(",");
-        state = adrs[4];
-        district = adrs[3];
-        tehsil = adrs[2];
-        area = `${adrs[0]} , ${adrs[1]}`;
-      }
-    }
-    try {
-      const gmp = await areaSchema.findOne({ name: area.split(",")[1] });
-      const ntehsil = await tehsilSchema.findOne({ name: tehsil });
-      if ((gmp.tehsil || "" != "") && gmp.tehsil != ntehsil._id) {
+      const locationDetsils = await getLocationDetails({
+        state: req.body.state,
+        district: req.body.district,
+        tehsil: req.body.tehsil,
+        janpad: req.body.janpad,
+        gramPanchayat: req.body.gramPanchayat,
+        gram: req.body.gram,
+      });
+      state = locationDetsils.state;
+      district = locationDetsils.district;
+      tehsil = locationDetsils.tehsil || "";
+      janpad = locationDetsils.janpad || "";
+      gramPanchayat = locationDetsils.gramPanchayat || "";
+      gram = locationDetsils.gram || "";
+    } else {
+      if (
+        userr.current_state == null ||
+        userr.current_district == null ||
+        userr.current_tehsil == null ||
+        userr.current_gram_panchayat == null ||
+        userr.current_gram == null
+      ) {
         return res.status(200).json({
           status: "failed",
-          message: "Gram panchayat has different tehsil match",
+          message: "Agent location not found. Please provide location details",
         });
-      } else {
-        await areaSchema.findByIdAndUpdate(gmp._id, {
-          tehsil: ntehsil._id,
-        });
-        console.log(await areaSchema.findById(gmp._id));
       }
-    } catch (err) {}
+      state = userr.current_state.name;
+      district = userr.current_district.name;
+      tehsil = userr.current_tehsil?.name || "";
+      janpad = userr.current_janpad?.name || "";
+      gramPanchayat = userr.current_gram_panchayat?.name || "";
+      gram = userr.current_gram?.name || "";
+    }
+
+    const area = `${gram} , ${gramPanchayat}`;
+
     const issueDate = new Date(parseInt(Date.now()));
     let family_member_details = {};
     if (req.body.card_type === "Family") {
@@ -92,8 +194,10 @@ const createCard = async (req, res) => {
       state: state,
       district: district,
       tehsil: tehsil,
+      janpad: janpad,
+      gramPanchayat: gramPanchayat,
+      gram: gram,
       area: area,
-      // address: req.body.address,
       phone: req.body.phone,
       father_husband_name: req.body.father_husband_name,
       blood_group: req.body.blood_group,

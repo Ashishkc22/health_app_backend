@@ -65,24 +65,33 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
   current_state: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "State",
   },
   current_district: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "District",
+  },
+  current_janpad: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Tehsil",
+  },
+  current_gram_panchayat: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Area",
+  },
+  current_gram: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Gram",
+  },
+  current_tehsil: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "newtehsils",
   },
   current_location_type: {
     type: String,
   },
   current_city: {
-    type: String,
-  },
-  current_janpad: {
-    type: String,
-  },
-  current_gram_panchayat: {
-    type: String,
-  },
-  current_tehsil: {
     type: String,
   },
   current_pincode: {
