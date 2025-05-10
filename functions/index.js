@@ -94,10 +94,7 @@ process.on("uncaughtException", (error) => {
 });
 
 // APP Listing
-if (
-  Process.env.NODE_ENV === "production" ||
-  Process.env.NODE_ENV === "staging"
-) {
+if (Process.env.ENV === "production" || Process.env.ENV === "staging") {
   exports.app = functions
     .runWith({ memory: "512MB" })
     .region("asia-south1")
