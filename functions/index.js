@@ -94,13 +94,18 @@ process.on("uncaughtException", (error) => {
 });
 
 // APP Listing
-// app.listen(PORT, async () => {
-//   logger.info(`Listening on port ${PORT}`);
-// });
-
-exports.app = functions
-  .runWith({ memory: "512MB" })
-  .region("asia-south1")
-  .https.onRequest(app);
+if (
+  Process.env.NODE_ENV === "production" ||
+  Process.env.NODE_ENV === "staging"
+) {
+  exports.app = functions
+    .runWith({ memory: "512MB" })
+    .region("asia-south1")
+    .https.onRequest(app);
+} else {
+  app.listen(PORT, async () => {
+    logger.info(`Listening on port ${PORT}`);
+  });
+}
 
 // exports.app = functions.https.onRequest(app);
