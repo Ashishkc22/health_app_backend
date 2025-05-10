@@ -1,7 +1,7 @@
 const { userSchema } = require("../../models");
 const { getUser, getUsersRoleAndServiceDetails } = require("../../processors");
 const { isEmpty } = require("lodash");
-const { ErrorEnums } = require("../../Enums");
+const { ErrorEnums, DBEnums } = require("../../Enums");
 const bcrypt = require("bcrypt");
 const { CustomError } = require("../../utils/custom-errors");
 const { token } = require("../../utils/token");
@@ -22,7 +22,17 @@ const login = async (req, res, next) => {
       throw new CustomError(ErrorEnums.USER_NOT_FOUND);
     }
 
-    if (process.env.NODE_ENV === "production") {
+    if (
+      user.status === DBEnums.USER_STATUS.Suspended ||
+      user.status === DBEnums.USER_STATUS.Rejected
+    ) {
+      throw new CustomError(ErrorEnums.USER_SUSPENDED);
+    }
+
+    if (
+      process.env.NODE_ENV === "production" ||
+      process.env.NODE_ENV === "staging"
+    ) {
       const isPasswordCorrect = await bcrypt.compareSync(
         req.body.password,
         user.password

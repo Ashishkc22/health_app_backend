@@ -2,8 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const functions = require("firebase-functions");
 // const fs = require("fs");
-const cors = require("cors")({ origin: true });
-const cron = require("node-cron");
+const cors = require("cors")({ origin: "*" });
 const path = require("path");
 const app = express();
 const { BaseError } = require("./utils/custom-errors");
@@ -95,13 +94,13 @@ process.on("uncaughtException", (error) => {
 });
 
 // APP Listing
-app.listen(PORT, async () => {
-  logger.info(`Listening on port ${PORT}`);
-});
+// app.listen(PORT, async () => {
+//   logger.info(`Listening on port ${PORT}`);
+// });
 
-// exports.app = functions
-//   .runWith({ memory: "512MB" })
-//   .region("asia-south1")
-//   .https.onRequest(app);
+exports.app = functions
+  .runWith({ memory: "512MB" })
+  .region("asia-south1")
+  .https.onRequest(app);
 
 // exports.app = functions.https.onRequest(app);

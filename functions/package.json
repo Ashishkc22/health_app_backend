@@ -10,7 +10,7 @@
     "devStart": "nodemon ./index.js"
   },
   "engines": {
-    "node": "16"
+    "node": "20"
   },
   "main": "index.js",
   "dependencies": {
@@ -43,10 +43,10 @@
     "useragent": "^2.3.0",
     "uuid-encoder": "^1.2.0",
     "uuid-token-generator": "^1.0.0",
-    "winston": "^3.17.0"
+    "winston": "^3.17.0",
+    "dotenv": "^16.0.3"
   },
   "devDependencies": {
-    "dotenv": "^16.0.3",
     "firebase-functions-test": "^0.2.0",
     "nodemon": "^2.0.20"
   },

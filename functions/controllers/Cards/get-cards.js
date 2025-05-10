@@ -382,6 +382,11 @@ const getCards = async (req, res, next) => {
               ? req.query.page || "0"
               : "0";
         }
+        const pendingCardCount = await cardSchema.countDocuments({
+          status: "PENDING",
+          userId: null,
+        });
+
         return res.status(200).json({
           status: "success",
           page_number: pageNumber,
@@ -390,6 +395,7 @@ const getCards = async (req, res, next) => {
           total_print_card: totalPrintCards,
           total_print_card_showing: totalPrintCardsShowing,
           statusCount,
+          pendingCardCount,
           // 'submitted': totalPrintCardsShowing,
           // 'delivered': newList.filter((a) => a.status.toString().toUpperCase() == "DELIVERED").length,
           // 'other': newList.filter((a) => (!(["DELIVERED", "SUBMITTED", "UNDELIVERED"].includes(a.status.toString().toUpperCase())))).length,

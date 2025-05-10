@@ -216,4 +216,9 @@ module.exports = {
     httpCode: 443,
     description: "Gram not found.",
   },
+  USER_SUSPENDED: {
+    name: "USER-SUSPENDED",
+    httpCode: 444,
+    description: "User is suspended.",
+  },
 };

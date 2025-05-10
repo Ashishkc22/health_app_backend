@@ -66,12 +66,12 @@ module.exports = {
   "/user/update-profile": {
     name: "update-user-profile",
     services: ["USER"],
-    permissions: [],
+    permissions: ["UPDATE_PROFILE"],
   },
   "/user/update-my-location": {
     name: "update-my-location",
     services: ["AGENT"],
-    permissions: [],
+    permissions: ["UPDATE_MY_LOCATION"],
     // Agent can update their location
   },
   "/user/add-tl": {
@@ -82,7 +82,7 @@ module.exports = {
   "/user/suspend": {
     name: "change-user-status-to-suspend",
     services: ["ADMIN"],
-    permissions: [],
+    permissions: ["SUSPEND_USERS"],
   },
   "/user/get-team-member-stats": {
     name: "get-team-member-stats",
@@ -91,33 +91,33 @@ module.exports = {
   },
   "/user/update-user-profile": {
     name: "update-user-profile",
-    services: ["USER"],
-    permissions: [],
+    services: ["USER"], //Need to check if this is correct
+    permissions: ["UPDATE_USER_PROFILE"],
   },
   "/user/get-customer": {
     name: "get-customer",
     services: ["ADMIN"],
-    permissions: [],
+    permissions: ["GET_CUSTOMER"],
   },
   "/user/verify-customer": {
     name: "verify-customer",
     services: ["ADMIN"],
-    permissions: [],
+    permissions: ["VERIFY_CUSTOMER"],
   },
   "/user/get-team-member-status": {
     name: "get-team-member-status",
     services: ["AGENT"],
-    permissions: [],
+    permissions: ["GET_TEAM_MEMBER_STATUS"],
   },
   "/user/set-my-password": {
     name: "set-my-password",
-    services: ["USER"],
-    permissions: [],
+    services: ["USER", "AGENT"],
+    permissions: ["SET_MY_PASSWORD"],
   },
   "/user/get-agent-details-by-uid": {
     name: "get-agent-details-by-uid",
     services: ["ADMIN"],
-    permissions: [],
+    permissions: ["GET_AGENT_DETAILS_BY_UID"],
   },
   // Address
   "/address/add-address": {
@@ -175,7 +175,7 @@ module.exports = {
   "/cards/update-card-status-by-id": {
     name: "update-card-status",
     services: ["AGENT", "ADMIN"],
-    permissions: [],
+    permissions: ["UPDATE_CARDS_STATUS_BY_ID"],
     //UPDATE_CARDS_STATUS
   },
   "/cards/update-card-by-id": {
@@ -186,7 +186,7 @@ module.exports = {
   "/cards/update-user-card": {
     name: "update-card-by-id",
     services: ["USER"],
-    permissions: [],
+    permissions: ["UPPDATE_USER_CARD"],
   },
   "/cards/get-cards": {
     name: "get-all-cards",
@@ -216,37 +216,37 @@ module.exports = {
   "/cards/get-my-card": {
     name: "get-users-card",
     services: ["USER"],
-    permissions: [],
+    permissions: ["GET_MY_CARD"],
   },
   "/cards/get-card-by-userid": {
     name: "get-card-by-userid",
     services: ["ADMIN"],
-    permissions: [],
+    permissions: ["GET_CARD_BY_USERID"],
   },
   "/cards/get-available-card-locations": {
     name: "get-available-card-locations",
     services: ["ADMIN"],
-    permissions: [],
+    permissions: ["GET_AVAILABLE_CARD_LOCATIONS"],
   },
   "/cards/get-cards-data-by-location": {
     name: "get-cards-data-by-location",
     services: ["ADMIN"],
-    permissions: [],
+    permissions: ["GET_CARDS_DATA_BY_LOCATION"],
   },
   "/cards/get-my-team-cards": {
     name: "get-my-team-members-cards",
     services: ["AGENT"],
-    permissions: [],
+    permissions: ["GET_MY_TEAM_CARDS"],
   },
   "/cards/get-card-counts": {
     name: "get-card-counts",
     services: ["ADMIN"],
-    permissions: [],
+    permissions: ["GET_CARD_COUNTS"],
   },
   "/cards/get-cards-data": {
     name: "get-cards-data",
     services: ["ADMIN"],
-    permissions: [],
+    permissions: ["GET_CARDS_DATA"],
     // Used to get card for to-be-printed
   },
   // Dashboard
@@ -258,7 +258,7 @@ module.exports = {
   "/dashboard/get-my-leaderboard": {
     name: "get-my-leaderboard",
     services: ["AGENT"],
-    permissions: [],
+    permissions: ["GET_MY_LEADERBOARD"],
   },
   // Hospitals
   "/hospitals/add-hospital": {
@@ -313,9 +313,7 @@ module.exports = {
   "/payment/p2p-coin": {
     name: "p2p-coin",
     services: ["AGENT"],
-    permissions: [
-      /*"P2P_COIN"*/
-    ],
+    permissions: ["P2P_COIN"],
   },
   //plans
   "/plans/get-plans": {
@@ -333,16 +331,13 @@ module.exports = {
     name: "add-user-card",
     // isPublic: true,
     services: ["USER"],
-    permissions: [
-      /*"ADD_USER_CARD"*/
-    ],
+    permissions: ["ADD_USER_CARD"],
   },
   // wallet
   "/wallet/get-my-wallet-details": {
     name: "get-my-wallet-details",
     services: ["AGENT"],
-    permissions: [],
-    // GET_MY_WALLET_DETAILS
+    permissions: ["GET_MY_WALLET_DETAILS"],
   },
   // Other
   "/other/add-hospital": {
@@ -354,12 +349,12 @@ module.exports = {
   "/upload/gallery-upload": {
     name: "upload-gallery",
     services: ["ADMIN"],
-    permissions: [],
+    permissions: ["UPLOAD_GALLERY_IMAGE"],
   },
   "/upload/delete": {
     name: "delete-gallery",
     services: ["ADMIN"],
-    permissions: [],
+    permissions: ["DELETE_GALLERY_IMAGE"],
   },
   "/upload/get-images": {
     name: "get-gallery",
@@ -370,7 +365,7 @@ module.exports = {
   "/testimonial-videos/upload-video": {
     name: "testimonial-upload-video",
     services: ["ADMIN"],
-    permissions: [],
+    permissions: ["UPLOAD_TESTIMONIAL_VIDEO"],
   },
   "/testimonial-videos/get-videos": {
     name: "testimonial-get-videos",
@@ -381,42 +376,42 @@ module.exports = {
   "/testimonial-videos/delete-video": {
     name: "testimonial-delete-video",
     services: ["ADMIN"],
-    permissions: [],
+    permissions: ["DELETE_TESTIMONIAL_VIDEO"],
   },
   "/faq/allFAQ": {
     name: "get-all-faqs",
     services: ["ADMIN"],
-    permissions: [],
+    permissions: ["GET_ALL_FAQS_ALL_DETAILS"],
   },
   "/faq/faq": {
     name: "get-faq-by-id",
     services: ["ADMIN"],
-    permissions: [],
+    permissions: ["GET_FAQ_BY_ID"],
   },
   "/faq": {
-    name: "add-faq",
+    name: "Get-all-faqs",
     isPublic: true,
-    services: [],
+    services: ["User"],
     permissions: [],
   },
   "/faq/addFaq": {
     name: "add-faq",
     services: ["ADMIN"],
-    permissions: [],
+    permissions: ["ADD_FAQ"],
   },
   "/faq/update-faq-by-id": {
     name: "update-faq",
     services: ["ADMIN"],
-    permissions: [],
+    permissions: ["UPDATE_FAQ"],
   },
   "/faq/delete-faq-by-id": {
     name: "delete-faq",
     services: ["ADMIN"],
-    permissions: [],
+    permissions: ["DELETE_FAQ"],
   },
   "/faq/disable-faq": {
     name: "disable-faq",
     services: ["ADMIN"],
-    permissions: [],
+    permissions: ["DISABLE_FAQ"],
   },
 };
