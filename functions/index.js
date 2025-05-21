@@ -15,11 +15,7 @@ const GoogleStrategy = require("passport-google-oauth20").Strategy;
 //aarogyam7r
 //XGPbiYAWIqHvzsQl
 //arogyam-clustor
-mongoose.connect(
-  // "mongodb+srv://aarogyam7r:XGPbiYAWIqHvzsQl@arogyam-clustor.jqc6cqy.mongodb.net/?retryWrites=true&w=majority",
-  "mongodb+srv://Ashish224:AshishKc225@ticketsys.b27zde6.mongodb.net/health-upwork-dev?retryWrites=true&w=majority&appName=TicketSys",
-  { useNewUrlParser: true }
-);
+mongoose.connect(process.env.MONGODB_URL, { useNewUrlParser: true });
 // mongoose.connect("mongodb+srv://lokeshpilani2010:Scanner1212@cluster0.yyqwqch.mongodb.net/?retryWrites=true&w=majority", { useNewUrlParser: true });
 // mongoose.set({ strictQuery: true });
 const db = mongoose.connection;
@@ -94,12 +90,15 @@ process.on("uncaughtException", (error) => {
 });
 
 // APP Listing
-if (Process.env.ENV === "production" || Process.env.ENV === "staging") {
+if (process.env.ENV === "production" || process.env.ENV === "staging") {
+  console.log("Running in production");
   exports.app = functions
     .runWith({ memory: "512MB" })
     .region("asia-south1")
     .https.onRequest(app);
 } else {
+  console.log("Running in development");
+
   app.listen(PORT, async () => {
     logger.info(`Listening on port ${PORT}`);
   });
