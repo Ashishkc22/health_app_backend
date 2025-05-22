@@ -133,8 +133,8 @@ async function getAddressByType({
                   $match: {
                     $expr: {
                       $eq: ["$ref_id", "$$areaId"], // Match ref_id with the area _id
-                      ...(query.active ? { active: query.active } : {}),
                     },
+                    ...(query.active ? { active: query.active } : {}),
                   },
                 },
                 { $project: { name: 1 } },
