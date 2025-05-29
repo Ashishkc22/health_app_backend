@@ -6,7 +6,7 @@ const getMyDetails = async (req, res, next) => {
       id: req.userDetails.id,
       projection: { password: 0, services: 0 },
     });
-    if ((user.team_leader_id || "") != "") {
+    if (user && (user.team_leader_id || "") != "") {
       const tl = await getUser({ tlID: user.team_leader_id });
       if (tl != null) {
         user.team_leader_name = tl.name;

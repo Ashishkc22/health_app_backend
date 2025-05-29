@@ -15,7 +15,10 @@ const GoogleStrategy = require("passport-google-oauth20").Strategy;
 //aarogyam7r
 //XGPbiYAWIqHvzsQl
 //arogyam-clustor
-mongoose.connect(process.env.MONGODB_URL, { useNewUrlParser: true });
+mongoose.connect(process.env.MONGODB_URL, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 // mongoose.connect("mongodb+srv://lokeshpilani2010:Scanner1212@cluster0.yyqwqch.mongodb.net/?retryWrites=true&w=majority", { useNewUrlParser: true });
 // mongoose.set({ strictQuery: true });
 const db = mongoose.connection;
@@ -24,7 +27,8 @@ db.on("error", (err) => {
   process.exit(1);
 });
 db.once("open", async function () {
-  logger.info(`connected to database`);
+  logger.info(`connected to database DB Name: ${mongoose.connection.name}`);
+  // console.log("mongoose.models", mongoose.models.User.schema);
 });
 app.use(express.json({ limit: "10mb" }));
 app.use(cors);
