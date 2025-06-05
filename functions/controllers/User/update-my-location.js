@@ -51,13 +51,13 @@ const updateMyLocation = async (req, res) => {
       if (!gramPanchayatExists)
         throw new CustomError(ErrorEnums.GRAM_PANCHAYAT_NOT_FOUND);
     }
+    if (gram) {
+      const gramExists = await gramSchema.exists({
+        _id: mongoose.Types.ObjectId(gram),
+      });
 
-    const gramExists = await gramSchema.exists({
-      _id: mongoose.Types.ObjectId(gram),
-    });
-
-    if (!gramExists) throw new CustomError(ErrorEnums.GRAM_NOT_FOUND);
-
+      if (!gramExists) throw new CustomError(ErrorEnums.GRAM_NOT_FOUND);
+    }
     // Update user location
     const updatedUser = await User.findByIdAndUpdate(
       userId,

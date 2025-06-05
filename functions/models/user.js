@@ -69,7 +69,7 @@ const userSchema = new mongoose.Schema({
     ref: "State",
   },
   current_district: {
-    type: mongoose.Schema.Types.Mixed,
+    type: mongoose.Schema.Types.ObjectId,
     ref: "District",
   },
   current_janpad: {
