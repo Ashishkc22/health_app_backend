@@ -69,6 +69,13 @@ async function getCards(req, res) {
       }
       result[str].count += 1;
       doc.address = `${doc.area}, ${doc.tehsil}, ${doc.district}, ${doc.state}`;
+      delete doc.area;
+      delete doc.tehsil;
+      delete doc.district;
+      delete doc.state;
+      delete doc.janpad;
+      delete doc.gramPanchayat;
+      delete doc.gram;
       result[str].data.push(doc);
       return result;
     }, {});

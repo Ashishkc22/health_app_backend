@@ -26,15 +26,11 @@ const getMyTeamCards = async (req, res, next) => {
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
     let [cards, total] = await Promise.all([
-      cardSchema
-        .find(query)
-        .skip(skip)
-        .limit(parseInt(limit))
-        .populate({
-          path: "created_by",
-          model: "User",
-          select: "image _id name",
-        }),
+      cardSchema.find(query).skip(skip).limit(parseInt(limit)).populate({
+        path: "created_by",
+        model: "User",
+        select: "image _id name",
+      }),
       cardSchema.countDocuments(query),
     ]);
 
@@ -55,6 +51,13 @@ const getMyTeamCards = async (req, res, next) => {
         }
         result[str].count += 1;
         doc.address = `${doc.area}, ${doc.tehsil}, ${doc.district}, ${doc.state}`;
+        delete doc.area;
+        delete doc.tehsil;
+        delete doc.district;
+        delete doc.state;
+        delete doc.janpad;
+        delete doc.gramPanchayat;
+        delete doc.gram;
         result[str].data.push(doc);
         return result;
       }, {});
