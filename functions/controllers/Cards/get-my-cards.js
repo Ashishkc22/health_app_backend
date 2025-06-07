@@ -54,7 +54,8 @@ async function getCards(req, res) {
     });
 
     // Grouping the data by date
-    const groupedCardData = cardData.reduce((result, doc) => {
+    const groupedCardData = cardData.reduce((result, card) => {
+      const doc = card.toObject();
       const date = new Date(doc.created_at);
       const str = `${weekName(date.getDay())} ${date.getDate()} ${monthName(
         date.getMonth()

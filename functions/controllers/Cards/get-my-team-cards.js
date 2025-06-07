@@ -36,7 +36,8 @@ const getMyTeamCards = async (req, res, next) => {
 
     if (listMode === "false") {
       // Grouping the data by date
-      cards = cards.reduce((result, doc) => {
+      cards = cards.reduce((result, card) => {
+        const doc = card.toObject();
         const date = new Date(doc.created_at);
         const str = `${weekName(date.getDay())} ${date.getDate()} ${monthName(
           date.getMonth()
@@ -61,6 +62,19 @@ const getMyTeamCards = async (req, res, next) => {
         result[str].data.push(doc);
         return result;
       }, {});
+    } else {
+      cards = cards.map((card) => {
+        const doc = card.toObject();
+        doc.address = `${doc.area}, ${doc.tehsil}, ${doc.district}, ${doc.state}`;
+        delete doc.area;
+        delete doc.tehsil;
+        delete doc.district;
+        delete doc.state;
+        delete doc.janpad;
+        delete doc.gramPanchayat;
+        delete doc.gram;
+        return doc;
+      });
     }
     res.status(200).json({
       status: "success",
