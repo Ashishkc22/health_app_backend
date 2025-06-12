@@ -3,7 +3,7 @@ const {
   getCardCount: getCardCountProcessor,
 } = require("../../processors");
 const statusMapper = {
-  SUBMITTED: ["REPRINT", "SUBMITTED", "PRINTED"],
+  SUBMITTED: ["REPRINT", "SUBMITTED", "PRINTED", "PENDING"],
   OTHER: ["UNDELIVERED", "DELIVERED"],
   REPRINT: ["REPRINT"],
   UNDELIVERED: ["UNDELIVERED"],
