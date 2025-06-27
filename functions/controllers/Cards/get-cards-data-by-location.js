@@ -56,7 +56,7 @@ const getCardsDataByLocation = async (req, res, next) => {
     const paginationData = {};
     for (let i = 0; i < cards.length; i++) {
       const page = 1;
-      let limit = 20;
+      let limit = 100;
       let skip = (page - 1) * limit;
       if (pagination[cards[i]._id]) {
         limit = pagination[cards[i]._id].limit;

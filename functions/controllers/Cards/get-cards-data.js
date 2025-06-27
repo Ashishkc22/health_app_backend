@@ -11,11 +11,15 @@ const getCardsData = async (req, res, next) => {
       limit = 100,
       page = 0,
       status,
+      feUid,
+      duration,
+      till_duration,
     } = req.query;
 
     // Build the query object
     let query = {
       status: status || DBEnums.CARD_STATUS.SUBMITTED,
+      created_by_uid: feUid,
       userId: null,
       ...(district && {
         district: district,

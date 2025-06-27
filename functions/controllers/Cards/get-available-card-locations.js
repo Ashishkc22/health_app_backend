@@ -1,5 +1,12 @@
 const { DBEnums } = require("../../Enums");
 const { cardSchema } = require("../../models");
+const moment = require("moment");
+
+const durationMapper = {
+  TODAY: "day",
+  "THIS WEEK": "week",
+  "THIS MONTH": "month",
+};
 
 const getAvailableCardLocations = async (req, res, next) => {
   try {
@@ -12,12 +19,24 @@ const getAvailableCardLocations = async (req, res, next) => {
       ...(req.query.created_by && {
         created_by_uid: req.query.created_by,
       }),
-
-      ...(req.query.from || req.query.to
+      ...(req.query.duration &&
+      !req.query.till_duration &&
+      durationMapper[req.query.duration]
         ? {
             created_at: {
-              ...(req.query.from && { $gte: parseInt(req.query.from) }),
-              ...(req.query.to && { $lte: parseInt(req.query.to) }),
+              $gte: moment()
+                .startOf(durationMapper[req.query.duration])
+                .valueOf(),
+            },
+          }
+        : {}),
+      ...(req.query.duration && req.query.till_duration
+        ? {
+            created_at: {
+              ...(req.query.duration && { $gte: parseInt(req.query.duration) }),
+              ...(req.query.till_duration && {
+                $lte: parseInt(req.query.till_duration),
+              }),
             },
           }
         : {}),

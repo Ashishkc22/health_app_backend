@@ -299,9 +299,8 @@ const getCards = async (req, res, next) => {
       const temp = {};
       Object.keys(statusCount).forEach((k) =>
         k === "SUBMITTED"
-          ? (temp["SUBMITTED"] =
-              statusCount["REPRINT"] + statusCount["SUBMITTED"])
-          : statusCount[k]
+          ? (temp[k] = (statusCount?.REPRINT || 0) + statusCount["SUBMITTED"])
+          : (temp[k] = statusCount[k])
       );
       statusCount = temp;
       const documentCount = await cardSchema.countDocuments(qry);

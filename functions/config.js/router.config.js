@@ -64,8 +64,8 @@ module.exports = {
     permissions: ["EDIT_USERS"],
   },
   "/user/update-profile": {
-    name: "update-user-profile",
-    services: ["USER"],
+    name: "update-agent-profile",
+    services: ["AGENT"],
     permissions: ["UPDATE_PROFILE"],
   },
   "/user/update-my-location": {

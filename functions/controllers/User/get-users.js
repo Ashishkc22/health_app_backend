@@ -167,7 +167,9 @@ const getUsers = async (req, res, next) => {
         list = sortBy(list, "ratio").reverse();
       }
       const visible = await userSchema.countDocuments(qry);
-      const total = await userSchema.countDocuments();
+      const total = await userSchema.countDocuments({
+        role: { $ne: "USER" },
+      });
       return res.status(200).json({
         status: "success",
         page_number: req.query.page || "0",
