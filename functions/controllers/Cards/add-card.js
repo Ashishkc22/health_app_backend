@@ -115,6 +115,18 @@ const createCard = async (req, res) => {
         message: "Year of birth should not contain alphabets",
       });
     }
+
+    const existingCard = cardSchema
+      .find({
+        name: req.body.name,
+        father_husband_name: req.body.father_husband_name,
+      })
+      .lean();
+
+    if (!isEmpty(existingCard)) {
+      throw new CustomError(ErrorEnums.CARD_ALREADY_EXISTS);
+    }
+
     let uuid;
     while (true) {
       var x = (Math.floor(Math.random() * (9999999 - 1000001 + 1)) + 1000001)
