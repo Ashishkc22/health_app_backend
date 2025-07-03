@@ -80,7 +80,7 @@ const {
 // }
 
 // Helper function to prepare update fields based on user roles
-async function prepareUpdateFields(req, oldData, requestUser) {
+function prepareUpdateFields(req, oldData, requestUser) {
   const fields = {};
 
   // Define field update permissions based on user roles
@@ -265,6 +265,7 @@ const updateUserDetailsById = async (req, res, next) => {
     const updatedUser = await updateUserById({
       id: userId,
       updatedData: fields,
+      rolesAndPermissionsDetails: oldData?.services || [],
       ...updateOptions,
     });
 

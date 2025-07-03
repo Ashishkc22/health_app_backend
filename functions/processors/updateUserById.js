@@ -1,7 +1,10 @@
 const mongoose = require("mongoose");
 const userSch = require("../models/user");
+const rolesSchema = require("../models/roles");
 const cardSchema = require("../models/card");
 const hospitalSchema = require("../models/hospital");
+const { DefaultRolePermissions, DBEnums } = require("../Enums");
+const { isEmpty } = require("lodash");
 
 async function updateUserById({
   id,
@@ -9,6 +12,7 @@ async function updateUserById({
   updateCards = true,
   updateHospitals = true,
   useUserId = false,
+  rolesAndPermissionsDetails = [],
 } = {}) {
   const session = await mongoose.startSession();
 
@@ -25,13 +29,46 @@ async function updateUserById({
       session,
     });
 
+    // If role is updating then assign permission accordingly
+    if (updatedData.role) {
+      let permissionDetails = {};
+      if (updatedData.role === DBEnums.USER_ROLES.FE) {
+        permissionDetails = DefaultRolePermissions.FE;
+      } else if (updatedData.role === DBEnums.USER_ROLES.TL) {
+        permissionDetails = DefaultRolePermissions.TL;
+      } else if (updatedData.role === DBEnums.USER_ROLES.SUBADMIN) {
+        permissionDetails = DefaultRolePermissions.SUBADMIN;
+      }
+      if (!isEmpty(permissionDetails)) {
+        const [services = {}] = updatedUser?.services || [];
+        if (services.roleId) {
+          await rolesSchema.findOneAndUpdate(
+            {
+              _id: services.roleId,
+            },
+            {
+              $set: {
+                name: permissionDetails.name,
+                permissions: permissionDetails.permissions,
+              },
+            },
+            { session }
+          );
+        }
+      }
+    }
+
     // If name is present in updatedData, update related cards and hospitals
     if (updatedData.name) {
       // Update all cards created by this user
       if (updateCards) {
         await cardSchema.updateMany(
           { ...(useUserId ? { userId: id } : { created_by: id }) },
-          { ...(useUserId ? { name: updatedData.name } : {created_by_name: updatedData.name}) },
+          {
+            ...(useUserId
+              ? { name: updatedData.name }
+              : { created_by_name: updatedData.name }),
+          },
           { session }
         );
       }
