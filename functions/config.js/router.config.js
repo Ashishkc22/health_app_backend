@@ -42,6 +42,12 @@ module.exports = {
     services: [],
     permissions: [],
   },
+  "/auth/user-exists": {
+    name: "verify-user-exists",
+    isPublic: true,
+    services: [],
+    permissions: [],
+  },
   // Users routes
   "/user/get-my-details": {
     name: "get-user-details",
@@ -119,6 +125,7 @@ module.exports = {
     services: ["ADMIN"],
     permissions: ["GET_AGENT_DETAILS_BY_UID"],
   },
+
   // Address
   "/address/add-address": {
     name: "add-address",

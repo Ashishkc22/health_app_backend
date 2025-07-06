@@ -1,9 +1,9 @@
 const { userSchema } = require("../models");
 const { DBEnums } = require("../Enums");
 const { bcrptyPassword } = require("../utils/bcrypt-util");
-const  addUserRole  = require("./addUserRole");
-const getServiceByName  = require("./getServiceByName");
-const {DefaultRolePermissions,ErrorEnums} = require("../Enums");
+const addUserRole = require("./addUserRole");
+const getServiceByName = require("./getServiceByName");
+const { DefaultRolePermissions, ErrorEnums } = require("../Enums");
 const { isEmpty } = require("lodash");
 
 async function getUuid({ role = "" } = {}) {
@@ -32,7 +32,7 @@ async function addUser({ data = {}, role = "FE", session } = {}) {
 
     const hashedPassword = bcrptyPassword.hashPassword({ text: data.password });
 
-    const roleDetails = await addUserRole({ session,role });
+    const roleDetails = await addUserRole({ session, role });
     const service = await getServiceByName({
       name: DefaultRolePermissions.SERVICES.AGENT.name,
     });
@@ -55,6 +55,7 @@ async function addUser({ data = {}, role = "FE", session } = {}) {
       ...(data.agreementImage && { agreementImage: data.agreementImage }),
       ...(data.panCardImage && { panCardImage: data.panCardImage }),
       ...(data.signatureImage && { signatureImage: data.signatureImage }),
+      ...(data.janPanchayat && { janPanchayat: data.janPanchayat }),
       password: hashedPassword,
       email: data.email,
       image: data.image,
@@ -71,7 +72,7 @@ async function addUser({ data = {}, role = "FE", session } = {}) {
       status: data?.status || DBEnums.USER_STATUS.Unverified,
       lat: parseFloat(data.lat) || 0.0,
       lon: parseFloat(data.lon) || 0.0,
-      services:[
+      services: [
         {
           serviceId: service._id,
           roleId: roleDetails._id,

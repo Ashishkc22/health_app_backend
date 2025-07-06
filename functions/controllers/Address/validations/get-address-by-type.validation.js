@@ -6,4 +6,5 @@ module.exports = Joi.object({
   isTeshilId: Joi.boolean(),
   showHidden: Joi.boolean(),
   showCardCount: Joi.boolean(),
+  showGrams: Joi.boolean(),
 });

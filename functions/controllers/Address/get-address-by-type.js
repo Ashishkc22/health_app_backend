@@ -12,7 +12,7 @@ const getAddessByType = async (req, res, next) => {
     const data = await getAddressByType({
       query,
       type: req.query.type,
-      showGrams: !isUserAdmin,
+      showGrams: !isUserAdmin || req.query.showGrams,
       gramWithTeshilId: req.query?.isTeshilId || false,
       showCardCount: req.query.showCardCount || false,
     });
