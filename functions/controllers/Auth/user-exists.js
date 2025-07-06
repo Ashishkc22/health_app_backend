@@ -8,7 +8,7 @@ async function userExists(req, res, next) {
     const { email, tlId, uId } = req.query || {};
     const user = await getUser({
       ...(email && { email }),
-      ...(tlId && { tl_id: tlId }),
+      ...(tlId && { tlID: tlId }),
       ...(uId && { uid: uId }),
     });
     if (isEmpty(user)) {
