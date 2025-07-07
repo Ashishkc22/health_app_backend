@@ -1,5 +1,4 @@
 const Joi = require("joi");
-const currentYear = new Date().getFullYear();
 module.exports = Joi.object({
   id_proof: {
     type: Joi.string(),
@@ -7,9 +6,7 @@ module.exports = Joi.object({
     back: Joi.string(),
   },
   blood_group: Joi.string(),
-  dob: Joi.number()
-    .min(currentYear - 120) // Max 120 years old
-    .max(currentYear - 10), // Min 10 years old
+  dob: Joi.string().pattern(/^([0-2][0-9]|3[0-1])\/(0[1-9]|1[0-2])\/\d{4}$/),
   passportImage: Joi.string(),
   address: Joi.string(),
   state: Joi.string(),
