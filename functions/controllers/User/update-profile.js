@@ -6,7 +6,7 @@ const updateProfile = async (req, res, next) => {
     const id = req.userDetails.id;
     const { role } = req.userDetails;
     if (role !== DBEnums.USER_ROLES.ADMIN) {
-      delete req.body.status;
+      req.body.status = DBEnums.USER_STATUS.Unverified;
       delete req.body.role;
     }
     const user = await updateUserById({
