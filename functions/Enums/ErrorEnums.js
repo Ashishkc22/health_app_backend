@@ -221,4 +221,9 @@ module.exports = {
     httpCode: 444,
     description: "User is suspended.",
   },
+  TL_DETAIL_NOT_FOUND: {
+    name: "TL-NOT-FOUND",
+    httpCode: 445,
+    description: "TL details not found.",
+  },
 };
