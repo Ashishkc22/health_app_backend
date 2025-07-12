@@ -242,7 +242,7 @@ const updateUserDetailsById = async (req, res, next) => {
     const fields = prepareUpdateFields(req, oldData, requestUser);
 
     // Generate TL ID if needed
-    if (fields.role === "TL" && (!oldData.tl_id || oldData.tl_id === "")) {
+    if (fields.role === "TL" && !oldData?.tl_id?.includes("TL")) {
       fields.tl_id = await generateTLId();
       fields.team_leader_id = "";
     }

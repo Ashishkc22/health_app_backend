@@ -37,7 +37,7 @@ module.exports = async (req, res) => {
         name: req.body.name,
         legalName: req.body.legalName,
         phone: req.body.phone,
-        alternate_phone: req.body.alternatePhone,
+        emergency_contact: req.body.alternatePhone,
         password: req.body.password,
         email: req.body.email,
         image: req.body.image,
