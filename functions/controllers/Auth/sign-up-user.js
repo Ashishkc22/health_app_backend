@@ -54,7 +54,7 @@ const userSignUp = async (req, res, next) => {
         state: req.body.state,
         district: req.body.district,
         id_proof: req.body.id_proof,
-        emergency_contact: req.body.emergency_contact,
+        alternate_phone: req.body.alternate_phone,
         team_leader_id: req.body.team_leader_id,
         device_id: req.body.device_id,
         lat: req.body.lat || 0.0,

@@ -13,10 +13,10 @@ const validationSchema = Joi.object({
   state: Joi.string().min(2).max(100).optional().label("State"),
   district: Joi.string().min(2).max(100).optional().label("District"),
   id_proof: Joi.string().min(5).max(255).optional().label("ID Proof"),
-  emergency_contact: Joi.string()
+  alternate_phone: Joi.string()
     .pattern(/^[0-9]{10}$/)
     .optional()
-    .label("Emergency Contact"),
+    .label("alternate_phone"),
   team_leader_id: Joi.string().optional().label("Team Leader ID"),
   device_id: Joi.string().optional().label("Device ID"),
   lat: Joi.number().min(-90).max(90).optional().default(0.0).label("Latitude"),
