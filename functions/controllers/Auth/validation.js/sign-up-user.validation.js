@@ -15,7 +15,7 @@ const validationSchema = Joi.object({
   id_proof: Joi.string().min(5).max(255).optional().label("ID Proof"),
   alternate_phone: Joi.string()
     .pattern(/^[0-9]{10}$/)
-    .optional()
+    .required()
     .label("alternate_phone"),
   team_leader_id: Joi.string().optional().label("Team Leader ID"),
   device_id: Joi.string().optional().label("Device ID"),
