@@ -11,6 +11,7 @@ const {
 const { DBEnums, ErrorEnums } = require("../../Enums");
 const mongoose = require("mongoose");
 const { CustomError } = require("../../utils/custom-errors");
+const { isEmpty } = require("lodash");
 
 async function getLocationDetails({
   state,
@@ -116,7 +117,7 @@ const createCard = async (req, res) => {
       });
     }
 
-    const existingCard = cardSchema
+    const existingCard = await cardSchema
       .find({
         name: req.body.name,
         father_husband_name: req.body.father_husband_name,
