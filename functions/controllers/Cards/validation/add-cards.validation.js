@@ -4,7 +4,7 @@ const Single = {
   image: joi.string().uri().optional().messages({
     "string.uri": "Image must be a valid URL.",
   }),
-
+  uncropped_adhar_image: joi.string(),
   birth_year: joi
     .number()
     .integer()

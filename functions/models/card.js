@@ -17,6 +17,9 @@ const cardSchema = new mongoose.Schema({
   id_proof: {
     type: Object,
   },
+  uncropped_adhar_image: {
+    type: String,
+  },
   pincode: {
     type: String,
   },

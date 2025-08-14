@@ -11,6 +11,7 @@ module.exports = Joi.object({
   address: Joi.string(),
   state: Joi.string(),
   district: Joi.string(),
+  image: Joi.string(),
   emergency_contact: Joi.string().pattern(/^[6-9]\d{9}$/),
   blood_group: Joi.string(),
 });

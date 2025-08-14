@@ -204,6 +204,9 @@ const createCard = async (req, res) => {
       name: req.body.name,
       gender: req.body.gender,
       id_proof: req.body.id_proof,
+      ...(req.body?.uncropped_adhar_image && {
+        uncropped_adhar_image: req.body.uncropped_adhar_image,
+      }),
       state: state,
       district: district,
       tehsil: tehsil,
